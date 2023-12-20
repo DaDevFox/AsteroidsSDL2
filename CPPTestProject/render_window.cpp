@@ -1,7 +1,7 @@
 #include "RenderWindow.h"
 
 RenderWindow::RenderWindow(const char *title, int width, int height) {
-	window = SDL_CreateWindow(title, 0, 0, width, height, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (window == NULL)
 	{
@@ -43,12 +43,12 @@ void RenderWindow::render_point(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 	SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void RenderWindow::render_draw_line(int x1, int y1, int x2, int y2, SDL_Color color) {
+void RenderWindow::render_line(int x1, int y1, int x2, int y2, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void RenderWindow::render_draw_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+void RenderWindow::render_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 	SDL_SetRenderDrawColor(renderer, r, g, b, a);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }

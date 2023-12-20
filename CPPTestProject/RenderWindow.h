@@ -3,7 +3,8 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-class RenderWindow {
+class RenderWindow 
+{
 
 public:
 	RenderWindow(const char* title, int width, int height);
@@ -32,14 +33,14 @@ public:
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="color"></param>
-	void render_draw_line(int x1, int y1, int x2, int y2, SDL_Color color);
+	void render_line(int x1, int y1, int x2, int y2, SDL_Color color);
 	/// <summary>
 	/// Changes the current RenderDrawColor and draws a line
 	/// </summary>
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="color"></param>
-	void render_draw_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+	void render_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 
 	void render(int x, int y, SDL_Texture* texture);

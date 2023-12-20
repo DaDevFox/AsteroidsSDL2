@@ -1,3 +1,10 @@
+#pragma once
 #include <SDL.h>
+#include "Entity.h"
 
-int input_update(SDL_Event *event);
+extern RectEntity player;
+
+void player_init();
+void player_update(SDL_Event *event);
+void player_cleanup();
+
