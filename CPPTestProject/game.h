@@ -1,5 +1,4 @@
 #include <SDL.h>
-#include "input.h"
 
 bool game_running;
 

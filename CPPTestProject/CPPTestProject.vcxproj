@@ -138,14 +138,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="input.cpp" />
+    <ClCompile Include="player.cpp" />
+    <ClCompile Include="render_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
-    <ClInclude Include="input.h" />
+    <ClInclude Include="player.h" />
+    <ClInclude Include="RenderWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
