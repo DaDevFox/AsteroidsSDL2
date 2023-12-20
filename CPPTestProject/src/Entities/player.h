@@ -2,9 +2,11 @@
 #include <SDL.h>
 #include "Entity.h"
 
+
 extern RectEntity player;
 
 void player_init();
-void player_update(SDL_Event *event);
+void player_input_update(SDL_Event *running_event);
+void player_render_update(RenderWindow* window);
 void player_cleanup();
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderWindow.h"
+#include "../RenderWindow.h"
 
 /// <summary>
 /// ABSTRACT DO NOT USE; see RectEntity instead
@@ -21,6 +21,10 @@ public:
 	int y;
 	int w;
 	int h;
+
+	double angle;
+	int rel_pivot_x;
+	int rel_pivot_y;
 
 	SDL_Texture* texture;
 

@@ -25,6 +25,18 @@ void RenderWindow::init() {
 
 }
 
+void RenderWindow::clear() {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	if (SDL_RenderClear(renderer) < 0)
+		SDL_Log("Error on clear RenderWindow: %s\n", SDL_GetError());
+}
+
+void RenderWindow::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	if (SDL_RenderClear(renderer) < 0)
+		SDL_Log("Error on clear RenderWindow: %s\n", SDL_GetError());
+}
+
 void RenderWindow::cleanup() {
 	SDL_DestroyWindow(window);
 }
@@ -110,7 +122,7 @@ void RenderWindow::render(const SDL_Rect* source, const SDL_Rect* destination, S
 }
 
 
-void RenderWindow::render_center(int x, int y, int w, int h, SDL_Texture* texture) {
+void RenderWindow::render_centered(int x, int y, int w, int h, SDL_Texture* texture) {
 	SDL_Rect destination{
 		x - w/2,
 		y - h/2,
@@ -121,28 +133,63 @@ void RenderWindow::render_center(int x, int y, int w, int h, SDL_Texture* textur
 	SDL_RenderCopy(renderer, texture, NULL, &destination);
 }
 
-void RenderWindow::render_center(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, SDL_Texture* texture) {
+void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Texture* texture) {
 	SDL_Rect source{
-		src_x - src_w/2,
-		src_y - src_h/2,
+		src_x,
+		src_y,
 		src_w,
 		src_h
 	};
 
 	// adjusts source.w and source.h to actual values?
 	SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
-	source.x = src_x - src_w / 2;
-	source.y = src_y - src_h / 2;
-
+	
 	SDL_Rect destination{
-		dst_x - dst_w/2,
-		dst_y - dst_h/2,
+		dst_x,
+		dst_y,
 		dst_w,
 		dst_h
 	};
 
-	SDL_RenderCopy(renderer, texture, &source, &destination);
+	SDL_Point center = {
+		dst_w/2,
+		dst_h/2
+	};
+
+	SDL_RenderCopyEx(renderer, texture, &source, &destination, angle, &center, SDL_FLIP_NONE);
 }
+
+void RenderWindow::render_rotate(int x, int y, int w, int h, double angle, SDL_Texture* texture) {
+	SDL_Rect destination{
+		x,
+		y,
+		w,
+		h
+	};
+
+
+	if (SDL_RenderCopyEx(renderer, texture, NULL, &destination, angle, NULL, SDL_FLIP_NONE) < 0)
+		SDL_Log("Error rendering texture with rotation: %s\n", SDL_GetError());
+}
+
+
+
+//void RenderWindow::render_rotate(int x, int y, int w, int h, double angle, SDL_Texture* texture) {
+//	SDL_Rect destination{
+//		x,
+//		y,
+//		w,
+//		h
+//	};
+//
+//	SDL_Point center = {
+//		x + w / 2,
+//		y + h / 2
+//	};
+//
+//	SDL_RenderCopyEx(renderer, texture, NULL, &destination, angle, &center, SDL_FLIP_NONE);
+//}
+
 
 #pragma endregion
 
@@ -170,7 +217,7 @@ void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SD
 	SDL_DestroyTexture(message);
 }
 
-void RenderWindow::render_center(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
+void RenderWindow::render_centered(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);

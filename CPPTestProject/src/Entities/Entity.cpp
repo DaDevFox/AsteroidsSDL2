@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "main.h"
+#include "../main.h"
 #include <string.h>;
 
 RectEntity::RectEntity(const char* texture_file_path, int w, int h) {
@@ -25,5 +25,7 @@ bool RectEntity::in_bounds(int x, int y) {
 }
 
 void RectEntity::render(RenderWindow *window) {
-	window->render_center(x, y, w, h, texture);
+
+	//SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+	window->render_rotate(0, 0, 0, 0, x - w/2, y - h/2, w, h, angle, texture);
 }

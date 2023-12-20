@@ -24,6 +24,7 @@
     <ProjectGuid>{557b64d1-c811-48da-8d14-374970461a38}</ProjectGuid>
     <RootNamespace>CPPTestProject</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>AsteroidsSDL</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -137,19 +138,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="render_window.cpp" />
+    <ClCompile Include="src\Entities\Entity.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Entities\player.cpp" />
+    <ClCompile Include="src\render_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="player.h" />
-    <ClInclude Include="RenderWindow.h" />
+    <ClInclude Include="src\Entities\Entity.h" />
+    <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\Entities\player.h" />
+    <ClInclude Include="src\RenderWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -2,7 +2,7 @@
 #include <SDL_image.h>
 
 #include "main.h"
-#include "player.h"
+#include "Entities/player.h"
 #include "RenderWindow.h"
 	
 #undef main // needed for cpp compilation
@@ -10,6 +10,8 @@
 const char* window_title = "Asteroids";
 RenderWindow window(window_title, WIDTH, HEIGHT);
 bool game_running;
+
+SDL_Event running_event;
 
 /// <summary>
 /// Inits SDL2 and required systems. returns false if failure occurs
@@ -39,24 +41,22 @@ bool game_init() {
 	return true;
 }
 
-void draw_update() {
-	window.draw();
-}
 
-void game_loop(SDL_Event *running_event) 
+void game_loop() 
 {
-	while (SDL_PollEvent(running_event))
+	while (SDL_PollEvent(&running_event))
 	{
-		if (running_event->type == SDL_QUIT)
+		if (running_event.type == SDL_QUIT)
 			game_running = false;
+		
+		player_input_update(&running_event);
 	}
+	window.clear();
 
-
-	player_update(running_event);
-	draw_update();
-
+	player_render_update(&window);
 	window.render_line(0, 0, 400, 400, 255, 255, 255, 255);
 
+	window.draw();
 	SDL_Delay(10);
 }
 
@@ -71,12 +71,12 @@ int main() {
 	if (!game_init())
 		exit(1);
 
-	SDL_Event running_event;
+	
 
 	window.init();
 	while (game_running) 
 	{
-		game_loop(&running_event);
+		game_loop();
 	}
 
 	game_cleanup();
