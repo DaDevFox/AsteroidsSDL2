@@ -18,16 +18,19 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\player.cpp">
+    <ClCompile Include="src\entities\asteroid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render_window.cpp">
+    <ClCompile Include="src\window\render_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Entity.cpp">
+    <ClCompile Include="src\entities\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -37,13 +40,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Entities\player.h">
+    <ClInclude Include="src\entities\asteroid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderWindow.h">
+    <ClInclude Include="src\window\RenderWindow.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\Entity.h">
+    <ClInclude Include="src\entities\Entity.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\main.h">
@@ -51,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="src\settings.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window\camera.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

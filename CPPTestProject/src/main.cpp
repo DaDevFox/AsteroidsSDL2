@@ -4,9 +4,15 @@
 #include <string>
 #include <any>
 #include "main.h"
-#include "Entities/player.h"
+#include "entities/asteroid.h"
 
 #undef main // needed for cpp compilation
+
+int WINDOW_height;
+int WINDOW_width;
+
+int GAME_height = 4096;
+int GAME_width = 4096;
 
 const char* window_title = "Asteroids";
 RenderWindow window(window_title, WIDTH, HEIGHT);
@@ -46,6 +52,9 @@ bool game_init() {
 		return false;
 	}
 
+	window.init();
+	window.camera.teleport(GAME_width / 2.0F, GAME_height / 2.0F);
+
 	encode_sans_medium = TTF_OpenFont("./EncodeSans-Medium.ttf", 18);
 	if (encode_sans_medium == NULL)
 	{
@@ -53,17 +62,30 @@ bool game_init() {
 		return false;
 	}
 
-	player_init();
+	asteroids_init();
+
 
 	return true;
 }
 
-void input_update() {
-	player_input_update(&running_event);
+void window_update() 
+{
+	switch (running_event.window.event) {
+		case SDL_WINDOWEVENT_RESIZED:
+			window.get_info(&WINDOW_width, &WINDOW_height);
+			break;
+	}
 }
 
-void render_update() {
-	player_render_update(&window);
+void input_update() 
+{
+	asteroids_input_update(&running_event);
+	window.camera.input_update(&running_event);
+}
+
+void render_update() 
+{
+	asteroids_render_update(&window);
 
 	SDL_Color color = 
 	{
@@ -75,20 +97,28 @@ void render_update() {
 
 
 	char output[7];
-	if (abs(player.velocity_x) > 0 || abs(player.velocity_y) > 0)
-		strcpy_s(output, 7, "moving");
-	else
-		strcpy_s(output, 7,  "   ");
+	bool flag = false;
+	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+		if (abs(asteroid->desired_velocity_x) > 0 || abs(asteroid->desired_velocity_x) > 0)
+			sprintf_s(output, "%.3f", asteroid->velocity_x);
+
+	//if(flag)
+	//	strcpy_s(output, 7, "moving");
+	//else
+	//	strcpy_s(output, 7, "   ");
 
 
 	window.render_centered(WIDTH / 2.0F, 50.0F, output, encode_sans_medium, color);
 }
 
-void update() {
+void update() 
+{
 	current_tick = SDL_GetTicks();
 	delta_time = (float)((current_tick - last_tick));
 
-	player_update();
+	window.camera.update(delta_time);
+	asteroids_update(delta_time);
+	
 
 	last_tick = current_tick;
 }
@@ -101,6 +131,9 @@ void game_loop()
 		if (running_event.type == SDL_QUIT)
 			game_running = false;
 		
+		if (running_event.type == SDL_WINDOWEVENT)
+			window_update();
+
 		input_update();
 	}
 
@@ -113,7 +146,7 @@ void game_loop()
 
 void game_cleanup() {
 
-	player_cleanup();
+	asteroids_cleanup();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -124,7 +157,6 @@ int main() {
 
 	
 
-	window.init();
 	while (game_running) 
 	{
 		game_loop();

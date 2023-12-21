@@ -1,5 +1,5 @@
 #pragma once
-#include "../RenderWindow.h"
+#include "../window/RenderWindow.h"
 
 /// <summary>
 /// ABSTRACT DO NOT USE; see RectEntity instead
@@ -15,14 +15,30 @@ public:
 	float desired_velocity_x;
 	float desired_velocity_y;
 
-	float linear_wind_speed = 0.0005F;
 
 	int screen_x;
 	int screen_y;
 	
-	float drag = 0.01F;
+	float movement_windup_speed;
+	float drag;
+	float mass;
 
-	float mass = 1.0F;
+	Entity() :
+		x(0.0F),
+		y(0.0F),
+		velocity_x(0.0F),
+		velocity_y(0.0F),
+		desired_velocity_x(0.0F),
+		desired_velocity_y(0.0F),
+		screen_x(0),
+		screen_y(0),
+
+		movement_windup_speed(0.005f),
+		drag(0.01F),
+		mass(1.0F)
+	{
+
+	}
 
 	void init();
 	void update();
@@ -30,6 +46,7 @@ public:
 	void cleanup();
 
 	bool in_bounds(int screen_x, int screen_y);
+	bool in_bounds(Entity other);
 };
 
 class RectEntity : public Entity {
@@ -43,7 +60,7 @@ public:
 
 	SDL_Texture* texture;
 
-	void init();
+	void init(const char* texture_file_path, int w, int h);
 	bool in_bounds(int screen_x, int screen_y);
 	void render(RenderWindow* window);
 	void cleanup();
