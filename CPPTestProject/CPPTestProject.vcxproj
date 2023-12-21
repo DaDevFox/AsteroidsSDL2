@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Entities\player.cpp" />
@@ -147,6 +148,7 @@
     <Image Include="res\circle.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\Entities\Entity.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Entities\player.h" />

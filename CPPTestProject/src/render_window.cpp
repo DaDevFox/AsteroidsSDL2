@@ -45,14 +45,14 @@ void RenderWindow::cleanup() {
 
 #pragma region Basic Geometry
 
-void RenderWindow::render_point(int x, int y, SDL_Color color) {
+void RenderWindow::render_point(int screen_x, int screen_y, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderDrawPoint(renderer, x, y);
+	SDL_RenderDrawPoint(renderer, screen_x, screen_y);
 }
 
-void RenderWindow::render_point(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+void RenderWindow::render_point(int screen_x, int screen_y, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 	SDL_SetRenderDrawColor(renderer, r, g, b, a);
-	SDL_RenderDrawPoint(renderer, x, y);
+	SDL_RenderDrawPoint(renderer, screen_x, screen_y);
 }
 
 void RenderWindow::render_line(int x1, int y1, int x2, int y2, SDL_Color color) {
@@ -159,10 +159,10 @@ void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int
 	SDL_RenderCopyEx(renderer, texture, &source, &destination, angle, &center, SDL_FLIP_NONE);
 }
 
-void RenderWindow::render_rotate(int x, int y, int w, int h, double angle, SDL_Texture* texture) {
+void RenderWindow::render_rotate(int screen_x, int screen_y, int w, int h, double angle, SDL_Texture* texture) {
 	SDL_Rect destination{
-		x,
-		y,
+		screen_x,
+		screen_y,
 		w,
 		h
 	};
@@ -195,7 +195,7 @@ void RenderWindow::render_rotate(int x, int y, int w, int h, double angle, SDL_T
 
 #pragma region Text
 
-void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SDL_Color color) 
+void RenderWindow::render(float screen_x, float screen_y, const char* text, TTF_Font* font, SDL_Color color) 
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
@@ -207,8 +207,8 @@ void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SD
 	src.h = surfaceMessage->h;
 
 	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
+	dst.x = screen_x;
+	dst.y = screen_y;
 	dst.w = src.w;
 	dst.h = src.h;
 
@@ -217,10 +217,19 @@ void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SD
 	SDL_DestroyTexture(message);
 }
 
-void RenderWindow::render_centered(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
+void RenderWindow::render_centered(float screen_x, float screen_y, const char* text, TTF_Font* font, SDL_Color color)
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
+	if (surfaceMessage == NULL) {
+		SDL_Log("Error rendering text; aborting: %s\n", SDL_GetError());
+		return;
+	}
+
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+	if (message == NULL) {
+		SDL_Log("Error rendering text; aborting: %s\n", SDL_GetError());
+		return;
+	}
 
 	SDL_Rect src;
 	src.x = 0;
@@ -232,8 +241,8 @@ void RenderWindow::render_centered(float x, float y, const char* text, TTF_Font*
 
 	// FLAG: these hardcoded constants!!!
 	
-	dst.x = 640 / 2 - src.w / 2 + x;
-	dst.y = 480 / 2 - src.h / 2 + y;
+	dst.x = 640 / 2 - src.w / 2 + screen_x;
+	dst.y = 480 / 2 - src.h / 2 + screen_y;
 	dst.w = src.w;
 	dst.h = src.h;
 

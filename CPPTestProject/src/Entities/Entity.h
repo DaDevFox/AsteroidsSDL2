@@ -6,19 +6,34 @@
 /// </summary>
 class Entity {
 public: 
-	int x;
-	int y;
+	float x;
+	float y;
 	
+	float velocity_x;
+	float velocity_y;
+
+	float desired_velocity_x;
+	float desired_velocity_y;
+
+	float linear_wind_speed = 0.0005F;
+
+	int screen_x;
+	int screen_y;
+	
+	float drag = 0.01F;
+
+	float mass = 1.0F;
+
 	void init();
-	bool in_bounds(int x, int y);
+	void update();
 	void render(RenderWindow *window);
 	void cleanup();
+
+	bool in_bounds(int screen_x, int screen_y);
 };
 
-class RectEntity : Entity {
+class RectEntity : public Entity {
 public:
-	int x;
-	int y;
 	int w;
 	int h;
 
@@ -29,7 +44,7 @@ public:
 	SDL_Texture* texture;
 
 	void init();
-	bool in_bounds(int x, int y);
+	bool in_bounds(int screen_x, int screen_y);
 	void render(RenderWindow* window);
 	void cleanup();
 
