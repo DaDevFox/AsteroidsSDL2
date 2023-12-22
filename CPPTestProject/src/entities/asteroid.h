@@ -3,9 +3,11 @@
 #include "Entity.h"
 
 
+extern int max_asteroid_radius;
+
 extern const int asteroids_count;
-extern RectEntity* asteroids;
-extern RectEntity player;
+extern Asteroid* asteroids;
+extern Asteroid player;
 
 void asteroids_init();
 void asteroids_input_update(SDL_Event *running_event);

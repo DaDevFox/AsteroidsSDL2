@@ -14,3 +14,5 @@ extern int WINDOW_height;
 extern RenderWindow window;
 extern float delta_time;
 extern bool game_running;
+
+extern TTF_Font* encode_sans_medium;

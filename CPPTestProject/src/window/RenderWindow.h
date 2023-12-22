@@ -83,10 +83,12 @@ public:
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Texture* texture);
 
 	void render(float x, float y, const char* text, TTF_Font* font, SDL_Color color);
-	void render_centered(float screen_x, float screen_y, const char* text, TTF_Font* font, SDL_Color color);
+	void render_centered_screen(float x, float y, const char* text, TTF_Font* font, SDL_Color color);
+	void render_centered_world(float x, float y, const char* text, TTF_Font* font, SDL_Color color);
 
 	void draw();
 
+	SDL_Texture* create_texture_from_surface(SDL_Surface* surface);
 	SDL_Texture* load_texture(const char* filename);
 
 protected:

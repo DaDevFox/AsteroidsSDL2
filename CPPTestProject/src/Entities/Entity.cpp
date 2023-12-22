@@ -1,31 +1,118 @@
 #include "Entity.h"
 #include "../main.h"
-#include <string.h>;
+#include <string.h>
 #include <unordered_map>
-#include <vector>
+#include <set>
+#include "asteroid.h"
+#include <set>
+#include <queue>
 
+const int tile_size = max_asteroid_radius;
+const int chunk_height = GAME_height / tile_size;
+const int chunk_width = GAME_width / tile_size;
 
-//int hash_entity(Entity entity) {
-//	
-//}
+std::unordered_map<int, std::set<Entity*>*> collision_check_grid;
 
-void Entity::update() 
+int hash_entity(Entity* entity) {
+	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
+}
+
+void Entity::move()
 {
 	x += velocity_x * delta_time;
 	y += velocity_y * delta_time;
 
 	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
 	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
-	
+
 	screen_x = (int)x;
 	screen_y = (int)y;
 }
 
-RectEntity::RectEntity(const char* texture_file_path, int w, int h) {
+void Entity::update_collision_chunk()
+{
+	int curr_chunk = hash_entity(this);
+	if (collision_chunk != curr_chunk)
+	{
+		if (collision_check_grid[collision_chunk] != NULL)
+			(*collision_check_grid[collision_chunk]).erase(this);
+		if (collision_check_grid[curr_chunk] == NULL)
+			collision_check_grid[curr_chunk] = new std::set<Entity*>();
+		collision_check_grid[curr_chunk]->insert(this);
+
+		collision_chunk = curr_chunk;
+	}
+}
+
+bool collision_between(Entity* a, Entity* b) {
+	if (!(a->point_count || b->point_count))
+		return false;
+
+	/*set<SDL_Point> used;
+	for (SDL_Point* i = a->outline; i < a->outline + a->point_count; i++)
+		used.insert({ a->screen_x + i->x, a->screen_y + i->y });
+
+	for (SDL_Point* i = b->outline; i < b->outline + b->point_count; i++)
+		if (!used.insert({ b->screen_x + i->x, b->screen_y + i->y }).second)
+			return true;*/
+
+	return false;
+}
+
+void Entity::check_collisions() 
+{
+	std::set<Entity*> to_check;
+	
+	int floor_y = (int)y / tile_size - 1;
+	int ceil_y = (int)y / tile_size + 1;
+	int left_x = (int)x / tile_size - 1;
+	int right_x = (int)x / tile_size + 1;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++) 
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
+		{
+			int chunk = ((int)curr_x + (GAME_width) * ((int)curr_y / tile_size)) / tile_size;
+			if (collision_check_grid[chunk] == NULL)
+				continue;
+			std::set<Entity*> curr_set = *(collision_check_grid[chunk]);
+			to_check.insert(curr_set.begin(), curr_set.end());
+		}
+	}
+
+	for (Entity* other : to_check) 
+	{
+		if (collision_between(this, other))
+		{
+			velocity_x = velocity_x - (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
+			velocity_y = velocity_y - (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
+
+			x -= velocity_x * delta_time;
+			y -= velocity_y * delta_time;
+
+			screen_x = (int)x;
+			screen_y = (int)y;
+
+			return;
+		}
+	}
+}
+
+
+void Entity::update()
+{
+	move();
+	update_collision_chunk();
+	check_collisions();
+}
+
+
+
+
+Asteroid::Asteroid(const char* texture_file_path, int w, int h) {
 	init(texture_file_path, w, h);
 }
 
-void RectEntity::init(const char* texture_file_path, int w, int h) {
+void Asteroid::init(const char* texture_file_path, int w, int h) {
 	x = 0.0F;
 	y = 0.0F;
 	velocity_x = 0.0F;
@@ -42,23 +129,76 @@ void RectEntity::init(const char* texture_file_path, int w, int h) {
 	screen_x = 0;
 	screen_y = 0;
 
-	texture = window.load_texture(texture_file_path);
+	//texture = window.load_texture(texture_file_path);
 	this->w = w;
 	this->h = h;
+
+	generate();
 }
 
-void RectEntity::cleanup() {
+
+int pixel_to_index(int x, int y, int w) {
+	return x + y * w;
+}
+
+std::pair<int, int> index_to_pixel(int idx, int w) {
+	return { idx % w, idx / w };
+}
+
+void Asteroid::generate() {
+	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	SDL_LockSurface(temp_surface);
+
+	std::queue<int> open;
+	std::set<int> visited;
+	open.push(pixel_to_index(w / 2, h / 2, w));
+
+	Uint32* buffer = (Uint32*)temp_surface->pixels;
+
+	while (!open.empty())
+	{
+		*(buffer + open.front()) = 0xFFFFFFFF;
+		std::pair<int, int> curr = index_to_pixel(open.front(), w);
+
+		open.pop();
+
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first + 1, curr.second, w)) == visited.end())
+			open.push(pixel_to_index(curr.first + 1, curr.second, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first - 1, curr.second, w)) == visited.end())
+			open.push(pixel_to_index(curr.first - 1, curr.second, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second + 1, w)) == visited.end())
+			open.push(pixel_to_index(curr.first, curr.second + 1, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second - 1, w)) == visited.end())
+			open.push(pixel_to_index(curr.first, curr.second - 1, w));
+	}
+
+
+	SDL_UnlockSurface(temp_surface);
+
+	texture = window.create_texture_from_surface(temp_surface);
+
+	SDL_FreeSurface(temp_surface);
+}
+
+void Asteroid::cleanup() {
 	SDL_DestroyTexture(texture);
 }
 
-bool RectEntity::in_bounds(int screen_x, int screen_y) {
+bool Asteroid::in_bounds(int screen_x, int screen_y) {
 	return
 		screen_x >= (this->screen_x - w / 2) && screen_x <= (this->screen_x + w / 2) &&
 		screen_y >= (this->screen_y - h / 2) && screen_y <= (this->screen_y + h / 2);
 }
 
-void RectEntity::render(RenderWindow *window) 
+void Asteroid::render(RenderWindow *window) 
 {
-	//SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+	//char str[8];/*
+	//sprintf_s(str, "%i", hash_entity(this));
+	//SDL_Color color = 
+	//{
+	//	255, 255, 255, 255 
+	//};
+	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);*/
+
 	window->render_rotate(0, 0, 0, 0, screen_x - w/2, screen_y - h/2, w, h, angle, texture);
 }

@@ -1,13 +1,16 @@
 #pragma once
-#include "../window/RenderWindow.h"
+#include "../main.h"
 
 /// <summary>
-/// ABSTRACT DO NOT USE; see RectEntity instead
+/// WIP
 /// </summary>
-class Entity {
+class Entity 
+{
 public: 
 	float x;
 	float y;
+	int w;
+	int h;
 	
 	float velocity_x;
 	float velocity_y;
@@ -23,15 +26,27 @@ public:
 	float drag;
 	float mass;
 
+	SDL_Texture* texture;
+
+	int collision_chunk;
+
+	float max_internal_chord = 300.0F;
+	int point_count;
+	SDL_Point outline[SETTING_MAX_POLYGON_VERTICES];
+
 	Entity() :
 		x(0.0F),
 		y(0.0F),
+		w(128),
+		h(128),
+
 		velocity_x(0.0F),
 		velocity_y(0.0F),
 		desired_velocity_x(0.0F),
 		desired_velocity_y(0.0F),
 		screen_x(0),
 		screen_y(0),
+		collision_chunk(0),
 
 		movement_windup_speed(0.005f),
 		drag(0.01F),
@@ -47,23 +62,24 @@ public:
 
 	bool in_bounds(int screen_x, int screen_y);
 	bool in_bounds(Entity other);
+private:
+	void move();
+	void update_collision_chunk();
+	void check_collisions();
+
 };
 
-class RectEntity : public Entity {
+class Asteroid : public Entity {
 public:
-	int w;
-	int h;
-
 	double angle;
 	int rel_pivot_x;
 	int rel_pivot_y;
 
-	SDL_Texture* texture;
-
 	void init(const char* texture_file_path, int w, int h);
+	void generate();
 	bool in_bounds(int screen_x, int screen_y);
 	void render(RenderWindow* window);
 	void cleanup();
 
-	RectEntity(const char* texture_file_path, int w, int h);
+	Asteroid(const char* texture_file_path, int w, int h);
 };

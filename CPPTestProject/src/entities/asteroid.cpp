@@ -3,12 +3,14 @@
 #include <math.h>
 #include <stdlib.h>
 
+int max_asteroid_radius = 100;
+
 int asteroid_variance = 250;
 
 const char* asteroid_texture_path = "./circle.png";
-RectEntity player(asteroid_texture_path, 32, 32);
+Asteroid player(asteroid_texture_path, 32, 32);
 
-RectEntity *asteroids;
+Asteroid *asteroids;
 const int asteroids_count = 20;
 
 float speed = 1.0F;
@@ -21,8 +23,8 @@ int mouse_diff_threshold_squared = 125;
 
 void asteroids_init() 
 {
-	asteroids = (RectEntity*)calloc(asteroids_count, sizeof(RectEntity));
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	asteroids = (Asteroid*)calloc(asteroids_count, sizeof(Asteroid));
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
 		asteroid->init(asteroid_texture_path, 32, 32);
 		asteroid->x = GAME_width / 2.0F + (float)(rand() % asteroid_variance);
@@ -32,7 +34,7 @@ void asteroids_init()
 
 void asteroids_input_update(SDL_Event *running_event) 
 {
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
 		int x_diff_to_mouse = window.camera.screen_to_world_x(running_event->motion.x) - asteroid->screen_x;
 		int y_diff_to_mouse = window.camera.screen_to_world_y(running_event->motion.y) - asteroid->screen_y;
@@ -114,7 +116,7 @@ void asteroids_input_update(SDL_Event *running_event)
 
 void asteroids_render_update(RenderWindow *window)
 {
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
 		asteroid->render(window);
 	}
@@ -122,7 +124,7 @@ void asteroids_render_update(RenderWindow *window)
 
 void asteroids_update(float delta_time) 
 {
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
 		asteroid->update();
 	}
@@ -130,7 +132,7 @@ void asteroids_update(float delta_time)
 
 void asteroids_cleanup() 
 {
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
 		asteroid->cleanup();
 	}

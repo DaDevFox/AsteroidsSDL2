@@ -358,7 +358,7 @@ void RenderWindow::render_rotate(int screen_x, int screen_y, int w, int h, doubl
 
 #pragma region Text
 
-void RenderWindow::render(float screen_x, float screen_y, const char* text, TTF_Font* font, SDL_Color color) 
+void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SDL_Color color) 
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
@@ -369,18 +369,20 @@ void RenderWindow::render(float screen_x, float screen_y, const char* text, TTF_
 	src.w = surfaceMessage->w;
 	src.h = surfaceMessage->h;
 
+
 	SDL_Rect dst;
-	dst.x = screen_x;
-	dst.y = screen_y;
 	dst.w = src.w;
 	dst.h = src.h;
 
-	SDL_RenderCopy(renderer, message, &src, &dst);
-	SDL_FreeSurface(surfaceMessage);
-	SDL_DestroyTexture(message);
+	if (world_to_screen(x, y, &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
+	{
+		SDL_RenderCopy(renderer, message, &src, &dst);
+		SDL_FreeSurface(surfaceMessage);
+		SDL_DestroyTexture(message);
+	}
 }
 
-void RenderWindow::render_centered(float screen_x, float screen_y, const char* text, TTF_Font* font, SDL_Color color)
+void RenderWindow::render_centered_screen(float x, float y, const char* text, TTF_Font* font, SDL_Color color) 
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	if (surfaceMessage == NULL) {
@@ -401,17 +403,49 @@ void RenderWindow::render_centered(float screen_x, float screen_y, const char* t
 	src.h = surfaceMessage->h;
 
 	SDL_Rect dst;
-
-	// FLAG: these hardcoded constants!!!
-	
-	dst.x = 640 / 2 - src.w / 2 + screen_x;
-	dst.y = 480 / 2 - src.h / 2 + screen_y;
+	dst.x = x - src.w / 2;
+	dst.y = y - src.h / 2;
 	dst.w = src.w;
 	dst.h = src.h;
 
 	SDL_RenderCopy(renderer, message, &src, &dst);
 	SDL_FreeSurface(surfaceMessage);
 	SDL_DestroyTexture(message);
+	
+}
+
+void RenderWindow::render_centered_world(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
+{
+	SDL_Rect dst;
+	// NOTE: 1-byte Latin1 text (incl. ASCII) only
+	TTF_SizeText(font, text, &(dst.w), &(dst.h));
+
+	if (world_to_screen((int)x - dst.w / 2, (int)y - dst.h / 2, &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
+	{
+		SDL_Rect src;
+		src.x = 0;
+		src.y = 0;
+		src.w = dst.w;
+		src.h = dst.h;
+
+		SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
+		if (surfaceMessage == NULL) {
+			SDL_Log("Error rendering text; aborting: %s\n", SDL_GetError());
+			return;
+		}
+
+		SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+		if (message == NULL) {
+			SDL_Log("Error rendering text; aborting: %s\n", SDL_GetError());
+			SDL_FreeSurface(surfaceMessage);
+			return;
+		}
+
+
+		SDL_RenderCopy(renderer, message, &src, &dst);
+		SDL_FreeSurface(surfaceMessage);
+		SDL_DestroyTexture(message);
+	}
 }
 
 #pragma endregion
@@ -421,6 +455,14 @@ void RenderWindow::render_centered(float screen_x, float screen_y, const char* t
 void RenderWindow::draw()
 {
 	SDL_RenderPresent(renderer);
+}
+
+SDL_Texture* RenderWindow::create_texture_from_surface(SDL_Surface* surface) {
+	SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surface);
+	if(result == NULL)
+		SDL_LogError(SDL_LOG_PRIORITY_DEBUG, "Failed to create texture from surface: %s\n", SDL_GetError());
+
+	return result;
 }
 
 SDL_Texture* RenderWindow::load_texture(const char* file_path) {

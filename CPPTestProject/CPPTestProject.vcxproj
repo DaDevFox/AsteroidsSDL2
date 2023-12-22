@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\math\polygon_math.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\entities\Entity.cpp" />
     <ClCompile Include="src\main.cpp" />

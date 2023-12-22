@@ -98,7 +98,7 @@ void render_update()
 
 	char output[7];
 	bool flag = false;
-	for (RectEntity* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 		if (abs(asteroid->desired_velocity_x) > 0 || abs(asteroid->desired_velocity_x) > 0)
 			sprintf_s(output, "%.3f", asteroid->velocity_x);
 
@@ -108,7 +108,7 @@ void render_update()
 	//	strcpy_s(output, 7, "   ");
 
 
-	window.render_centered(WIDTH / 2.0F, 50.0F, output, encode_sans_medium, color);
+	window.render_centered_screen(WINDOW_width / 2.0F, 50.0F, output, encode_sans_medium, color);
 }
 
 void update() 
