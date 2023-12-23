@@ -18,6 +18,7 @@ public:
 	float desired_velocity_x;
 	float desired_velocity_y;
 
+	bool drag_enabled;
 
 	int screen_x;
 	int screen_y;
@@ -37,8 +38,8 @@ public:
 	Entity() :
 		x(0.0F),
 		y(0.0F),
-		w(128),
-		h(128),
+		w(512),
+		h(512),
 
 		velocity_x(0.0F),
 		velocity_y(0.0F),
@@ -49,7 +50,7 @@ public:
 		collision_chunk(0),
 
 		movement_windup_speed(0.005f),
-		drag(0.01F),
+		drag(0.0001F),
 		mass(1.0F)
 	{
 
@@ -71,6 +72,9 @@ private:
 
 class Asteroid : public Entity {
 public:
+	float target_offset_x;
+	float target_offset_y;
+
 	double angle;
 	int rel_pivot_x;
 	int rel_pivot_y;

@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-int max_asteroid_radius = 100;
+int max_asteroid_radius = 256/2;
 
 int asteroid_variance = 250;
 
@@ -18,7 +18,8 @@ float speed = 1.0F;
 int downup = 0;
 int leftright = 0;
 
-int towards_mouse = 0;
+bool primary_held;
+
 int mouse_diff_threshold_squared = 125;
 
 void asteroids_init() 
@@ -36,81 +37,22 @@ void asteroids_input_update(SDL_Event *running_event)
 {
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
-		int x_diff_to_mouse = window.camera.screen_to_world_x(running_event->motion.x) - asteroid->screen_x;
-		int y_diff_to_mouse = window.camera.screen_to_world_y(running_event->motion.y) - asteroid->screen_y;
-		
-		// mouse based movement
-		float magnitude_squared = x_diff_to_mouse * x_diff_to_mouse + y_diff_to_mouse * y_diff_to_mouse;
-		if (magnitude_squared >= mouse_diff_threshold_squared)
+		if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
 		{
-			if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
-			{
-				towards_mouse = 1;
-			}
-			if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
-			{
-				towards_mouse = 0;
-			}
+			primary_held = true;
 		}
 
+		if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
+		{
+			primary_held = false;
+		}
+
+		int x_diff_to_mouse = window.camera.screen_to_world_x(running_event->motion.x) + asteroid->target_offset_x - asteroid->screen_x;
+		int y_diff_to_mouse = window.camera.screen_to_world_y(running_event->motion.y) + asteroid->target_offset_y - asteroid->screen_y;
 
 		// mouse based rotation always
 		if (running_event->type == SDL_MOUSEMOTION) 
 			asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
-		
-
-
-		float step_magnitude = SDL_clamp(magnitude_squared * towards_mouse, 0, speed);
-
-		asteroid->desired_velocity_x = cos(asteroid->angle) * step_magnitude;
-		asteroid->desired_velocity_y = sin(asteroid->angle) * step_magnitude;
-		
-		//SDL_Log("asteroid moving: %i", towards_mouse);
-
-		//if (abs((int)asteroid->desired_velocity_x) > 0 || fabs(asteroid->desired_velocity_y) > 0)
-
-		//if (SETTING_keyboard_player_movement)
-		//{
-		//	player.desired_velocity_x = 0.0F;
-		//	player.desired_velocity_y = 0.0F;
-		//	if (running_event->type == SDL_KEYDOWN)
-		//	{
-		//		//const Uint8* keystates = SDL_GetKeyboardState(NULL);
-		//		//if (keystates[SDL_SCANCODE_RIGHT])
-		//		//	player.desired_velocity_x = speed;
-		//		//if (keystates[SDL_SCANCODE_LEFT])
-		//		//	player.desired_velocity_x = -speed;
-		//		//if (keystates[SDL_SCANCODE_UP])
-		//		//	player.desired_velocity_y = -speed;
-		//		//if (keystates[SDL_SCANCODE_DOWN])
-		//		//	player.desired_velocity_y = speed;
-		//
-		//		if (running_event->key.keysym.sym == SDLK_DOWN)
-		//			downup = -1;
-		//		if (running_event->key.keysym.sym == SDLK_UP)
-		//			downup = 1;
-		//		if (running_event->key.keysym.sym == SDLK_LEFT)
-		//			leftright = -1;
-		//		if (running_event->key.keysym.sym == SDLK_RIGHT)
-		//			leftright = 1;
-		//	}
-		//	if (running_event->type == SDL_KEYUP)
-		//	{
-		//		if (running_event->key.keysym.sym == SDLK_DOWN)
-		//			downup = 0;
-		//		if (running_event->key.keysym.sym == SDLK_UP)
-		//			downup = 0;
-		//		if (running_event->key.keysym.sym == SDLK_LEFT)
-		//			leftright = 0;
-		//		if (running_event->key.keysym.sym == SDLK_RIGHT)
-		//			leftright = 0;
-		//	}
-		//	player.desired_velocity_x = leftright * speed;
-		//	player.desired_velocity_y = -downup * speed;
-		//}
-		//else
-		//{
-		//}
 	}
 }
 
@@ -126,6 +68,32 @@ void asteroids_update(float delta_time)
 {
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
+		if (primary_held)
+		{
+			int mouse_x;
+			int mouse_y;
+
+			SDL_GetMouseState(&mouse_x, &mouse_y);
+
+			int x_diff_to_mouse = window.camera.screen_to_world_x(mouse_x) + asteroid->target_offset_x - asteroid->screen_x;
+			int y_diff_to_mouse = window.camera.screen_to_world_y(mouse_y) + asteroid->target_offset_y - asteroid->screen_y;
+
+			float magnitude_squared = x_diff_to_mouse * x_diff_to_mouse + y_diff_to_mouse * y_diff_to_mouse;
+			if (magnitude_squared >= mouse_diff_threshold_squared) 
+			{
+				float step_magnitude = SDL_clamp(magnitude_squared, 0, speed);
+
+				asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
+				asteroid->desired_velocity_x = cos(asteroid->angle) * step_magnitude;
+				asteroid->desired_velocity_y = sin(asteroid->angle) * step_magnitude;
+
+				
+				asteroid->drag_enabled = false;
+			}
+		}
+		else
+			asteroid->drag_enabled = true;
+
 		asteroid->update();
 	}
 }

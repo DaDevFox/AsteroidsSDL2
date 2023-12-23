@@ -35,6 +35,7 @@ TTF_Font *encode_sans_medium;
 /// <returns></returns>
 bool game_init() {
 	game_running = true;
+	srand(12);
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 
 	{
