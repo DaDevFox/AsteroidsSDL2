@@ -2,16 +2,24 @@
 #include "../main.h"
 #include <math.h>
 #include <stdlib.h>
+#include <set>
+#include <queue>
+#include <iostream>
 
-int max_asteroid_radius = 256/2;
+float minimum_mass = 1.0F;
+float maximum_mass = 2.0F;
+float mass_per_pixel = (maximum_mass - minimum_mass) / (4.0F * max_asteroid_radius * max_asteroid_radius);
+int max_asteroid_radius = 128/2;
 
 int asteroid_variance = 250;
+float top_initial_speed = 0.05F;
 
 const char* asteroid_texture_path = "./circle.png";
-Asteroid player(asteroid_texture_path, 32, 32);
 
 Asteroid *asteroids;
-const int asteroids_count = 20;
+const int asteroids_count = 50;
+
+int controlled_asteroid;
 
 float speed = 1.0F;
 
@@ -22,44 +30,248 @@ bool primary_held;
 
 int mouse_diff_threshold_squared = 125;
 
+const int max_asteroid_target_variance = 100;
+
+const Uint32 asteroid_color_raw = 0xFFFFFFFF;
+const Uint32 blank_space_color = 0x00000000;
+
+/*
+
+CONCEPT:
+
+you are an asteroid in an asteroid field
+most asteroids cannot control their movement (initial velocity + drag and collisions)
+you are sentient, and can move
+
+the 'players' (ships) hunt you, but you can see their field of view and know they can't differentiate you from other asteroids 
+unless they see you move
+knock them from behind to destroy them
+survive and destroy all players by the time limit
+
+*/
+
+
+
+Asteroid::Asteroid() 
+{
+	init(max_asteroid_radius * 2, max_asteroid_radius * 2);
+}
+
+void Asteroid::init(int w, int h) {
+	this->w = w;
+	this->h = h;
+
+	generate();
+}
+
+
+int pixel_to_index(int x, int y, int w) {
+	return x + y * w;
+}
+
+std::pair<int, int> index_to_pixel(int idx, int w) {
+	return { idx % w, idx / w };
+}
+
+void Asteroid::generate()
+{
+	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	SDL_LockSurface(temp_surface);
+
+	std::queue<int> open;
+	std::set<int> visited;
+	open.push(pixel_to_index(w / 2, h / 2, w));
+
+	Uint32* buffer = (Uint32*)temp_surface->pixels;
+
+	int pixels = 0;
+	while (!open.empty())
+	{
+		std::pair<int, int> curr = index_to_pixel(open.front(), w);
+		if (curr.first < 0 || curr.first >= w || curr.second < 0 || curr.second >= h)
+		{
+			open.pop();
+			continue;
+		}
+
+		*(buffer + open.front()) = asteroid_color_raw;
+		pixels++;
+		open.pop();
+
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first + 1, curr.second, w)) == visited.end())
+			open.push(pixel_to_index(curr.first + 1, curr.second, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first - 1, curr.second, w)) == visited.end())
+			open.push(pixel_to_index(curr.first - 1, curr.second, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second + 1, w)) == visited.end())
+			open.push(pixel_to_index(curr.first, curr.second + 1, w));
+		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second - 1, w)) == visited.end())
+			open.push(pixel_to_index(curr.first, curr.second - 1, w));
+	}
+
+	std::vector<SDL_Point> outline;
+	for (int curr_x = 0; curr_x < w; curr_x++)
+	{
+		for (int curr_y = 0; curr_y < h; curr_y++)
+		{
+			if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != asteroid_color_raw)
+				continue;
+
+			if (curr_x + 1 < w &&
+				curr_y - 1 > 0 &&
+				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == blank_space_color)
+				outline.push_back({ curr_x + 1, curr_y - 1 });
+			if (curr_x + 1 < w &&
+				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == blank_space_color)
+				outline.push_back({ curr_x + 1, curr_y });
+			if (curr_x + 1 < w &&
+				curr_y + 1 < h &&
+				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == blank_space_color)
+				outline.push_back({ curr_x + 1, curr_y + 1 });
+			if (curr_x - 1 > 0 &&
+				curr_y + 1 < h &&
+				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == blank_space_color)
+				outline.push_back({ curr_x - 1, curr_y + 1 });
+			if (curr_x - 1 > 0 &&
+				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == blank_space_color)
+				outline.push_back({ curr_x - 1, curr_y });
+			if (curr_x - 1 > 0 &&
+				curr_y - 1 > 0 &&
+				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == blank_space_color)
+				outline.push_back({ curr_x - 1, curr_y });
+			if (curr_y + 1 < h &&
+				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == blank_space_color)
+				outline.push_back({ curr_x, curr_y + 1 });
+			if (curr_y - 1 > 0 &&
+				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == blank_space_color)
+				outline.push_back({ curr_x, curr_y - 1 });
+		}
+	}
+
+	if (outline.size() < 4 * SETTING_MAX_POLYGON_VERTICES)
+	{
+		for (int i = 0; i < outline.size(); i++)
+			this->outline[i] = outline.at(i);
+		point_count = outline.size();
+		mass = minimum_mass + mass_per_pixel * pixels;
+	}
+	else
+		SDL_Log("ERROR: outline buffer overflow for asteroid.\n");
+
+	SDL_UnlockSurface(temp_surface);
+
+	texture = window.create_texture_from_surface(temp_surface);
+
+	SDL_FreeSurface(temp_surface);
+}
+
+void Asteroid::cleanup() {
+	SDL_DestroyTexture(texture);
+}
+
+bool Asteroid::in_bounds(int screen_x, int screen_y) const {
+	return
+		screen_x >= (this->screen_x - w / 2) && screen_x <= (this->screen_x + w / 2) &&
+		screen_y >= (this->screen_y - h / 2) && screen_y <= (this->screen_y + h / 2);
+}
+
+//void Asteroid::render(RenderWindow* window)
+//{
+//	//char str[8];/*
+//	//sprintf_s(str, "%i", hash_entity(this));
+//	//SDL_Color color = 
+//	//{
+//	//	255, 255, 255, 255 
+//	//};
+//	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);*/
+//
+//	/*window->render(0, 0, 0, 0, screen_x - w / 2, screen_y - h / 2, w, h, texture);*/
+//}
+
 void asteroids_init() 
 {
-	asteroids = (Asteroid*)calloc(asteroids_count, sizeof(Asteroid));
+	asteroids = new Asteroid[asteroids_count];
+
+	int i = 0;
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
-		asteroid->init(asteroid_texture_path, 32, 32);
 		asteroid->x = GAME_width / 2.0F + (float)(rand() % asteroid_variance);
 		asteroid->y = GAME_height / 2.0F + (float)(rand() % asteroid_variance);
+
+		asteroid->velocity_x = (float)((float)rand() / (float)RAND_MAX) * 2 * top_initial_speed - top_initial_speed * 0.5F;
+		asteroid->velocity_y = (float)((float)rand() / (float)RAND_MAX) * 2 * top_initial_speed - top_initial_speed * 0.5F;
+		asteroid->velocity_x /= asteroid->mass;
+		asteroid->velocity_y /= asteroid->mass;
+		asteroid->desired_velocity_x = asteroid->velocity_x;
+		asteroid->desired_velocity_y = asteroid->velocity_y;
+		asteroid->drag_enabled = true;
+		
+		asteroid->idx = i;
+
+		std::cout << "asteroid initialized w/ main index " << asteroid->id << " and asteroid index " << asteroid->idx << std::endl;
+		i++;
 	}
 }
 
-void asteroids_input_update(SDL_Event *running_event) 
+void player_input_update(SDL_Event *running_event) 
 {
+	// Select controlled asteroid
+	
+	// Direct controlled asteroid
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
-		if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
-		{
-			primary_held = true;
-		}
+		//if (asteroid->asteroid_id != controlled_asteroid)
+		//	continue;
 
-		if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
-		{
-			primary_held = false;
-		}
+		//// ESC to deselect 
+		//if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE) 
+		//{
+		//	controlled_asteroid = -1;
+		//}
 
-		int x_diff_to_mouse = window.camera.screen_to_world_x(running_event->motion.x) + asteroid->target_offset_x - asteroid->screen_x;
-		int y_diff_to_mouse = window.camera.screen_to_world_y(running_event->motion.y) + asteroid->target_offset_y - asteroid->screen_y;
+		//// CLICK to set heading
+		//if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
+		//{
+		//	asteroid->heading_x = window.camera.screen_to_world_x(running_event->motion.x);
+		//	asteroid->heading_y = window.camera.screen_to_world_y(running_event->motion.y);
+		//	controlled_asteroid = -1;
+		//}
 
-		// mouse based rotation always
-		if (running_event->type == SDL_MOUSEMOTION) 
-			asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
+		//// mouse based rotation always
+		//if (running_event->type == SDL_MOUSEMOTION) 
+		//	asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
 	}
+}
+
+inline bool operator==(const SDL_Color& self, const SDL_Color& b) {
+	return self.r == b.r && self.g == b.g && self.b == b.b && self.a == b.a;
 }
 
 void asteroids_render_update(RenderWindow *window)
 {
+	for (int x = 0; x < GAME_width; x += tile_size) 
+		window->render_line(x, 0, x, GAME_height, {200, 200, 200, 255});
+
+	for (int y = 0; y < GAME_height; y += tile_size)
+		window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
+	
+
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
+		/*char text[8];
+		sprintf_s(text, "%.1d", asteroid->point_count);
+		window->render_centered_world(asteroid->x - asteroid->w, asteroid->y - asteroid->h, text, encode_sans_medium, {255, 255, 255, 255});
+
+		int ax = asteroid->screen_x - asteroid->w/2;
+		int ay = asteroid->screen_y - asteroid->h/2;
+		for (SDL_Point* i = asteroid->outline; i < asteroid->outline + asteroid->point_count; i++)
+		{
+			int wx = i->x + ax;
+			int wy = i->y + ay;
+
+			window->render_point(wx, wy, { 0, 0, 255, 255 });
+		}*/
+
+
 		asteroid->render(window);
 	}
 }
@@ -68,32 +280,6 @@ void asteroids_update(float delta_time)
 {
 	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	{
-		if (primary_held)
-		{
-			int mouse_x;
-			int mouse_y;
-
-			SDL_GetMouseState(&mouse_x, &mouse_y);
-
-			int x_diff_to_mouse = window.camera.screen_to_world_x(mouse_x) + asteroid->target_offset_x - asteroid->screen_x;
-			int y_diff_to_mouse = window.camera.screen_to_world_y(mouse_y) + asteroid->target_offset_y - asteroid->screen_y;
-
-			float magnitude_squared = x_diff_to_mouse * x_diff_to_mouse + y_diff_to_mouse * y_diff_to_mouse;
-			if (magnitude_squared >= mouse_diff_threshold_squared) 
-			{
-				float step_magnitude = SDL_clamp(magnitude_squared, 0, speed);
-
-				asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
-				asteroid->desired_velocity_x = cos(asteroid->angle) * step_magnitude;
-				asteroid->desired_velocity_y = sin(asteroid->angle) * step_magnitude;
-
-				
-				asteroid->drag_enabled = false;
-			}
-		}
-		else
-			asteroid->drag_enabled = true;
-
 		asteroid->update();
 	}
 }
@@ -104,5 +290,5 @@ void asteroids_cleanup()
 	{
 		asteroid->cleanup();
 	}
-	free(asteroids);
+	delete[] asteroids;
 }

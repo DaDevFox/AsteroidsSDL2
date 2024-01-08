@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL.h>
 
-#define SETTING_MAX_POLYGON_VERTICES 128
+#define SETTING_MAX_POLYGON_VERTICES 512
 
 extern int SETTING_camera_pan_speed;
 extern float SETTING_camera_pan_smoothness;

@@ -8,6 +8,8 @@ public:
 	float desired_x;
 	float desired_y;
 
+	float zoom;
+
 	void teleport(float x, float y);
 
 	void input_update(SDL_Event* running_event);
@@ -36,4 +38,9 @@ public:
 	bool world_to_screen(float world_x, float world_y, int* screen_x, int* screen_y);
 	int world_to_screen_x(float world_x);
 	int world_to_screen_y(float world_y);
+
+	Camera()
+		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F) {
+
+	}
 };

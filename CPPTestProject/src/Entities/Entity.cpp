@@ -1,24 +1,124 @@
 #include "Entity.h"
 #include "../main.h"
 #include <string.h>
-#include <unordered_map>
-#include <set>
+#include <map>
 #include "asteroid.h"
 #include <set>
+#include <unordered_set>
 #include <queue>
+#include <vector>
+#include <iostream>
 
-const Uint32 asteroid_color_raw = 0xFFFFFFFF;
-const Uint32 blank_space_color = 0x00000000;
-
-const int max_asteroid_target_variance = 100;
 const int tile_size = max_asteroid_radius;
 const int chunk_height = GAME_height / tile_size;
 const int chunk_width = GAME_width / tile_size;
 
-std::unordered_map<int, std::set<Entity*>*> collision_check_grid;
+std::map<int, std::set<int>*> collision_check_grid;
+
+int Entity::curr_id = 0;
+
+std::vector<Entity*> Entity::active;
+
+//EntityManager::EntityManager() {
+//	registry = new std::vector<Entity>();
+//}
+//
+//EntityManager::EntityManager(int count) {
+//	registry = new std::vector<Entity>();
+//	registry->reserve(count);
+//	for(int i = 0; i < count; i++)
+//		create_entity();
+//}
+//
+//EntityManager::~EntityManager() {
+//	delete registry;
+//}
+//
+//Entity& EntityManager::create_entity() {
+//	registry->emplace_back();
+//
+//	return registry->back();
+//}
+//
+////Asteroid& EntityManager::create_asteroid() {
+////
+////}
+//
+//Entity& EntityManager::get_entity(int id) {
+//	return (*registry)[id];
+//}
+
+//Asteroid& EntityManager::get_asteroid(int id) {
+//
+//}
 
 int hash_entity(Entity* entity) {
 	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
+}
+
+Entity::Entity() :
+	id(curr_id++),
+
+	x(0.0F),
+	y(0.0F),
+	w(512),
+	h(512),
+
+	velocity_x(0.0F),
+	velocity_y(0.0F),
+
+	desired_velocity_x(0.0F),
+	desired_velocity_y(0.0F),
+
+	drag_enabled(true),
+
+	screen_x(0),
+	screen_y(0),
+
+	movement_windup_speed(0.005f),
+	drag(0.0001F),
+	mass(1.0F),
+
+	texture(nullptr),
+	collision_chunk(0),
+
+	point_count(0),
+	outline()
+{
+	active.push_back(this);
+	std::cout << "entity active list count: " << active.size() << std::endl;
+}
+
+Entity::Entity(const Entity& copy)
+	: id(copy.curr_id),
+
+	x(copy.x),
+	y(copy.y),
+	w(copy.w),
+	h(copy.h),
+
+	velocity_x(copy.velocity_x),
+	velocity_y(copy.velocity_y),
+
+	desired_velocity_x(copy.desired_velocity_x),
+	desired_velocity_y(copy.desired_velocity_y),
+
+	drag_enabled(copy.drag_enabled),
+
+	screen_x(copy.screen_x),
+	screen_y(copy.screen_y),
+
+	movement_windup_speed(copy.movement_windup_speed),
+	drag(copy.drag),
+	mass(copy.mass),
+
+	texture(copy.texture),
+	collision_chunk(copy.collision_chunk),
+
+	point_count(copy.point_count),
+	outline()
+{
+	std::cout << "copied entity!" << std::endl;
 }
 
 void Entity::init() 
@@ -28,6 +128,17 @@ void Entity::init()
 
 void Entity::move()
 {
+	
+
+	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
+	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
+
+	if (drag_enabled) 
+	{
+		desired_velocity_x *= (1.0F - drag);
+		desired_velocity_y *= (1.0F - drag);
+	}
+
 	x += velocity_x * delta_time;
 	y += velocity_y * delta_time;
 
@@ -40,15 +151,6 @@ void Entity::move()
 	if (y < 0)
 		y += GAME_width;
 
-	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
-	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
-
-	if (drag_enabled) 
-	{
-		desired_velocity_x *= (1.0F - drag);
-		desired_velocity_y *= (1.0F - drag);
-	}
-
 	screen_x = (int)x;
 	screen_y = (int)y;
 }
@@ -58,34 +160,72 @@ void Entity::update_collision_chunk()
 	int curr_chunk = hash_entity(this);
 	if (collision_chunk != curr_chunk)
 	{
-		if (collision_check_grid[collision_chunk] != NULL)
-			(*collision_check_grid[collision_chunk]).erase(this);
-		if (collision_check_grid[curr_chunk] == NULL)
-			collision_check_grid[curr_chunk] = new std::set<Entity*>();
-		collision_check_grid[curr_chunk]->insert(this);
+		if (collision_check_grid[collision_chunk] != nullptr)
+			(*collision_check_grid[collision_chunk]).erase(id);
+		if (collision_check_grid[curr_chunk] == nullptr)
+			collision_check_grid[curr_chunk] = new std::set<int>();
 
+		collision_check_grid[curr_chunk]->insert(id);
 		collision_chunk = curr_chunk;
 	}
+
+	window.render_rect((screen_x / tile_size) * tile_size, (screen_y / tile_size) * tile_size, tile_size, tile_size, {100, 100, 100, 20});
 }
+
+
+//std::vector<int> used;
+
+int hash(int x, int y);
+
+//bool operator<(const SDL_Point& a, const SDL_Point& b) 
+//{
+//	return hash(a.x, a.y) < hash(b.x, b.y);
+//}
+//
+//bool operator==(const SDL_Point& a, const SDL_Point& b) {
+//	return hash(a.x, a.y) == hash(b.x, b.y);
+//}
+	
+std::vector<int> used;
 
 bool collision_between(Entity* a, Entity* b) {
 	if (!(a->point_count || b->point_count))
 		return false;
+	
+	used.clear();
+	
+	int ax = a->screen_x - a->w/2;
+	int ay = a->screen_y - a->h/2;
+	int bx = b->screen_x - b->w/2;
+	int by = b->screen_y - b->h/2;
 
-	/*set<SDL_Point> used;
 	for (SDL_Point* i = a->outline; i < a->outline + a->point_count; i++)
-		used.insert({ a->screen_x + i->x, a->screen_y + i->y });
+	{
+		used.push_back(hash(ax + i->x, ay + i->y));
+		//used.insert(hash(ax + i->x, ay + i->y));
+		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255});
+	}
 
 	for (SDL_Point* i = b->outline; i < b->outline + b->point_count; i++)
-		if (!used.insert({ b->screen_x + i->x, b->screen_y + i->y }).second)
-			return true;*/
+	{
+		int hashed = hash(bx + i->x, by + i->y);
+		for(int idx = 0; idx < used.size(); idx++)
+			if(used[idx] == hashed)//TODO: sorting + binary search for vector
+			//if(!used.insert(hashed).second)
+				return true;
+				//window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
+	}
 
 	return false;
 }
 
+int hash(int x, int y) {
+	return x + GAME_width * y;
+}
+
 void Entity::check_collisions() 
 {
-	std::set<Entity*> to_check;
+	std::set<int> to_check;
 	
 	int floor_y = (int)y / tile_size - 1;
 	int ceil_y = (int)y / tile_size + 1;
@@ -95,26 +235,63 @@ void Entity::check_collisions()
 	{
 		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
 		{
-			int chunk = ((int)curr_x + (GAME_width) * ((int)curr_y / tile_size)) / tile_size;
-			if (collision_check_grid[chunk] == NULL)
+			int chunk = curr_x + (GAME_width/tile_size) * curr_y;
+			if (collision_check_grid[chunk] == nullptr)
 				continue;
-			std::set<Entity*> curr_set = *(collision_check_grid[chunk]);
+			std::set<int> curr_set = *(collision_check_grid[chunk]);
 			to_check.insert(curr_set.begin(), curr_set.end());
 		}
 	}
 
-	for (Entity* other : to_check) 
+	char text[8];
+	sprintf_s(text, "%i", to_check.size());
+	window.render_centered_world(x, y, text, encode_sans_medium, {255, 255, 255, 255});
+
+	for (int otherID : to_check) 
 	{
+		if(otherID == id)
+			continue;
+
+		Entity* other = active[otherID];
 		if (collision_between(this, other))
 		{
-			velocity_x = velocity_x - (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
-			velocity_y = velocity_y - (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
-
-			x -= velocity_x * delta_time;
-			y -= velocity_y * delta_time;
+;
 
 			screen_x = (int)x;
 			screen_y = (int)y;
+
+			// full equation for perfectly elastic collision: 
+			// https://phys.libretexts.org/Courses/Joliet_Junior_College/Physics_201_-_Fall_2019v2/Book%3A_Custom_Physics_textbook_for_JJC/09%3A_Linear_Momentum_and_Collisions/9.16%3A_Collisions#:~:text=If%20two%20particles%20are%20involved,m1)v2i.
+
+			float velocity_x_after = 
+				( (mass - other->mass) * velocity_x
+				+ (2 * other->mass)    * other->velocity_x ) 
+				/ (mass + other->mass);
+			
+			float velocity_y_after = 
+				( (mass - other->mass) * velocity_y
+				+ (2 * other->mass)    * other->velocity_y ) 
+				/ (mass + other->mass);
+
+			// undo movement into collision
+			float seperation_multiplier = 10.0F;
+
+			/*x -= velocity_x * delta_time * seperation_multiplier;
+			y -= velocity_y * delta_time * seperation_multiplier;
+			
+			other->x -= other->velocity_x * delta_time * seperation_multiplier;
+			other->y -= other->velocity_y * delta_time * seperation_multiplier*/
+
+			// conduct extra separation movement
+			x += velocity_x_after * delta_time;
+			y += velocity_y_after * delta_time;
+
+
+			desired_velocity_x = velocity_x_after;
+			desired_velocity_y = velocity_y_after;
+
+			velocity_x = velocity_x_after;
+			velocity_y = velocity_y_after;
 
 			return;
 		}
@@ -122,164 +299,21 @@ void Entity::check_collisions()
 }
 
 
-void Entity::update()
+void Entity::render(RenderWindow* window)
 {
-	move();
+	window->render(0, 0, 0, 0, screen_x - w / 2, screen_y - h / 2, w, h, texture);
 	update_collision_chunk();
 	check_collisions();
 }
 
-
-
-
-Asteroid::Asteroid(const char* texture_file_path, int w, int h) {
-	init(texture_file_path, w, h);
-}
-
-void Asteroid::init(const char* texture_file_path, int w, int h) {
-	x = 0.0F;
-	y = 0.0F;
-	velocity_x = 0.0F;
-	velocity_y = 0.0F;
-	desired_velocity_x = 0.0F;
-	desired_velocity_y = 0.0F;
-	
-	angle = 0.0F;
-
-	movement_windup_speed = 0.005f;
-	mass = 1.0F;
-	drag = 0.000025F;
-
-	screen_x = 0;
-	screen_y = 0;
-
-	target_offset_x = rand() % max_asteroid_target_variance - max_asteroid_target_variance/2;
-	target_offset_y = rand() % max_asteroid_target_variance - max_asteroid_target_variance / 2;
-
-	//texture = window.load_texture(texture_file_path);
-	this->w = w;
-	this->h = h;
-
-	generate();
-}
-
-
-int pixel_to_index(int x, int y, int w) {
-	return x + y * w;
-}
-
-std::pair<int, int> index_to_pixel(int idx, int w) {
-	return { idx % w, idx / w };
-}
-
-void Asteroid::generate() 
+void Entity::update()
 {
-	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-	SDL_LockSurface(temp_surface);
-
-	std::queue<int> open;
-	std::set<int> visited;
-	open.push(pixel_to_index(w / 2, h / 2, w));
-
-	Uint32* buffer = (Uint32*)temp_surface->pixels;
-
-	while (!open.empty())
-	{
-		std::pair<int, int> curr = index_to_pixel(open.front(), w);
-		if (curr.first < 0 || curr.first >= w || curr.second < 0 || curr.second >= h)
-		{
-			open.pop();
-			continue;
-		}
-		*(buffer + open.front()) = asteroid_color_raw;
-
-		open.pop();
-
-		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first + 1, curr.second, w)) == visited.end())
-			open.push(pixel_to_index(curr.first + 1, curr.second, w));
-		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first - 1, curr.second, w)) == visited.end())
-			open.push(pixel_to_index(curr.first - 1, curr.second, w));
-		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second + 1, w)) == visited.end())
-			open.push(pixel_to_index(curr.first, curr.second + 1, w));
-		if (rand() % 4 == 0 && visited.find(pixel_to_index(curr.first, curr.second - 1, w)) == visited.end())
-			open.push(pixel_to_index(curr.first, curr.second - 1, w));
-	}
-
-	std::vector<SDL_Point> outline;
-	for (int curr_x = 0; curr_x < w; curr_x++) 
-	{
-		for (int curr_y = 0; curr_y < h; curr_y++)
-		{
-			if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != asteroid_color_raw)
-				continue;
-
-			if (curr_x + 1 < w && 
-				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == blank_space_color)
-				outline.push_back({ curr_x + 1, curr_y - 1 });
-			if (curr_x + 1 < w &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == blank_space_color)
-				outline.push_back({ curr_x + 1, curr_y });
-			if (curr_x + 1 < w &&
-				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == blank_space_color)
-				outline.push_back({ curr_x + 1, curr_y + 1 });
-			if (curr_x - 1 > 0 &&
-				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == blank_space_color)
-				outline.push_back({ curr_x - 1, curr_y + 1 });
-			if (curr_x - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == blank_space_color)
-				outline.push_back({ curr_x - 1, curr_y });
-			if (curr_x - 1 > 0 &&
-				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == blank_space_color)
-				outline.push_back({ curr_x - 1, curr_y });
-			if (curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == blank_space_color)
-				outline.push_back({ curr_x, curr_y + 1 });
-			if (curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == blank_space_color)
-				outline.push_back({ curr_x, curr_y - 1 });
-		}
-	}
-
-	if (outline.size() < SETTING_MAX_POLYGON_VERTICES)
-	{
-		for (int i = 0; i < outline.size(); i++) 
-		{
-			this->outline[i] = outline.at(i);
-		}
-	}
-	else
-		SDL_Log("ERROR: outline buffer overflow for asteroid.\n");
-
-	SDL_UnlockSurface(temp_surface);
-
-	texture = window.create_texture_from_surface(temp_surface);
-
-	SDL_FreeSurface(temp_surface);
+	move();
 }
 
-void Asteroid::cleanup() {
-	SDL_DestroyTexture(texture);
+void entities_cleanup() {
+	//TODO
+
+
 }
 
-bool Asteroid::in_bounds(int screen_x, int screen_y) {
-	return
-		screen_x >= (this->screen_x - w / 2) && screen_x <= (this->screen_x + w / 2) &&
-		screen_y >= (this->screen_y - h / 2) && screen_y <= (this->screen_y + h / 2);
-}
-
-void Asteroid::render(RenderWindow *window) 
-{
-	//char str[8];/*
-	//sprintf_s(str, "%i", hash_entity(this));
-	//SDL_Color color = 
-	//{
-	//	255, 255, 255, 255 
-	//};
-	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);*/
-
-	window->render_rotate(0, 0, 0, 0, screen_x - w/2, screen_y - h/2, w, h, angle, texture);
-}

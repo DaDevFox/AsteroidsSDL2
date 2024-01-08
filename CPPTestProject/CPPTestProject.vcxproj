@@ -150,6 +150,7 @@
     <Image Include="res\circle.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\entities\EntityManager.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\entities\Entity.h" />
     <ClInclude Include="src\main.h" />

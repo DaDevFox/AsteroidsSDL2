@@ -1,12 +1,14 @@
 #pragma once
 #include "window/RenderWindow.h"
 #include "settings.h"
+#include "entities/Entity.h"
 
 #define WIDTH 680
 #define HEIGHT 400
 
 extern int GAME_width;
 extern int GAME_height;
+extern SDL_Rect GAME_window_rect;
 
 extern int WINDOW_width;
 extern int WINDOW_height;

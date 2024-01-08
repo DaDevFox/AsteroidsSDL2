@@ -1,10 +1,9 @@
 #pragma once
-#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "camera.h"
 
-class RenderWindow 
+class RenderWindow
 {
 
 public:
@@ -27,6 +26,16 @@ public:
 	void init();
 
 	/// <summary>
+	/// DO NOT USE HORRENDOUSLY SLOW
+	/// </summary>
+	/// <param name="world_x"></param>
+	/// <param name="world_y"></param>
+	/// <returns></returns>
+	SDL_Color get_pixel_color(float world_x, float world_y);
+
+	void render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color);
+
+	/// <summary>
 	/// Changes the current RenderDrawColor and draws a pixel at the given x and y pixel coordinate
 	/// </summary>
 	/// <param name="x"></param>
@@ -47,7 +56,7 @@ public:
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="color"></param>
-	void render_line(int x1, int y1, int x2, int y2, SDL_Color color);
+	void render_line(int x1, int y1, int x2, int y2, const SDL_Color& color);
 	/// <summary>
 	/// Changes the current RenderDrawColor and draws a line
 	/// </summary>
