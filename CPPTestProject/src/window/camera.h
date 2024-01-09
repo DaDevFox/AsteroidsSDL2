@@ -10,6 +10,11 @@ public:
 
 	float zoom;
 
+	/// <summary>
+	/// Sets zoom and teleports to new zoomed location to avoid jarring movements
+	/// </summary>
+	/// <param name="new_zoom"></param>
+	void set_zoom(float new_zoom);
 	void teleport(float x, float y);
 
 	void input_update(SDL_Event* running_event);

@@ -33,6 +33,7 @@ public:
 	/// <returns></returns>
 	SDL_Color get_pixel_color(float world_x, float world_y);
 
+	void render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color);
 	void render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color);
 
 	/// <summary>

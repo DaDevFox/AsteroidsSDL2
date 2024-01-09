@@ -82,7 +82,7 @@ Entity::Entity() :
 	texture(nullptr),
 	collision_chunk(0),
 
-	point_count(0),
+	outline_point_count(0),
 	outline()
 {
 	active.push_back(this);
@@ -115,7 +115,7 @@ Entity::Entity(const Entity& copy)
 	texture(copy.texture),
 	collision_chunk(copy.collision_chunk),
 
-	point_count(copy.point_count),
+	outline_point_count(copy.outline_point_count),
 	outline()
 {
 	std::cout << "copied entity!" << std::endl;
@@ -186,10 +186,10 @@ int hash(int x, int y);
 //	return hash(a.x, a.y) == hash(b.x, b.y);
 //}
 	
-std::vector<int> used;
+std::set<int> used;
 
 bool collision_between(Entity* a, Entity* b) {
-	if (!(a->point_count || b->point_count))
+	if (!(a->outline_point_count || b->outline_point_count))
 		return false;
 	
 	used.clear();
@@ -199,24 +199,27 @@ bool collision_between(Entity* a, Entity* b) {
 	int bx = b->screen_x - b->w/2;
 	int by = b->screen_y - b->h/2;
 
-	for (SDL_Point* i = a->outline; i < a->outline + a->point_count; i++)
+	for (SDL_Point* i = a->outline; i < a->outline + a->outline_point_count; i++)
 	{
-		used.push_back(hash(ax + i->x, ay + i->y));
-		//used.insert(hash(ax + i->x, ay + i->y));
+		//used.push_back(hash(ax + i->x, ay + i->y));
+		used.insert(hash(ax + i->x, ay + i->y));
 		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255});
 	}
 
-	for (SDL_Point* i = b->outline; i < b->outline + b->point_count; i++)
+	bool flag = false;
+	for (SDL_Point* i = b->outline; i < b->outline + b->outline_point_count; i++)
 	{
 		int hashed = hash(bx + i->x, by + i->y);
-		for(int idx = 0; idx < used.size(); idx++)
-			if(used[idx] == hashed)//TODO: sorting + binary search for vector
-			//if(!used.insert(hashed).second)
-				return true;
-				//window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
+		//for(int idx = 0; idx < used.size(); idx++)
+		//	if(used[idx] == hashed)//TODO: sorting + binary search for vector
+		if(used.find(hashed) != used.end()){
+			//return true;
+				window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
+				flag = true;
+		}
 	}
 
-	return false;
+	return flag;
 }
 
 int hash(int x, int y) {
@@ -283,8 +286,8 @@ void Entity::check_collisions()
 			other->y -= other->velocity_y * delta_time * seperation_multiplier*/
 
 			// conduct extra separation movement
-			x += velocity_x_after * delta_time;
-			y += velocity_y_after * delta_time;
+			//x += velocity_x_after * delta_time;
+			//y += velocity_y_after * delta_time;
 
 
 			desired_velocity_x = velocity_x_after;
@@ -301,6 +304,7 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
+	//window->render_rect_outline(screen_x - w / 2, screen_y - h / 2, screen_x + w / 2, screen_y + h / 2, {100, 100, 100, 100});
 	window->render(0, 0, 0, 0, screen_x - w / 2, screen_y - h / 2, w, h, texture);
 	update_collision_chunk();
 	check_collisions();

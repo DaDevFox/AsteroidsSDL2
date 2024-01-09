@@ -10,6 +10,13 @@ void Camera::teleport(float x, float y) {
 	desired_y = y;
 }
 
+void Camera::set_zoom(float new_zoom) {
+	zoom = new_zoom;
+
+	x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
+	y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
+}
+
 bool Camera::in_game(int screen_x, int screen_y) {
 	int world_x = screen_x * zoom + x;
 	int world_y = screen_y * zoom + y;
@@ -81,30 +88,30 @@ void Camera::input_update(SDL_Event *running_event)
 
 		if (running_event->key.keysym.sym == SDLK_f)
 		{
-			zoom += 0.1f;
+			set_zoom(zoom + 0.1f);
 		}
 		if (running_event->key.keysym.sym == SDLK_v)
 		{
-			zoom -= 0.1f;
+			set_zoom(zoom - 0.1f);
 		}
 	}
 }
 
 void Camera::update(float delta_time) {
-	float true_desired_x = desired_x - WINDOW_width/2;
-	float true_desired_y = desired_y - WINDOW_height/2;
+	float true_desired_x = desired_x - screen_to_world_x(WINDOW_width)/2.0F;
+	float true_desired_y = desired_y - screen_to_world_y(WINDOW_height)/2.0F;
 
 	if(fabs(true_desired_x - x) > 0.1f)
 		x = x + (true_desired_x - x) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
 	if(fabs(true_desired_y - y) > 0.1f)
 		y = y + (true_desired_y - y) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
 	
-	if (true_desired_x + WINDOW_width > GAME_width + edge_buffer)
-		desired_x = GAME_width - WINDOW_width + WINDOW_width/2 + edge_buffer;
+	if (true_desired_x + screen_to_world_x(WINDOW_width) > GAME_width + edge_buffer)
+		desired_x = GAME_width - screen_to_world_x(WINDOW_width) + screen_to_world_x(WINDOW_width) / 2.0F + edge_buffer;
 	if (true_desired_x < -edge_buffer)
-		desired_x = WINDOW_width/2 - edge_buffer;
-	if (true_desired_y + WINDOW_height > GAME_height + edge_buffer)
-		desired_y = GAME_height - WINDOW_height + WINDOW_height/2 + edge_buffer;
-	if (true_desired_y < -edge_buffer)
-		desired_y = WINDOW_height/2 - edge_buffer;
+		desired_x = screen_to_world_x(WINDOW_width) / 2.0F - edge_buffer;
+	/*if (true_desired_y + screen_to_world_y(WINDOW_height) > GAME_height)
+		desired_y = GAME_height - screen_to_world_y(WINDOW_height) + screen_to_world_y(WINDOW_height) / 2.0F;
+	if (true_desired_y < 0)
+		desired_y = screen_to_world_y(WINDOW_height) / 2.0F;*/
 }

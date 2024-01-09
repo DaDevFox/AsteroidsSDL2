@@ -42,6 +42,7 @@ public:
 
 	int collision_chunk;
 
+	int outline_point_count;
 	int point_count;
 	SDL_Point outline[4 * SETTING_MAX_POLYGON_VERTICES];
 

@@ -120,7 +120,7 @@ void render_update()
 	};
 
 
-	char output[20];
+	char output[40];
 	bool flag = false;
 	//for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
 	//	if (abs(asteroid->desired_velocity_x) > 0 || abs(asteroid->desired_velocity_x) > 0)
@@ -131,7 +131,7 @@ void render_update()
 	//else
 	//	strcpy_s(output, 7, "   ");
 
-	sprintf_s(output, "%.1d, %.1d", (int)window.camera.x, (int)window.camera.y);
+	sprintf_s(output, "%.1d %.1d, %.1d", (int)(1.0f / delta_time), (int)window.camera.x, (int)window.camera.y);
 
 
 	window.render_centered_screen(WINDOW_width / 2.0F, 50.0F, output, encode_sans_medium, color);

@@ -8,12 +8,17 @@ public:
 
 	void init(int w, int h);
 	void generate();
+	void create_outline(Uint32* buffer);
 	bool in_bounds(int screen_x, int screen_y) const;
 	//void render(RenderWindow* window);
 	void cleanup();
 
 	Asteroid();
 	/*~Asteroid();*/
+private:
+	void rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
+	void circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
+
 };
 
 extern int max_asteroid_radius;

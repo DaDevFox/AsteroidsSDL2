@@ -152,6 +152,14 @@ int RenderWindow::world_to_screen_y(float world_y) {
 
 #pragma region Basic Geometry
 
+void RenderWindow::render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color) 
+{
+	render_line(world_x, world_y, world_x + world_w, world_y, color);
+	render_line(world_x + world_w, world_y, world_x + world_w, world_y + world_h, color);
+	render_line(world_x + world_w, world_y + world_h, world_x, world_y + world_h, color);
+	render_line(world_x, world_y + world_h, world_x, world_y, color);
+}
+
 void RenderWindow::render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color) {
 	SDL_Rect rect{
 		0,
