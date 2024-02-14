@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 
-const int tile_size = max_asteroid_radius;
+const int tile_size = ASTEROID_max_asteroid_radius;
 const int chunk_height = GAME_height / tile_size;
 const int chunk_width = GAME_width / tile_size;
 
@@ -18,6 +18,8 @@ std::map<int, std::set<int>*> collision_check_grid;
 int Entity::curr_id = 0;
 
 std::vector<Entity*> Entity::active;
+
+std::set<int> scratch;
 
 //EntityManager::EntityManager() {
 //	registry = new std::vector<Entity>();
@@ -52,6 +54,8 @@ std::vector<Entity*> Entity::active;
 //
 //}
 
+int hash(int x, int y);
+
 int hash_entity(Entity* entity) {
 	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
 }
@@ -74,6 +78,9 @@ Entity::Entity() :
 
 	screen_x(0),
 	screen_y(0),
+
+	center_x(0),
+	center_y(0),
 
 	movement_windup_speed(0.005f),
 	drag(0.0001F),
@@ -107,6 +114,9 @@ Entity::Entity(const Entity& copy)
 
 	screen_x(copy.screen_x),
 	screen_y(copy.screen_y),
+
+	center_x(copy.center_x),
+	center_y(copy.center_y),
 
 	movement_windup_speed(copy.movement_windup_speed),
 	drag(copy.drag),
@@ -170,52 +180,34 @@ void Entity::update_collision_chunk()
 	window.render_rect((screen_x / tile_size) * tile_size, (screen_y / tile_size) * tile_size, tile_size, tile_size, {100, 100, 100, 20});
 }
 
-
-//std::vector<int> used;
-
-int hash(int x, int y);
-
-//bool operator<(const SDL_Point& a, const SDL_Point& b) 
-//{
-//	return hash(a.x, a.y) < hash(b.x, b.y);
-//}
-//
-//bool operator==(const SDL_Point& a, const SDL_Point& b) {
-//	return hash(a.x, a.y) == hash(b.x, b.y);
-//}
-	
-std::set<int> used;
-
 bool collision_between(Entity* a, Entity* b, SDL_Point *hit) {
 	if (!(a->outline_point_count || b->outline_point_count))
 		return false;
 	
-	used.clear();
+	scratch.clear();
 	
-	int ax = a->screen_x - a->w/2;
-	int ay = a->screen_y - a->h/2;
-	int bx = b->screen_x - b->w/2;
-	int by = b->screen_y - b->h/2;
+	int ax = a->screen_x - (a->w >> 1);
+	int ay = a->screen_y - (a->h >> 1);
+	int bx = b->screen_x - (b->w >> 1);
+	int by = b->screen_y - (b->h >> 1);
+
 
 	for (SDL_Point* i = a->outline; i < a->outline + a->outline_point_count; i++)
 	{
-		//used.push_back(hash(ax + i->x, ay + i->y));
-		used.insert(hash(ax + i->x, ay + i->y));
+		scratch.insert(hash(ax + i->x, ay + i->y));
 		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255});
 	}
 	
 	for (SDL_Point* i = b->outline; i < b->outline + b->outline_point_count; i++)
 	{
 		int hashed = hash(bx + i->x, by + i->y);
-		//for(int idx = 0; idx < used.size(); idx++)
-		//	if(used[idx] == hashed)//TODO: sorting + binary search for vector
-		if(used.find(hashed) != used.end()){
-			//return true;
-				//window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
-				*hit = SDL_Point {bx + i->x, by + i->y};
-				return true;
+		//for(int idx = 0; idx < scratch.size(); idx++)
+		//	if(scratch[idx] == hashed)//TODO: sorting + binary search for vector
+		if(scratch.find(hashed) != scratch.end())
+		{
+			*hit = SDL_Point{ bx + i->x, by + i->y };
+			return true;
 		}
-
 	}
 
 	return false;
@@ -259,11 +251,11 @@ void Entity::check_collisions()
 		if (collision_between(this, other, &hit))
 		{
 			// EXPENSIVE IKIK
-			float other_x = other->x + (other->w >> 1);
-			float other_y = other->y + (other->h >> 1);
+			float other_x = other->x + (other->center_x);
+			float other_y = other->y + (other->center_y);
 
-			float this_x = x + (w>>1);
-			float this_y = y + (h>>1);
+			float this_x = x + (center_x);
+			float this_y = y + (center_y);
 
 			float diff_x = other_x - this_x;
 			float diff_y = other_y - this_y;
@@ -272,21 +264,19 @@ void Entity::check_collisions()
 			diff_x /= magnitude;
 			diff_y /= magnitude;
 
-			float seperation_multiplier = 0.01F;
+			float explosive_force = 0.001F;
 
 			other->velocity_x *= diff_x;
 			other->velocity_y *= diff_y;
 
-			other->velocity_x += diff_x * seperation_multiplier * delta_time;
-			other->velocity_y += diff_y * seperation_multiplier * delta_time;
+			other->velocity_x += diff_x * explosive_force * delta_time;
+			other->velocity_y += diff_y * explosive_force * delta_time;
 
 			velocity_x *= -diff_x;
 			velocity_y *= -diff_y;
 
-			velocity_x += -diff_x * seperation_multiplier * delta_time;
-			velocity_y += -diff_y * seperation_multiplier * delta_time;
-
-
+			velocity_x += -diff_x * explosive_force * delta_time;
+			velocity_y += -diff_y * explosive_force * delta_time;
 
 			desired_velocity_x = velocity_x;
 			desired_velocity_y = velocity_y;
@@ -294,11 +284,11 @@ void Entity::check_collisions()
 			other->desired_velocity_x = other->velocity_x;
 			other->desired_velocity_y = other->velocity_y;
 
-			other->x -= other->velocity_x * delta_time * seperation_multiplier;
-			other->y -= other->velocity_y * delta_time * seperation_multiplier;
+			other->x -= other->velocity_x * delta_time * explosive_force;
+			other->y -= other->velocity_y * delta_time * explosive_force;
 
-			x -= velocity_x * delta_time * seperation_multiplier;
-			y -= velocity_y * delta_time * seperation_multiplier;
+			x -= velocity_x * delta_time * explosive_force;
+			y -= velocity_y * delta_time * explosive_force;
 
 
 
@@ -325,8 +315,7 @@ void Entity::check_collisions()
 			desired_velocity_y = velocity_y_after;
 
 			velocity_x = velocity_x_after;
-			velocity_y = velocity_y_after;*/
-						
+			velocity_y = velocity_y_after;*/			
 
 			return;
 		}
@@ -336,15 +325,16 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
-	//window->render_rect_outline(screen_x - w / 2, screen_y - h / 2, screen_x + w / 2, screen_y + h / 2, {100, 100, 100, 100});
-	window->render(0, 0, 0, 0, screen_x - w / 2, screen_y - h / 2, w, h, texture);
-	update_collision_chunk();
-	check_collisions();
+	window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, {100, 100, 100, 100});
+	window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
+	
 }
 
 void Entity::update()
 {
 	move();
+	update_collision_chunk();
+	check_collisions();
 }
 
 void entities_cleanup() {

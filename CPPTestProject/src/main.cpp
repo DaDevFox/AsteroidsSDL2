@@ -19,6 +19,8 @@ const int ships_count = 10;
 
 SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 
+Entity *entities;
+
 const char* window_title = "Asteroids";
 RenderWindow window(window_title, WIDTH, HEIGHT);
 
@@ -181,9 +183,7 @@ void game_cleanup() {
 int main() {
 	if (!game_init())
 		exit(1);
-
 	
-
 	while (game_running) 
 	{
 		game_loop();

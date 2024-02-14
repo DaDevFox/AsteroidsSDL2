@@ -6,20 +6,14 @@
 #include <queue>
 #include <iostream>
 
-float minimum_mass = 1.0F;
-float maximum_mass = 5.0F;
-float mass_per_pixel = (maximum_mass - minimum_mass) / (4.0F * max_asteroid_radius * max_asteroid_radius);
-int max_asteroid_radius = 128/2;
-
-int asteroid_variance = 750;
-float top_initial_speed = 0.02F;
-
+float mass_per_pixel = (ASTEROID_maximum_mass - ASTEROID_minimum_mass) / (4.0F * ASTEROID_max_asteroid_radius * ASTEROID_max_asteroid_radius);
 const char* asteroid_texture_path = "./circle.png";
 
-Asteroid *asteroids;
-const int asteroids_count = 20;
 
-int controlled_asteroid;
+Asteroid *asteroids;
+int controlled_asteroid = 0;
+
+#pragma region deprecated
 
 float speed = 1.0F;
 
@@ -32,8 +26,7 @@ int mouse_diff_threshold_squared = 125;
 
 const int max_asteroid_target_variance = 100;
 
-const Uint32 asteroid_color_raw = 0xFFFFFFFF;
-const Uint32 blank_space_color = 0x00000000;
+#pragma endregion
 
 /*
 
@@ -62,7 +55,7 @@ phys
 
 Asteroid::Asteroid() 
 {
-	init(max_asteroid_radius * 2, max_asteroid_radius * 2);
+	init(ASTEROID_max_asteroid_radius * 2, ASTEROID_max_asteroid_radius * 2);
 }
 
 void Asteroid::init(int w, int h) {
@@ -86,7 +79,7 @@ void Asteroid::rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y
 	std::queue<int> open;
 	std::set<int> visited;
 
-	open.push(pixel_to_index(w / 2, h / 2, w));
+	open.push(pixel_to_index((w >> 1), (h >> 1), w));
 
 	*pixel_count = 0;
 	*leftmost_x = w;
@@ -101,7 +94,7 @@ void Asteroid::rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y
 			continue;
 		}
 
-		*(buffer + open.front()) = asteroid_color_raw;
+		*(buffer + open.front()) = GAME_asteroid_color_raw;
 		*pixel_count++;
 		open.pop();
 
@@ -161,7 +154,7 @@ void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost
 			int offset_x = cosf(theta) * i;
 			int offset_y = sinf(theta) * i;
 
-			*(buffer + pixel_to_index(center_x + offset_x, center_y + offset_y, w)) = asteroid_color_raw;
+			*(buffer + pixel_to_index(center_x + offset_x, center_y + offset_y, w)) = GAME_asteroid_color_raw;
 			pixel_count++;
 		}
 
@@ -183,7 +176,7 @@ void Asteroid::generate()
 	circle_expand_fill(buffer, &leftmost_x, &leftmost_y, &pixels);
 	
 	point_count = pixels;
-	mass = minimum_mass + mass_per_pixel * pixels;
+	mass = ASTEROID_minimum_mass + mass_per_pixel * pixels;
 
 	create_outline(buffer);
 
@@ -196,6 +189,8 @@ void Asteroid::generate()
 
 void Asteroid::create_outline(Uint32* buffer) {
 	std::vector<SDL_Point> outline;
+
+#pragma region deprecated
 
 	// wrap clockwise
 	//visited.clear();
@@ -219,43 +214,43 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	if (visited.find(pixel_to_index(curr_x, curr_y, w)) != visited.end())
 	//		continue;
 
-	//	if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != asteroid_color_raw)
+	//	if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != GAME_asteroid_color_raw)
 	//		continue;
 
 	//	if (curr_x + 1 < w &&
 	//		curr_y - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_x + 1 < w &&
-	//		*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_x + 1 < w &&
 	//		curr_y + 1 < h &&
-	//		*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_x - 1 > 0 &&
 	//		curr_y + 1 < h &&
-	//		*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_x - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_x - 1 > 0 &&
 	//		curr_y - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;;
 
 	//	if (curr_y + 1 < h &&
-	//		*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	if (curr_y - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == blank_space_color)
+	//		*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == GAME_blank_space_color)
 	//		curr_outline = true;
 
 	//	visited.insert(pixel_to_index(curr_x, curr_y, w));
@@ -273,7 +268,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	outline.push_back({ curr_x, curr_y });
 
 	//	if (curr_x - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == asteroid_color_raw
+	//		*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_asteroid_color_raw
 	//		&& visited.find(pixel_to_index(curr_x - 1, curr_y, w)) == visited.end())
 	//	{
 	//		open.push(pixel_to_index(curr_x - 1, curr_y, w));
@@ -282,7 +277,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 
 
 	//	if (curr_y - 1 > 0 &&
-	//		*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == asteroid_color_raw
+	//		*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == GAME_asteroid_color_raw
 	//		&& visited.find(pixel_to_index(curr_x, curr_y - 1, w)) == visited.end())
 	//	{
 	//		open.push(pixel_to_index(curr_x, curr_y - 1, w));
@@ -290,7 +285,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	}
 
 	//	if (curr_x + 1 < w &&
-	//		*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == asteroid_color_raw
+	//		*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_asteroid_color_raw
 	//		&& visited.find(pixel_to_index(curr_x + 1, curr_y, w)) == visited.end())
 	//	{ 
 	//		open.push(pixel_to_index(curr_x + 1, curr_y, w));
@@ -298,7 +293,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	}
 
 	//	if (curr_y + 1 < h &&
-	//		*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == asteroid_color_raw
+	//		*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == GAME_asteroid_color_raw
 	//		&& visited.find(pixel_to_index(curr_x, curr_y + 1, w)) == visited.end())
 	//	{
 	//		open.push(pixel_to_index(curr_x, curr_y + 1, w));
@@ -306,53 +301,61 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	}
 	//}
 
+#pragma endregion
 
+    int sum_x = 0;
+	int sum_y = 0;
+	int count = 0;
 
 	//2
     for (int curr_x = 0; curr_x < w; curr_x++)
 	{
 		for (int curr_y = 0; curr_y < h; curr_y++)
 		{
-			if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != asteroid_color_raw)
+			if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != GAME_asteroid_color_raw)
 				continue;
 
-			outline.push_back({curr_x + 1, curr_y - 1});
+			sum_x += curr_x;
+			sum_y += curr_y;
+			count++;
 
-			/*if (curr_x + 1 < w &&
+			//outline.push_back({curr_x + 1, curr_y - 1});
+
+			if (curr_x + 1 < w &&
 				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x + 1, curr_y - 1 });
 
 			if (curr_x + 1 < w &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x + 1, curr_y });
 
 			if (curr_x + 1 < w &&
 				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x + 1, curr_y + 1 });
 
 			if (curr_x - 1 > 0 &&
 				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x - 1, curr_y + 1 });
 
 			if (curr_x - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x - 1, curr_y });
 
 			if (curr_x - 1 > 0 &&
 				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x - 1, curr_y });
 
 			if (curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == blank_space_color)
+				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == GAME_blank_space_color)
 				outline.push_back({ curr_x, curr_y + 1 });
 
 			if (curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == blank_space_color)
-				outline.push_back({ curr_x, curr_y - 1 });*/
+				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == GAME_blank_space_color)
+				outline.push_back({ curr_x, curr_y - 1 });
 
 		}
 	}
@@ -360,6 +363,8 @@ void Asteroid::create_outline(Uint32* buffer) {
 	// TODO: wrap outline clockwise first (for left normals; counterclockwise for right normals)
 	// start floodfill at leftmost with upward bias???
 
+	this->center_x = sum_x / count;
+	this->center_y = sum_y / count;
 
 	if (outline.size() < 4 * SETTING_MAX_POLYGON_VERTICES)
 	{
@@ -377,8 +382,8 @@ void Asteroid::cleanup() {
 
 bool Asteroid::in_bounds(int screen_x, int screen_y) const {
 	return
-		screen_x >= (this->screen_x - w / 2) && screen_x <= (this->screen_x + w / 2) &&
-		screen_y >= (this->screen_y - h / 2) && screen_y <= (this->screen_y + h / 2);
+		screen_x >= (this->screen_x - (w >> 1)) && screen_x <= (this->screen_x + (w >> 1)) &&
+		screen_y >= (this->screen_y - (h >> 1)) && screen_y <= (this->screen_y + (h >> 1));
 }
 
 //void Asteroid::render(RenderWindow* window)
@@ -391,21 +396,21 @@ bool Asteroid::in_bounds(int screen_x, int screen_y) const {
 //	//};
 //	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);*/
 //
-//	/*window->render(0, 0, 0, 0, screen_x - w / 2, screen_y - h / 2, w, h, texture);*/
+//	/*window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);*/
 //}
 
 void asteroids_init() 
 {
-	asteroids = new Asteroid[asteroids_count];
+	asteroids = new Asteroid[GAME_asteroid_count];
 
 	int i = 0;
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
 	{
-		asteroid->x = GAME_width / 2.0F + (float)(rand() % asteroid_variance);
-		asteroid->y = GAME_height / 2.0F + (float)(rand() % asteroid_variance);
+		asteroid->x = GAME_width / 2.0F + (float)(rand() % ASTEROID_startpos_variance);
+		asteroid->y = GAME_height / 2.0F + (float)(rand() % ASTEROID_startpos_variance);
 
-		asteroid->velocity_x = (float)((float)rand() / (float)RAND_MAX) * 2 * top_initial_speed - top_initial_speed * 0.5F;
-		asteroid->velocity_y = (float)((float)rand() / (float)RAND_MAX) * 2 * top_initial_speed - top_initial_speed * 0.5F;
+		asteroid->velocity_x = (float)((float)rand() / (float)RAND_MAX) * 2 * ASTEROID_startspeed_maximum - ASTEROID_startspeed_maximum * 0.5F;
+		asteroid->velocity_y = (float)((float)rand() / (float)RAND_MAX) * 2 * ASTEROID_startspeed_maximum - ASTEROID_startspeed_maximum * 0.5F;
 		asteroid->velocity_x /= asteroid->mass;
 		asteroid->velocity_y /= asteroid->mass;
 		asteroid->desired_velocity_x = asteroid->velocity_x;
@@ -423,11 +428,13 @@ void player_input_update(SDL_Event *running_event)
 {
 	// Select controlled asteroid
 	
+
+
 	// Direct controlled asteroid
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
 	{
-		//if (asteroid->asteroid_id != controlled_asteroid)
-		//	continue;
+		/*if (asteroid->asteroid_id != controlled_asteroid)
+			continue;*/
 
 		//// ESC to deselect 
 		//if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE) 
@@ -462,7 +469,7 @@ void asteroids_render_update(RenderWindow *window)
 		window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
 	
 
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
 	{
 		/*char text[8];
 		sprintf_s(text, "%.1d", asteroid->outline_point_count);
@@ -485,7 +492,7 @@ void asteroids_render_update(RenderWindow *window)
 
 void asteroids_update(float delta_time) 
 {
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
 	{
 		asteroid->update();
 	}
@@ -493,7 +500,7 @@ void asteroids_update(float delta_time)
 
 void asteroids_cleanup() 
 {
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
+	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
 	{
 		asteroid->cleanup();
 	}

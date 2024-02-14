@@ -21,9 +21,9 @@ private:
 
 };
 
-extern int max_asteroid_radius;
+extern int ASTEROID_max_asteroid_radius;
 
-extern const int asteroids_count;
+extern const int GAME_asteroid_count;
 extern Asteroid* asteroids;
 extern Asteroid player;
 

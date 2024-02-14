@@ -33,6 +33,9 @@ public:
 
 	int screen_x;
 	int screen_y;
+
+	int center_x;
+	int center_y;
 	
 	float movement_windup_speed;
 	float drag;

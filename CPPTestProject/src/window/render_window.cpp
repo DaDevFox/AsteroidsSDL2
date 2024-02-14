@@ -6,8 +6,10 @@ RenderWindow::RenderWindow(const char *title, int width, int height)
 {
 	camera.x = 0.0F;
 	camera.y = 0.0F;
+
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	
 	if (window == nullptr)
 	{
 		SDL_Log("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -28,6 +30,8 @@ RenderWindow::RenderWindow(const char *title, int width, int height)
 
 RenderWindow::RenderWindow(const RenderWindow& other) 
 {
+	std::cout<<"Copy Constructor for RenderWindow called! Expensive!";
+
 	camera.x = 0.0F;
 	camera.y = 0.0F;
 	// FLAG: no renderer sharing; that's weird
@@ -38,6 +42,7 @@ RenderWindow::RenderWindow(const RenderWindow& other)
 		SDL_Log("Window could not be created! SDL Error: %s\n", SDL_GetError());
 		exit(1);
 	}
+
 	if (renderer == nullptr)
 	{
 		SDL_Log("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -297,7 +302,7 @@ void RenderWindow::render(int src_x, int src_y, int src_w, int src_h, int dst_x,
 	};
 	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
 	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
-	if (flag1)
+	if (flag1 || flag2)
 	{
 		destination.w = screen_dest_x_end - destination.x;
 		destination.h = screen_dest_y_end - destination.y;
@@ -374,8 +379,8 @@ void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int
 	if (flag1 && flag2)
 	{
 		SDL_Point center = {
-			destination.w / 2,
-			destination.h / 2
+			destination.w >> 1,
+			destination.h >> 1
 		};
 
 		SDL_RenderCopyEx(renderer, texture, &source, &destination, angle, &center, SDL_FLIP_NONE);
@@ -406,8 +411,8 @@ void RenderWindow::render_rotate(int screen_x, int screen_y, int w, int h, doubl
 //	};
 //
 //	SDL_Point center = {
-//		x + w / 2,
-//		y + h / 2
+//		x + (w >> 1),
+//		y + (h >> 1)
 //	};
 //
 //	SDL_RenderCopyEx(renderer, texture, nullptr, &destination, angle, &center, SDL_FLIP_NONE);
@@ -463,8 +468,8 @@ void RenderWindow::render_centered_screen(float x, float y, const char* text, TT
 	src.h = surfaceMessage->h;
 
 	SDL_Rect dst;
-	dst.x = x - src.w / 2;
-	dst.y = y - src.h / 2;
+	dst.x = x - (src.w >> 1);
+	dst.y = y - (src.h >> 1);
 	dst.w = src.w;
 	dst.h = src.h;
 
@@ -480,7 +485,7 @@ void RenderWindow::render_centered_world(float x, float y, const char* text, TTF
 	// NOTE: 1-byte Latin1 text (incl. ASCII) only
 	TTF_SizeText(font, text, &(dst.w), &(dst.h));
 
-	if (world_to_screen((int)x - dst.w / 2, (int)y - dst.h / 2, &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
+	if (world_to_screen((int)x - dst.w >> 1, (int)y - dst.h >> 1, &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
 	{
 		SDL_Rect src;
 		src.x = 0;
