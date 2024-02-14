@@ -17,7 +17,7 @@ float top_initial_speed = 0.02F;
 const char* asteroid_texture_path = "./circle.png";
 
 Asteroid *asteroids;
-const int asteroids_count = 50;
+const int asteroids_count = 20;
 
 int controlled_asteroid;
 
@@ -50,7 +50,15 @@ survive and destroy all players by the time limit
 
 */
 
+/*
 
+phys
+
+
+
+
+
+*/
 
 Asteroid::Asteroid() 
 {
@@ -298,14 +306,19 @@ void Asteroid::create_outline(Uint32* buffer) {
 	//	}
 	//}
 
-	for (int curr_x = 0; curr_x < w; curr_x++)
+
+
+	//2
+    for (int curr_x = 0; curr_x < w; curr_x++)
 	{
 		for (int curr_y = 0; curr_y < h; curr_y++)
 		{
 			if (*(buffer + pixel_to_index(curr_x, curr_y, w)) != asteroid_color_raw)
 				continue;
 
-			if (curr_x + 1 < w &&
+			outline.push_back({curr_x + 1, curr_y - 1});
+
+			/*if (curr_x + 1 < w &&
 				curr_y - 1 > 0 &&
 				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == blank_space_color)
 				outline.push_back({ curr_x + 1, curr_y - 1 });
@@ -339,7 +352,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 
 			if (curr_y - 1 > 0 &&
 				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == blank_space_color)
-				outline.push_back({ curr_x, curr_y - 1 });
+				outline.push_back({ curr_x, curr_y - 1 });*/
 
 		}
 	}

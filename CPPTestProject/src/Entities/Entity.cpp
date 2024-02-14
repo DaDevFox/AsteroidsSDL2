@@ -128,8 +128,6 @@ void Entity::init()
 
 void Entity::move()
 {
-	
-
 	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
 	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
 
@@ -143,11 +141,11 @@ void Entity::move()
 	y += velocity_y * delta_time;
 
 	if (x > GAME_width)
-		x -= GAME_width;
+		x = (int)x % GAME_width;
 	if (x < 0)
 		x += GAME_width;
 	if (y > GAME_height)
-		y -= GAME_height;
+		y = (int) y % GAME_height;
 	if (y < 0)
 		y += GAME_width;
 
@@ -188,7 +186,7 @@ int hash(int x, int y);
 	
 std::set<int> used;
 
-bool collision_between(Entity* a, Entity* b) {
+bool collision_between(Entity* a, Entity* b, SDL_Point *hit) {
 	if (!(a->outline_point_count || b->outline_point_count))
 		return false;
 	
@@ -205,8 +203,7 @@ bool collision_between(Entity* a, Entity* b) {
 		used.insert(hash(ax + i->x, ay + i->y));
 		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255});
 	}
-
-	bool flag = false;
+	
 	for (SDL_Point* i = b->outline; i < b->outline + b->outline_point_count; i++)
 	{
 		int hashed = hash(bx + i->x, by + i->y);
@@ -214,12 +211,14 @@ bool collision_between(Entity* a, Entity* b) {
 		//	if(used[idx] == hashed)//TODO: sorting + binary search for vector
 		if(used.find(hashed) != used.end()){
 			//return true;
-				window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
-				flag = true;
+				//window.render_point(bx + i->x, by + i->y, { 255, 0, 0, 255 });
+				*hit = SDL_Point {bx + i->x, by + i->y};
+				return true;
 		}
+
 	}
 
-	return flag;
+	return false;
 }
 
 int hash(int x, int y) {
@@ -256,17 +255,57 @@ void Entity::check_collisions()
 			continue;
 
 		Entity* other = active[otherID];
-		if (collision_between(this, other))
+		SDL_Point hit;
+		if (collision_between(this, other, &hit))
 		{
-;
+			// EXPENSIVE IKIK
+			float other_x = other->x + (other->w >> 1);
+			float other_y = other->y + (other->h >> 1);
 
-			screen_x = (int)x;
-			screen_y = (int)y;
+			float this_x = x + (w>>1);
+			float this_y = y + (h>>1);
+
+			float diff_x = other_x - this_x;
+			float diff_y = other_y - this_y;
+
+			float magnitude = sqrt(diff_x * diff_x + diff_y * diff_y);
+			diff_x /= magnitude;
+			diff_y /= magnitude;
+
+			float seperation_multiplier = 0.01F;
+
+			other->velocity_x *= diff_x;
+			other->velocity_y *= diff_y;
+
+			other->velocity_x += diff_x * seperation_multiplier * delta_time;
+			other->velocity_y += diff_y * seperation_multiplier * delta_time;
+
+			velocity_x *= -diff_x;
+			velocity_y *= -diff_y;
+
+			velocity_x += -diff_x * seperation_multiplier * delta_time;
+			velocity_y += -diff_y * seperation_multiplier * delta_time;
+
+
+
+			desired_velocity_x = velocity_x;
+			desired_velocity_y = velocity_y;
+
+			other->desired_velocity_x = other->velocity_x;
+			other->desired_velocity_y = other->velocity_y;
+
+			other->x -= other->velocity_x * delta_time * seperation_multiplier;
+			other->y -= other->velocity_y * delta_time * seperation_multiplier;
+
+			x -= velocity_x * delta_time * seperation_multiplier;
+			y -= velocity_y * delta_time * seperation_multiplier;
+
+
 
 			// full equation for perfectly elastic collision: 
 			// https://phys.libretexts.org/Courses/Joliet_Junior_College/Physics_201_-_Fall_2019v2/Book%3A_Custom_Physics_textbook_for_JJC/09%3A_Linear_Momentum_and_Collisions/9.16%3A_Collisions#:~:text=If%20two%20particles%20are%20involved,m1)v2i.
 
-			float velocity_x_after = 
+			/*float velocity_x_after = 
 				( (mass - other->mass) * velocity_x
 				+ (2 * other->mass)    * other->velocity_x ) 
 				/ (mass + other->mass);
@@ -274,27 +313,20 @@ void Entity::check_collisions()
 			float velocity_y_after = 
 				( (mass - other->mass) * velocity_y
 				+ (2 * other->mass)    * other->velocity_y ) 
-				/ (mass + other->mass);
+				/ (mass + other->mass);*/
 
-			// undo movement into collision
-			float seperation_multiplier = 10.0F;
-
-			/*x -= velocity_x * delta_time * seperation_multiplier;
-			y -= velocity_y * delta_time * seperation_multiplier;
-			
-			other->x -= other->velocity_x * delta_time * seperation_multiplier;
-			other->y -= other->velocity_y * delta_time * seperation_multiplier*/
+			//// undo movement into collision
 
 			// conduct extra separation movement
-			//x += velocity_x_after * delta_time;
-			//y += velocity_y_after * delta_time;
 
 
-			desired_velocity_x = velocity_x_after;
+
+			/*desired_velocity_x = velocity_x_after;
 			desired_velocity_y = velocity_y_after;
 
 			velocity_x = velocity_x_after;
-			velocity_y = velocity_y_after;
+			velocity_y = velocity_y_after;*/
+						
 
 			return;
 		}

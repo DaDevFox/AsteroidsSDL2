@@ -3,18 +3,18 @@
 
 const int edge_buffer = 512;
 
+void Camera::set_zoom(float new_zoom) {
+	zoom = SDL_min(SDL_max(new_zoom, SETTING_camera_zoom_min), SETTING_camera_zoom_max);
+
+	x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
+	y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
+}
+
 void Camera::teleport(float x, float y) {
 	this->x = x;
 	this->y = y;
 	desired_x = x;
 	desired_y = y;
-}
-
-void Camera::set_zoom(float new_zoom) {
-	zoom = new_zoom;
-
-	x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
-	y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
 }
 
 bool Camera::in_game(int screen_x, int screen_y) {

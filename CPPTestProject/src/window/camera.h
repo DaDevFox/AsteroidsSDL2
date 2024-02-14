@@ -15,6 +15,11 @@ public:
 	/// </summary>
 	/// <param name="new_zoom"></param>
 	void set_zoom(float new_zoom);
+	/// <summary>
+	/// Moves instantaneously to a given x and y coordinate
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
 	void teleport(float x, float y);
 
 	void input_update(SDL_Event* running_event);
@@ -45,7 +50,5 @@ public:
 	int world_to_screen_y(float world_y);
 
 	Camera()
-		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F) {
-
-	}
+		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F) {}
 };

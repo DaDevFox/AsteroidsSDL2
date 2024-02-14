@@ -1,7 +1,6 @@
 #pragma once
 #include "window/RenderWindow.h"
 #include "settings.h"
-#include "entities/Entity.h"
 
 #define WIDTH 680
 #define HEIGHT 400

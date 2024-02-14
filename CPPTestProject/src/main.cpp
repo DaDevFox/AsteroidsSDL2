@@ -1,10 +1,11 @@
+#include <iostream>
+#include <string>
+
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <string>
-#include <any>
+
 #include "main.h"
 #include "entities/asteroid.h"
-#include <iostream>
 
 #undef main // needed for cpp compilation
 
@@ -131,7 +132,7 @@ void render_update()
 	//else
 	//	strcpy_s(output, 7, "   ");
 
-	sprintf_s(output, "%.1d %.1d, %.1d", (int)(1.0f / delta_time), (int)window.camera.x, (int)window.camera.y);
+	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window.camera.x, (int)window.camera.y);
 
 
 	window.render_centered_screen(WINDOW_width / 2.0F, 50.0F, output, encode_sans_medium, color);
