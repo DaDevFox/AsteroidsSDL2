@@ -5,8 +5,9 @@
 #include <set>
 #include <queue>
 #include <iostream>
+#include <random>
 
-float mass_per_pixel = (ASTEROID_maximum_mass - ASTEROID_minimum_mass) / (4.0F * ASTEROID_max_asteroid_radius * ASTEROID_max_asteroid_radius);
+float mass_per_pixel = (ASTEROID_maximum_mass - ASTEROID_minimum_mass) / (4.0F * ASTEROID_maximum_radius * ASTEROID_maximum_radius);
 const char* asteroid_texture_path = "./circle.png";
 
 
@@ -55,7 +56,7 @@ phys
 
 Asteroid::Asteroid() 
 {
-	init(ASTEROID_max_asteroid_radius * 2, ASTEROID_max_asteroid_radius * 2);
+	init(ASTEROID_maximum_radius * 2, ASTEROID_maximum_radius * 2);
 }
 
 void Asteroid::init(int w, int h) {
@@ -401,10 +402,13 @@ bool Asteroid::in_bounds(int screen_x, int screen_y) const {
 
 void asteroids_init() 
 {
-	asteroids = new Asteroid[GAME_asteroid_count];
+	//asteroids = new Asteroid[GAME_asteroid_count];
 
 	int i = 0;
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
+	std::cout << sizeof(Asteroid) << "\n";
+	std::cout << sizeof(Entity) << std::endl;
+
+	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
 	{
 		asteroid->x = GAME_width / 2.0F + (float)(rand() % ASTEROID_startpos_variance);
 		asteroid->y = GAME_height / 2.0F + (float)(rand() % ASTEROID_startpos_variance);
@@ -417,59 +421,112 @@ void asteroids_init()
 		asteroid->desired_velocity_y = asteroid->velocity_y;
 		asteroid->drag_enabled = true;
 		
-		asteroid->idx = i;
+		//asteroid->id = i;
 
-		std::cout << "asteroid initialized w/ main index " << asteroid->id << " and asteroid index " << asteroid->idx << std::endl;
+		asteroid->init(ASTEROID_maximum_radius * 2, ASTEROID_maximum_radius * 2);
+
+		std::cout << "asteroid initialized w/ main index " << asteroid->id << std::endl;
 		i++;
 	}
 }
 
+static bool clicking = true;
+
 void player_input_update(SDL_Event *running_event) 
 {
-	// Select controlled asteroid
-	
+
 
 
 	// Direct controlled asteroid
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
-	{
+	//for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
+	//{
 		/*if (asteroid->asteroid_id != controlled_asteroid)
 			continue;*/
 
-		//// ESC to deselect 
-		//if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE) 
-		//{
-		//	controlled_asteroid = -1;
-		//}
+		// ESC to deselect 
+		if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE) 
+		{
+			controlled_asteroid = -1;
+		}
 
-		//// CLICK to set heading
-		//if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
-		//{
-		//	asteroid->heading_x = window.camera.screen_to_world_x(running_event->motion.x);
-		//	asteroid->heading_y = window.camera.screen_to_world_y(running_event->motion.y);
-		//	controlled_asteroid = -1;
-		//}
+		// CLICK to set heading
+		if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
+			clicking = true;
+		else if(running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
+			clicking = false;
 
-		//// mouse based rotation always
+		// mouse based rotation always
 		//if (running_event->type == SDL_MOUSEMOTION) 
-		//	asteroid->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
-	}
+		//	player->angle = atan2((double)y_diff_to_mouse, (double)x_diff_to_mouse);
+		
+
+	//}
 }
 
 inline bool operator==(const SDL_Color& self, const SDL_Color& b) {
 	return self.r == b.r && self.g == b.g && self.b == b.b && self.a == b.a;
 }
 
+int* thrust_columns = NULL;
+
+int thrust_outline_thickness = 4;
+float thrust_elapsed = 0.0F;
+const int thrust_max_height = 2;
+float thrust_random_tick = 10.0F;
+const int thrust_numColumns = 10;
+std::random_device rand_device;
+std::uniform_int_distribution<int> dist(1, thrust_max_height);
+
 void asteroids_render_update(RenderWindow *window)
 {
-	for (int x = 0; x < GAME_width; x += tile_size) 
-		window->render_line(x, 0, x, GAME_height, {200, 200, 200, 255});
+	if(DEBUG_chunk_gridlines)
+	{
+		for (int x = 0; x < GAME_width; x += tile_size) 
+			window->render_line(x, 0, x, GAME_height, {200, 200, 200, 255});
 
-	for (int y = 0; y < GAME_height; y += tile_size)
-		window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
+		for (int y = 0; y < GAME_height; y += tile_size)
+			window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
+	}
+
 	
+	if(thrust_columns == NULL)
+		thrust_columns = new int[thrust_numColumns];
 
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
+	if (clicking) 
+	{
+		thrust_elapsed += delta_time;
+		if (thrust_elapsed > thrust_random_tick) 
+		{
+			for(int i = 0; i < thrust_numColumns; i++)
+			{
+				thrust_columns[i] = dist(rand_device);
+			}
+
+			thrust_elapsed = 0.0F;
+		}
+		
+
+		// Select player asteroid
+		Asteroid* player = ((Asteroid*)entities + GAME_ship_count + 1);
+
+		float vel_magnitude = sqrt((player->desired_velocity_x * player->desired_velocity_x) + (player->desired_velocity_y * player->desired_velocity_y));
+		float vel_normalized_x = player->desired_velocity_x / vel_magnitude;
+		float vel_normalized_y = player->desired_velocity_y / vel_magnitude;
+
+		for(int i = 0; i < player->outline_point_count; i++)
+		{
+			SDL_Point point = player->outline[i];
+			int size = thrust_outline_thickness * thrust_columns[(int)((float)thrust_numColumns * ((float)i / (float)player->outline_point_count))];
+			int size_x = size * vel_normalized_x;
+			int size_y = size * vel_normalized_y;
+			window->render_rect(
+				player->x + point.x - (player->w>>1) - (size_x), 
+				player->y + point.y - (player->h >> 1) - (size_y), 
+				size_x, size_y, PLAYER_thrusting_outline_color);
+		}
+	}
+
+	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
 	{
 		/*char text[8];
 		sprintf_s(text, "%.1d", asteroid->outline_point_count);
@@ -492,7 +549,38 @@ void asteroids_render_update(RenderWindow *window)
 
 void asteroids_update(float delta_time) 
 {
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
+
+	static int heading_x;
+	static int heading_y;
+
+	if (clicking)
+	{
+		// Select player asteroid
+		Asteroid* player = ((Asteroid*)entities + GAME_ship_count + 1);
+		
+		int mouse_x, mouse_y;
+		SDL_GetMouseState(&mouse_x, &mouse_y);
+
+		heading_x = window.camera.screen_to_world_x(mouse_x);
+		heading_y = window.camera.screen_to_world_y(mouse_y);
+
+		/*int mouse_x, mouse_y;
+		SDL_GetMouseState(&mouse_x, &mouse_y);*/
+
+		float x_diff = (heading_x - player->x);
+		float y_diff = (heading_y - player->y);
+		
+		x_diff = SDL_clamp(x_diff, -PLAYER_controlspeed_maximum, PLAYER_controlspeed_maximum);
+		y_diff = SDL_clamp(y_diff, -PLAYER_controlspeed_maximum, PLAYER_controlspeed_maximum);
+
+
+
+		player->desired_velocity_x += (x_diff - player->desired_velocity_x) * delta_time * player->movement_windup_speed;
+		player->desired_velocity_y += (y_diff - player->desired_velocity_y) * delta_time * player->movement_windup_speed;
+	}
+
+	// TODO: no player control X seconds after collision
+	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
 	{
 		asteroid->update();
 	}
@@ -500,9 +588,9 @@ void asteroids_update(float delta_time)
 
 void asteroids_cleanup() 
 {
-	for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + GAME_asteroid_count; asteroid++)
+	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
 	{
 		asteroid->cleanup();
 	}
-	delete[] asteroids;
+	delete[] thrust_columns;
 }

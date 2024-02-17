@@ -19,7 +19,7 @@ const int ships_count = 10;
 
 SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 
-Entity *entities;
+void *entities;
 
 const char* window_title = "Asteroids";
 RenderWindow window(window_title, WIDTH, HEIGHT);
@@ -76,7 +76,7 @@ bool game_init() {
 		return false;
 	}
 
-	asteroids_init();
+	entities_init();
 	
 	return true;
 }
@@ -96,7 +96,7 @@ void resize() {
 
 void input_update() 
 {
-	//player_input_update(&running_event);
+	player_input_update(&running_event);
 	window.camera.input_update(&running_event);
 }
 
@@ -175,7 +175,7 @@ void game_loop()
 
 void game_cleanup() {
 
-	asteroids_cleanup();
+	entities_cleanup();
 	IMG_Quit();
 	SDL_Quit();
 }

@@ -4,7 +4,7 @@
 
 class Asteroid : public Entity {
 public:
-	int idx;
+	//int idx;
 
 	void init(int w, int h);
 	void generate();

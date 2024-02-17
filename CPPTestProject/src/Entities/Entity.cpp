@@ -1,4 +1,3 @@
-#include "Entity.h"
 #include "../main.h"
 #include <string.h>
 #include <map>
@@ -9,7 +8,7 @@
 #include <vector>
 #include <iostream>
 
-const int tile_size = ASTEROID_max_asteroid_radius;
+const int tile_size = ASTEROID_maximum_radius;
 const int chunk_height = GAME_height / tile_size;
 const int chunk_width = GAME_width / tile_size;
 
@@ -325,7 +324,8 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
-	window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, {100, 100, 100, 100});
+	if(DEBUG_entity_outlines)
+		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
 	window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
 	
 }
@@ -337,9 +337,19 @@ void Entity::update()
 	check_collisions();
 }
 
+void entities_init() {
+	entities = new Entity[GAME_ship_count + GAME_asteroid_count];
+
+
+
+	asteroids_init();
+}
+
 void entities_cleanup() {
 	//TODO
 
+	asteroids_cleanup();
 
+	delete[] entities;
 }
 

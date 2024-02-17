@@ -67,3 +67,6 @@ private:
 
 	friend class EntityManager;
 };
+
+void entities_init();
+void entities_cleanup();
