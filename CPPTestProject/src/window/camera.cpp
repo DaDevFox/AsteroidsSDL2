@@ -20,12 +20,12 @@ void Camera::teleport(float x, float y) {
 bool Camera::in_game(int screen_x, int screen_y) {
 	int world_x = screen_x * zoom + x;
 	int world_y = screen_y * zoom + y;
-	return 
+	return
 		world_x > 0 && world_x < GAME_width &&
 		world_y > 0 && world_y < GAME_height;
 }
 
-bool Camera::screen_to_world(int screen_x, int screen_y, float* world_x, float* world_y) 
+bool Camera::screen_to_world(int screen_x, int screen_y, float* world_x, float* world_y)
 {
 	*world_x = screen_x * zoom + x;
 	*world_y = screen_y * zoom + y;
@@ -59,13 +59,13 @@ bool Camera::world_to_screen(float world_x, float world_y, int* screen_x, int* s
 }
 
 int Camera::world_to_screen_x(float world_x) {
-	return (int)((world_x - x)/zoom);
+	return (int)((world_x - x) / zoom);
 }
 int Camera::world_to_screen_y(float world_y) {
-	return (int)((world_y - y)/zoom);
+	return (int)((world_y - y) / zoom);
 }
 
-void Camera::input_update(SDL_Event *running_event) 
+void Camera::input_update(SDL_Event* running_event)
 {
 	if (running_event->type == SDL_KEYDOWN)
 	{
@@ -98,14 +98,14 @@ void Camera::input_update(SDL_Event *running_event)
 }
 
 void Camera::update(float delta_time) {
-	float true_desired_x = desired_x - screen_to_world_x(WINDOW_width)/2.0F;
-	float true_desired_y = desired_y - screen_to_world_y(WINDOW_height)/2.0F;
+	float true_desired_x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
+	float true_desired_y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
 
-	if(fabs(true_desired_x - x) > 0.1f)
+	if (fabs(true_desired_x - x) > 0.1f)
 		x = x + (true_desired_x - x) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
-	if(fabs(true_desired_y - y) > 0.1f)
+	if (fabs(true_desired_y - y) > 0.1f)
 		y = y + (true_desired_y - y) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
-	
+
 	if (true_desired_x + screen_to_world_x(WINDOW_width) > GAME_width + edge_buffer)
 		desired_x = GAME_width - screen_to_world_x(WINDOW_width) + screen_to_world_x(WINDOW_width) / 2.0F + edge_buffer;
 	if (true_desired_x < -edge_buffer)

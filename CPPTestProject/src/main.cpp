@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "entities/asteroid.h"
+#include "entities/ship.h"
 
 #undef main // needed for cpp compilation
 
@@ -19,7 +20,7 @@ const int ships_count = 10;
 
 SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 
-void *entities;
+void* entities;
 
 const char* window_title = "Asteroids";
 RenderWindow window(window_title, WIDTH, HEIGHT);
@@ -33,10 +34,10 @@ Uint32 current_tick;
 
 SDL_Event running_event;
 
-SDL_Color game_frame_color{120, 120, 120, 255};
+SDL_Color game_frame_color{ 120, 120, 120, 255 };
 
 // resources
-TTF_Font *encode_sans_medium;
+TTF_Font* encode_sans_medium;
 
 void resize(void);
 
@@ -48,17 +49,17 @@ bool game_init() {
 	game_running = true;
 	srand(12);
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		SDL_Log("Error on SDL_Init: %s\n", SDL_GetError());
 		return false;
 	}
-	if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) 
+	if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
 	{
 		SDL_Log("Error on IMG_Init: %s\n", SDL_GetError());
 		return false;
 	}
-	if (TTF_Init() < 0) 
+	if (TTF_Init() < 0)
 	{
 		SDL_Log("Error on TTF_Init: %s\n", SDL_GetError());
 		return false;
@@ -77,16 +78,16 @@ bool game_init() {
 	}
 
 	entities_init();
-	
+
 	return true;
 }
 
-void window_update() 
+void window_update()
 {
 	switch (running_event.window.event) {
-		case SDL_WINDOWEVENT_RESIZED:
-			resize();
-			break;
+	case SDL_WINDOWEVENT_RESIZED:
+		resize();
+		break;
 	}
 }
 
@@ -94,13 +95,13 @@ void resize() {
 	window.get_info(&WINDOW_width, &WINDOW_height);
 }
 
-void input_update() 
+void input_update()
 {
 	player_input_update(&running_event);
 	window.camera.input_update(&running_event);
 }
 
-void render_game_frame() 
+void render_game_frame()
 {
 	window.render_line(0, 0, GAME_width, 0, game_frame_color);
 	window.render_line(GAME_width, 0, GAME_width, GAME_height, game_frame_color);
@@ -108,15 +109,16 @@ void render_game_frame()
 	window.render_line(0, GAME_height, 0, 0, game_frame_color);
 }
 
-void render_update() 
+void render_update()
 {
 	render_game_frame();
 
+	ships_render_update(&window);
 	asteroids_render_update(&window);
 
-	SDL_Color color = 
+	SDL_Color color =
 	{
-		255, 
+		255,
 		255,
 		255,
 		255
@@ -140,26 +142,27 @@ void render_update()
 	window.render_centered_screen(WINDOW_width / 2.0F, 50.0F, output, encode_sans_medium, color);
 }
 
-void update() 
+void update()
 {
 	current_tick = SDL_GetTicks();
 	delta_time = (float)((current_tick - last_tick));
 
 	window.camera.update(delta_time);
+	ships_update(delta_time);
 	asteroids_update(delta_time);
-	
+
 
 	last_tick = current_tick;
 }
 
 
-void game_loop() 
+void game_loop()
 {
 	while (SDL_PollEvent(&running_event))
 	{
 		if (running_event.type == SDL_QUIT)
 			game_running = false;
-		
+
 		if (running_event.type == SDL_WINDOWEVENT)
 			window_update();
 
@@ -183,8 +186,8 @@ void game_cleanup() {
 int main() {
 	if (!game_init())
 		exit(1);
-	
-	while (game_running) 
+
+	while (game_running)
 	{
 		game_loop();
 	}

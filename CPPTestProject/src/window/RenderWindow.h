@@ -8,7 +8,7 @@ class RenderWindow
 
 public:
 	Camera camera;
-	
+
 
 	RenderWindow(const char* title, int width, int height);
 	~RenderWindow();
@@ -21,7 +21,7 @@ public:
 
 	void clear();
 	void clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-	
+
 	void cleanup();
 	void init();
 
@@ -89,7 +89,7 @@ public:
 	/// <param name="angle"></param>
 	/// <param name="texture"></param>
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Texture* texture);
-	void render_rotate(int x, int y, int w, int h, double angle, SDL_Point *center, SDL_RendererFlip flip, SDL_Texture* texture);
+	void render_rotate(int x, int y, int w, int h, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Texture* texture);
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Texture* texture);
 
 	void render(float x, float y, const char* text, TTF_Font* font, SDL_Color color);

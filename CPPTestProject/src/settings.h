@@ -3,6 +3,8 @@
 
 #define SETTING_MAX_POLYGON_VERTICES 512
 
+extern const char* RESOURCE_ship_texture_path;
+
 extern int SETTING_camera_pan_speed;
 extern float SETTING_camera_pan_smoothness;
 

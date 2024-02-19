@@ -2,7 +2,8 @@
 #include <SDL.h>
 #include "Entity.h"
 
-class Asteroid : public Entity {
+class Asteroid : public Entity
+{
 public:
 	//int idx;
 
@@ -30,7 +31,7 @@ extern Asteroid player;
 
 
 void asteroids_init();
-void player_input_update(SDL_Event *running_event);
+void player_input_update(SDL_Event* running_event);
 void asteroids_render_update(RenderWindow* window);
 void asteroids_update(float delta_time);
 void asteroids_cleanup();

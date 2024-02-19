@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\entities\ship.cpp" />
     <ClCompile Include="src\math\polygon_math.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\entities\Entity.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\entities\EntityManager.h" />
+    <ClInclude Include="src\entities\ship.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\entities\Entity.h" />
     <ClInclude Include="src\main.h" />

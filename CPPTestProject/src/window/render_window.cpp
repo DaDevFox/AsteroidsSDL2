@@ -2,14 +2,14 @@
 #include "../main.h"
 #include <iostream>
 
-RenderWindow::RenderWindow(const char *title, int width, int height)
+RenderWindow::RenderWindow(const char* title, int width, int height)
 {
 	camera.x = 0.0F;
 	camera.y = 0.0F;
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	
+
 	if (window == nullptr)
 	{
 		SDL_Log("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -28,9 +28,9 @@ RenderWindow::RenderWindow(const char *title, int width, int height)
 	}
 }
 
-RenderWindow::RenderWindow(const RenderWindow& other) 
+RenderWindow::RenderWindow(const RenderWindow& other)
 {
-	std::cout<<"Copy Constructor for RenderWindow called! Expensive!";
+	std::cout << "Copy Constructor for RenderWindow called! Expensive!";
 
 	camera.x = 0.0F;
 	camera.y = 0.0F;
@@ -56,7 +56,7 @@ RenderWindow::RenderWindow(const RenderWindow& other)
 	}
 }
 
-RenderWindow& RenderWindow::operator=(const RenderWindow& other) 
+RenderWindow& RenderWindow::operator=(const RenderWindow& other)
 {
 	camera.x = 0.0F;
 	camera.y = 0.0F;
@@ -81,59 +81,59 @@ RenderWindow& RenderWindow::operator=(const RenderWindow& other)
 	}
 }
 
-RenderWindow::~RenderWindow() 
+RenderWindow::~RenderWindow()
 {
 	cleanup();
 }
 
-void RenderWindow::init() 
+void RenderWindow::init()
 {
-	
+
 }
 
 
-void RenderWindow::clear() 
+void RenderWindow::clear()
 {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	if (SDL_RenderClear(renderer) < 0)
 		SDL_Log("Error on clear RenderWindow: %s\n", SDL_GetError());
 }
 
-void RenderWindow::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a) 
+void RenderWindow::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	SDL_SetRenderDrawColor(renderer, r, g, b, a);
 	if (SDL_RenderClear(renderer) < 0)
 		SDL_Log("Error on clear RenderWindow: %s\n", SDL_GetError());
 }
 
-void RenderWindow::get_info(int* width, int* height) 
+void RenderWindow::get_info(int* width, int* height)
 {
 	SDL_GetWindowSize(window, width, height);
 }
 
-void RenderWindow::cleanup() 
+void RenderWindow::cleanup()
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
 
 
-SDL_Color RenderWindow::get_pixel_color(float world_x, float world_y) 
+SDL_Color RenderWindow::get_pixel_color(float world_x, float world_y)
 {
-	SDL_Rect rect = {0,0,1,1};
+	SDL_Rect rect = { 0,0,1,1 };
 	camera.world_to_screen(world_x, world_y, &rect.x, &rect.y);
-	Uint32 *buffer = nullptr;
+	Uint32* buffer = nullptr;
 	SDL_RenderReadPixels(renderer, &rect, SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA8888, buffer, sizeof(int));
 
-	if(buffer == nullptr)
-		return {0, 0, 0, 0};
+	if (buffer == nullptr)
+		return { 0, 0, 0, 0 };
 
 	Uint8 r = *((Uint8*)buffer);
 	Uint8 g = *((Uint8*)buffer + 1);
 	Uint8 b = *((Uint8*)buffer + 2);
 	Uint8 a = *((Uint8*)buffer + 3);
 
-	return {r, g, b, a};
+	return { r, g, b, a };
 
 }
 
@@ -157,7 +157,7 @@ int RenderWindow::world_to_screen_y(float world_y) {
 
 #pragma region Basic Geometry
 
-void RenderWindow::render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color) 
+void RenderWindow::render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color)
 {
 	render_line(world_x, world_y, world_x + world_w, world_y, color);
 	render_line(world_x + world_w, world_y, world_x + world_w, world_y + world_h, color);
@@ -173,29 +173,29 @@ void RenderWindow::render_rect(float world_x, float world_y, float world_w, floa
 		0
 	};
 
-	if (world_to_screen(world_x, world_y, &rect.x, &rect.y) && world_to_screen(world_x + world_w, world_y + world_h, &rect.w, &rect.h)) 
+	if (world_to_screen(world_x, world_y, &rect.x, &rect.y) && world_to_screen(world_x + world_w, world_y + world_h, &rect.w, &rect.h))
 	{
 		// w and h temporarily store screen_x2 and screen_y2
 		rect.w -= rect.x;
 		rect.h -= rect.y;
 
 		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-		SDL_RenderDrawRect(renderer, &rect);
+		SDL_RenderFillRect(renderer, &rect);
 	}
 }
 
-void RenderWindow::render_point(int x, int y, SDL_Color color) 
+void RenderWindow::render_point(int x, int y, SDL_Color color)
 {
 	int screen_x;
 	int screen_y;
-	if (world_to_screen(x, y, &screen_x, &screen_y)) 
+	if (world_to_screen(x, y, &screen_x, &screen_y))
 	{
 		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawPoint(renderer, screen_x, screen_y);
 	}
 }
 
-void RenderWindow::render_point(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a) 
+void RenderWindow::render_point(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	int screen_x;
 	int screen_y;
@@ -206,7 +206,7 @@ void RenderWindow::render_point(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 	}
 }
 
-void RenderWindow::render_line(int x1, int y1, int x2, int y2, const SDL_Color& color) 
+void RenderWindow::render_line(int x1, int y1, int x2, int y2, const SDL_Color& color)
 {
 	int screen_x1;
 	int screen_y1;
@@ -223,7 +223,7 @@ void RenderWindow::render_line(int x1, int y1, int x2, int y2, const SDL_Color& 
 	}
 }
 
-void RenderWindow::render_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a) 
+void RenderWindow::render_line(int x1, int y1, int x2, int y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	int screen_x1;
 	int screen_y1;
@@ -262,7 +262,7 @@ void RenderWindow::render(int x, int y, SDL_Texture* texture) {
 	}
 }
 
-void RenderWindow::render(int x, int y, int w, int h, SDL_Texture* texture) 
+void RenderWindow::render(int x, int y, int w, int h, SDL_Texture* texture)
 {
 	int screen_x;
 	int screen_y;
@@ -302,7 +302,8 @@ void RenderWindow::render(int src_x, int src_y, int src_w, int src_h, int dst_x,
 	};
 	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
 	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
-	if (flag1 || flag2)
+
+	if (flag1 || flag2 || on_screen(dst_x + dst_w, dst_y) || on_screen(dst_x, dst_y + dst_h))
 	{
 		destination.w = screen_dest_x_end - destination.x;
 		destination.h = screen_dest_y_end - destination.y;
@@ -311,7 +312,7 @@ void RenderWindow::render(int src_x, int src_y, int src_w, int src_h, int dst_x,
 	}
 }
 
-void RenderWindow::render(const SDL_Rect* destination, SDL_Texture* texture) 
+void RenderWindow::render(const SDL_Rect* destination, SDL_Texture* texture)
 {
 	int screen_dst_x;
 	int screen_dst_y;
@@ -336,7 +337,7 @@ void RenderWindow::render(const SDL_Rect* destination, SDL_Texture* texture)
 /// <param name="source"></param>
 /// <param name="destination"></param>
 /// <param name="texture"></param>
-void RenderWindow::render(const SDL_Rect* source, const SDL_Rect* destination, SDL_Texture* texture) 
+void RenderWindow::render(const SDL_Rect* source, const SDL_Rect* destination, SDL_Texture* texture)
 {
 	SDL_RenderCopy(renderer, texture, source, destination);
 }
@@ -344,8 +345,8 @@ void RenderWindow::render(const SDL_Rect* source, const SDL_Rect* destination, S
 
 void RenderWindow::render_centered(int x, int y, int w, int h, SDL_Texture* texture) {
 	SDL_Rect destination{
-		x - w/2,
-		y - h/2,
+		x - w / 2,
+		y - h / 2,
 		w,
 		h
 	};
@@ -363,7 +364,7 @@ void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int
 
 	// adjusts source.w and source.h to actual values?
 	SDL_QueryTexture(texture, nullptr, nullptr, &source.w, &source.h);
-	
+
 	SDL_Rect destination{
 		dst_x,
 		dst_y,
@@ -423,7 +424,7 @@ void RenderWindow::render_rotate(int screen_x, int screen_y, int w, int h, doubl
 
 #pragma region Text
 
-void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SDL_Color color) 
+void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
@@ -447,7 +448,7 @@ void RenderWindow::render(float x, float y, const char* text, TTF_Font* font, SD
 	}
 }
 
-void RenderWindow::render_centered_screen(float x, float y, const char* text, TTF_Font* font, SDL_Color color) 
+void RenderWindow::render_centered_screen(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
 {
 	SDL_Surface* surfaceMessage = TTF_RenderText_Blended(font, text, color);
 	if (surfaceMessage == nullptr) {
@@ -476,7 +477,7 @@ void RenderWindow::render_centered_screen(float x, float y, const char* text, TT
 	SDL_RenderCopy(renderer, message, &src, &dst);
 	SDL_FreeSurface(surfaceMessage);
 	SDL_DestroyTexture(message);
-	
+
 }
 
 void RenderWindow::render_centered_world(float x, float y, const char* text, TTF_Font* font, SDL_Color color)
@@ -524,7 +525,7 @@ void RenderWindow::draw()
 
 SDL_Texture* RenderWindow::create_texture_from_surface(SDL_Surface* surface) {
 	SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surface);
-	if(result == nullptr)
+	if (result == nullptr)
 		SDL_LogError(SDL_LOG_PRIORITY_DEBUG, "Failed to create texture from surface: %s\n", SDL_GetError());
 
 	return result;
@@ -534,8 +535,8 @@ SDL_Texture* RenderWindow::load_texture(const char* file_path) {
 	SDL_Texture* result = IMG_LoadTexture(renderer, file_path);
 	if (result == nullptr)
 		SDL_LogError(SDL_LOG_PRIORITY_DEBUG, "Failed to load texture %s: %s\n", file_path, SDL_GetError());
-	
-	
+
+
 	return result;
 }
 

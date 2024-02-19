@@ -1,12 +1,10 @@
 #include "../main.h"
-#include <string.h>
 #include <map>
 #include "asteroid.h"
 #include <set>
-#include <unordered_set>
-#include <queue>
 #include <vector>
 #include <iostream>
+#include "ship.h"
 
 const int tile_size = ASTEROID_maximum_radius;
 const int chunk_height = GAME_height / tile_size;
@@ -85,6 +83,8 @@ Entity::Entity() :
 	drag(0.0001F),
 	mass(1.0F),
 
+	rotation(0.0),
+
 	texture(nullptr),
 	collision_chunk(0),
 
@@ -121,6 +121,8 @@ Entity::Entity(const Entity& copy)
 	drag(copy.drag),
 	mass(copy.mass),
 
+	rotation(copy.rotation),
+
 	texture(copy.texture),
 	collision_chunk(copy.collision_chunk),
 
@@ -130,7 +132,7 @@ Entity::Entity(const Entity& copy)
 	std::cout << "copied entity!" << std::endl;
 }
 
-void Entity::init() 
+void Entity::init()
 {
 
 }
@@ -140,7 +142,7 @@ void Entity::move()
 	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
 	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
 
-	if (drag_enabled) 
+	if (drag_enabled)
 	{
 		desired_velocity_x *= (1.0F - drag);
 		desired_velocity_y *= (1.0F - drag);
@@ -154,7 +156,7 @@ void Entity::move()
 	if (x < 0)
 		x += GAME_width;
 	if (y > GAME_height)
-		y = (int) y % GAME_height;
+		y = (int)y % GAME_height;
 	if (y < 0)
 		y += GAME_width;
 
@@ -176,15 +178,15 @@ void Entity::update_collision_chunk()
 		collision_chunk = curr_chunk;
 	}
 
-	window.render_rect((screen_x / tile_size) * tile_size, (screen_y / tile_size) * tile_size, tile_size, tile_size, {100, 100, 100, 20});
+	window.render_rect((screen_x / tile_size) * tile_size, (screen_y / tile_size) * tile_size, tile_size, tile_size, { 100, 100, 100, 20 });
 }
 
-bool collision_between(Entity* a, Entity* b, SDL_Point *hit) {
+bool collision_between(Entity* a, Entity* b, SDL_Point* hit) {
 	if (!(a->outline_point_count || b->outline_point_count))
 		return false;
-	
+
 	scratch.clear();
-	
+
 	int ax = a->screen_x - (a->w >> 1);
 	int ay = a->screen_y - (a->h >> 1);
 	int bx = b->screen_x - (b->w >> 1);
@@ -194,15 +196,15 @@ bool collision_between(Entity* a, Entity* b, SDL_Point *hit) {
 	for (SDL_Point* i = a->outline; i < a->outline + a->outline_point_count; i++)
 	{
 		scratch.insert(hash(ax + i->x, ay + i->y));
-		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255});
+		window.render_point(ax + i->x, ay + i->y, { 0, 0, 255, 255 });
 	}
-	
+
 	for (SDL_Point* i = b->outline; i < b->outline + b->outline_point_count; i++)
 	{
 		int hashed = hash(bx + i->x, by + i->y);
 		//for(int idx = 0; idx < scratch.size(); idx++)
 		//	if(scratch[idx] == hashed)//TODO: sorting + binary search for vector
-		if(scratch.find(hashed) != scratch.end())
+		if (scratch.find(hashed) != scratch.end())
 		{
 			*hit = SDL_Point{ bx + i->x, by + i->y };
 			return true;
@@ -216,19 +218,19 @@ int hash(int x, int y) {
 	return x + GAME_width * y;
 }
 
-void Entity::check_collisions() 
+void Entity::check_collisions()
 {
 	std::set<int> to_check;
-	
+
 	int floor_y = (int)y / tile_size - 1;
 	int ceil_y = (int)y / tile_size + 1;
 	int left_x = (int)x / tile_size - 1;
 	int right_x = (int)x / tile_size + 1;
-	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++) 
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++)
 	{
 		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
 		{
-			int chunk = curr_x + (GAME_width/tile_size) * curr_y;
+			int chunk = curr_x + (GAME_width / tile_size) * curr_y;
 			if (collision_check_grid[chunk] == nullptr)
 				continue;
 			std::set<int> curr_set = *(collision_check_grid[chunk]);
@@ -238,11 +240,11 @@ void Entity::check_collisions()
 
 	char text[8];
 	sprintf_s(text, "%i", to_check.size());
-	window.render_centered_world(x, y, text, encode_sans_medium, {255, 255, 255, 255});
+	window.render_centered_world(x, y, text, encode_sans_medium, { 255, 255, 255, 255 });
 
-	for (int otherID : to_check) 
+	for (int otherID : to_check)
 	{
-		if(otherID == id)
+		if (otherID == id)
 			continue;
 
 		Entity* other = active[otherID];
@@ -294,27 +296,27 @@ void Entity::check_collisions()
 			// full equation for perfectly elastic collision: 
 			// https://phys.libretexts.org/Courses/Joliet_Junior_College/Physics_201_-_Fall_2019v2/Book%3A_Custom_Physics_textbook_for_JJC/09%3A_Linear_Momentum_and_Collisions/9.16%3A_Collisions#:~:text=If%20two%20particles%20are%20involved,m1)v2i.
 
-			/*float velocity_x_after = 
+			/*float velocity_x_after =
 				( (mass - other->mass) * velocity_x
-				+ (2 * other->mass)    * other->velocity_x ) 
+				+ (2 * other->mass)    * other->velocity_x )
 				/ (mass + other->mass);
-			
-			float velocity_y_after = 
+
+			float velocity_y_after =
 				( (mass - other->mass) * velocity_y
-				+ (2 * other->mass)    * other->velocity_y ) 
+				+ (2 * other->mass)    * other->velocity_y )
 				/ (mass + other->mass);*/
 
-			//// undo movement into collision
+				//// undo movement into collision
 
-			// conduct extra separation movement
+				// conduct extra separation movement
 
 
 
-			/*desired_velocity_x = velocity_x_after;
-			desired_velocity_y = velocity_y_after;
+				/*desired_velocity_x = velocity_x_after;
+				desired_velocity_y = velocity_y_after;
 
-			velocity_x = velocity_x_after;
-			velocity_y = velocity_y_after;*/			
+				velocity_x = velocity_x_after;
+				velocity_y = velocity_y_after;*/
 
 			return;
 		}
@@ -324,10 +326,10 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
-	if(DEBUG_entity_outlines)
+	if (DEBUG_entity_outlines)
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
 	window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
-	
+
 }
 
 void Entity::update()
@@ -341,13 +343,14 @@ void entities_init() {
 	entities = new Entity[GAME_ship_count + GAME_asteroid_count];
 
 
-
+	ships_init();
 	asteroids_init();
 }
 
 void entities_cleanup() {
 	//TODO
 
+	ships_cleanup();
 	asteroids_cleanup();
 
 	delete[] entities;

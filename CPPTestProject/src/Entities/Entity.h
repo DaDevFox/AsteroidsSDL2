@@ -10,7 +10,7 @@ extern const int chunk_width;
 /// <summary>
 /// WIP
 /// </summary>
-class Entity 
+class Entity
 {
 public:
 	static std::vector<Entity*> active;
@@ -22,7 +22,7 @@ public:
 	float y;
 	int w;
 	int h;
-	
+
 	float velocity_x;
 	float velocity_y;
 
@@ -36,10 +36,12 @@ public:
 
 	int center_x;
 	int center_y;
-	
+
 	float movement_windup_speed;
 	float drag;
 	float mass;
+
+	double rotation;
 
 	SDL_Texture* texture;
 
@@ -55,7 +57,7 @@ public:
 
 	void init();
 	virtual void update();
-	virtual void render(RenderWindow *window);
+	virtual void render(RenderWindow* window);
 	void cleanup();
 
 	bool in_bounds(int screen_x, int screen_y);
