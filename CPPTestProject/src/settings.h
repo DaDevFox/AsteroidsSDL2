@@ -20,6 +20,21 @@ extern float SETTING_camera_zoom_min;
 extern bool DEBUG_chunk_gridlines;
 extern bool DEBUG_entity_outlines;
 
+// Controls
+extern const SDL_KeyCode KEY_up;
+extern const SDL_KeyCode KEY_up_alt;
+extern const SDL_KeyCode KEY_down;
+extern const SDL_KeyCode KEY_down_alt;
+extern const SDL_KeyCode KEY_left;
+extern const SDL_KeyCode KEY_left_alt;
+extern const SDL_KeyCode KEY_right;
+extern const SDL_KeyCode KEY_right_alt;
+
+extern const SDL_KeyCode KEY_zoom_in;
+extern const SDL_KeyCode KEY_zoom_in_alt;
+extern const SDL_KeyCode KEY_zoom_out;
+extern const SDL_KeyCode KEY_zoom_out_alt;
+
 // Game
 extern const int GAME_asteroid_count;
 extern const int GAME_ship_count;

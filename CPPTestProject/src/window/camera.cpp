@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "../main.h"
+#include <stdio.h>
 
 const int edge_buffer = 512;
 
@@ -69,30 +70,33 @@ void Camera::input_update(SDL_Event* running_event)
 {
 	if (running_event->type == SDL_KEYDOWN)
 	{
-		if (running_event->key.keysym.sym == SDLK_RIGHT)
+		auto sym = running_event->key.keysym.sym;
+
+
+		if (sym == KEY_right || sym == KEY_right_alt)
 		{
 			desired_x += SETTING_camera_pan_speed;
 		}
-		if (running_event->key.keysym.sym == SDLK_LEFT)
+		if (sym == KEY_left || sym == KEY_left_alt)
 		{
 			desired_x -= SETTING_camera_pan_speed;
 		}
-		if (running_event->key.keysym.sym == SDLK_DOWN)
+		if (sym == KEY_down || sym == KEY_down_alt)
 		{
 			desired_y += SETTING_camera_pan_speed;
 		}
-		if (running_event->key.keysym.sym == SDLK_UP)
+		if (sym == KEY_up || sym == KEY_up_alt)
 		{
 			desired_y -= SETTING_camera_pan_speed;
 		}
 
-		if (running_event->key.keysym.sym == SDLK_f)
-		{
-			set_zoom(zoom + 0.1f);
-		}
-		if (running_event->key.keysym.sym == SDLK_v)
+		if (sym == KEY_zoom_in || sym == KEY_zoom_in_alt)
 		{
 			set_zoom(zoom - 0.1f);
+		}
+		if (sym == KEY_zoom_out || sym == KEY_zoom_out_alt)
+		{
+			set_zoom(zoom + 0.1f);
 		}
 	}
 }

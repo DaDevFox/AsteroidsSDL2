@@ -19,13 +19,29 @@ float SETTING_camera_zoom_min = 0.2F;
 
 bool SETTING_thrust_animation;
 
-bool DEBUG_chunk_gridlines = false;
-bool DEBUG_entity_outlines = false;
+// Movement Controls
+const SDL_KeyCode KEY_up = SDLK_UP;
+const SDL_KeyCode KEY_up_alt = SDLK_w;
+const SDL_KeyCode KEY_down = SDLK_DOWN;
+const SDL_KeyCode KEY_down_alt = SDLK_s;
+const SDL_KeyCode KEY_left = SDLK_LEFT;
+const SDL_KeyCode KEY_left_alt = SDLK_a;
+const SDL_KeyCode KEY_right = SDLK_RIGHT;
+const SDL_KeyCode KEY_right_alt = SDLK_d;
+
+// Camera Controls
+const SDL_KeyCode KEY_zoom_in = SDLK_v;
+const SDL_KeyCode KEY_zoom_in_alt = SDLK_PAGEUP;
+const SDL_KeyCode KEY_zoom_out = SDLK_f;
+const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
+
+bool DEBUG_chunk_gridlines = true;
+bool DEBUG_entity_outlines = true;
 
 #pragma endregion
 
-const int GAME_asteroid_count = 20;
-const int GAME_ship_count = 3;
+const int GAME_asteroid_count = 10;
+const int GAME_ship_count = 10;
 
 
 const Uint32 GAME_asteroid_color_raw = 0xFFFFFFFF;
