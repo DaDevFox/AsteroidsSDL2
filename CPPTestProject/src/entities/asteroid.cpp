@@ -115,7 +115,6 @@ void Asteroid::rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y
 	}
 }
 
-#define PI 3.14159265F
 
 void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count)
 {
@@ -389,15 +388,15 @@ bool Asteroid::in_bounds(int screen_x, int screen_y) const {
 
 //void Asteroid::render(RenderWindow* window)
 //{
-//	//char str[8];/*
+//	//char str[8];
 //	//sprintf_s(str, "%i", hash_entity(this));
 //	//SDL_Color color = 
 //	//{
 //	//	255, 255, 255, 255 
 //	//};
-//	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);*/
+//	//window->render_centered_world(x, y - (float)h/2 - 10.0F, str, encode_sans_medium, color);
 //
-//	/*window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);*/
+//	/*window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
 //}
 
 void asteroids_init()
@@ -466,9 +465,9 @@ int* thrust_columns = NULL;
 
 int thrust_outline_thickness = 2;
 float thrust_elapsed = 0.0F;
-const int thrust_max_height = 4;
+const int thrust_max_height = 6;
 const int thrust_min_height = 2;
-float thrust_random_tick = 10.0F;
+float thrust_random_tick = 6.0F;
 const int thrust_numColumns = 10;
 std::random_device rand_device;
 std::uniform_int_distribution<int> dist(thrust_min_height, thrust_max_height);

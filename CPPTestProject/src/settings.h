@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL.h>
 
+#define PI 3.14159265358979323F
+
 #define SETTING_MAX_POLYGON_VERTICES 512
 
 extern const char* RESOURCE_ship_texture_path;
@@ -34,3 +36,5 @@ extern const float ASTEROID_startspeed_maximum;
 
 extern const float PLAYER_controlspeed_maximum;
 extern const SDL_Color PLAYER_thrusting_outline_color;
+
+extern const float SHIP_speed_maximum;

@@ -1,6 +1,7 @@
 #include "settings.h"
 #include <SDL.h>
 
+
 #pragma region Interactive
 
 const char* RESOURCE_ship_texture_path = "./circle.png";
@@ -24,7 +25,7 @@ bool DEBUG_entity_outlines = false;
 #pragma endregion
 
 const int GAME_asteroid_count = 20;
-const int GAME_ship_count = 2;
+const int GAME_ship_count = 3;
 
 
 const Uint32 GAME_asteroid_color_raw = 0xFFFFFFFF;
@@ -40,6 +41,8 @@ const float ASTEROID_startspeed_maximum = 0.02F;
 
 const float PLAYER_controlspeed_maximum = 0.05F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
+
+const float SHIP_speed_maximum = 0.5F;
 
 
 
