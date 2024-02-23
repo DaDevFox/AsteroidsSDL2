@@ -1,12 +1,14 @@
 #pragma once
 #include "../main.h"
-#include "EntityManager.h"
 #include <vector>
+#include <map>
+#include <set>
 
 extern const int tile_size;
 extern const int chunk_height;
 extern const int chunk_width;
 
+extern std::map<int, std::set<int>*> collision_check_grid;
 /// <summary>
 /// WIP
 /// </summary>
@@ -72,3 +74,7 @@ private:
 
 void entities_init();
 void entities_cleanup();
+
+extern int hash_entity(Entity* entity);
+
+extern int hash(int x, int y);

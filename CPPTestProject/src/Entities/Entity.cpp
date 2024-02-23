@@ -51,8 +51,6 @@ std::set<int> scratch;
 //
 //}
 
-int hash(int x, int y);
-
 int hash_entity(Entity* entity) {
 	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
 }
@@ -237,10 +235,6 @@ void Entity::check_collisions()
 			to_check.insert(curr_set.begin(), curr_set.end());
 		}
 	}
-
-	char text[8];
-	sprintf_s(text, "%i", to_check.size());
-	window.render_centered_world(x, y, text, encode_sans_medium, { 255, 255, 255, 255 });
 
 	for (int otherID : to_check)
 	{
