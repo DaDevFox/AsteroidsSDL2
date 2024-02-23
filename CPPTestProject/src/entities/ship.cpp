@@ -6,6 +6,7 @@
 SDL_Texture* ship_texture;
 
 void render_fovs();
+void run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 
 std::vector<SDL_Point> search_positions;
 
@@ -70,15 +71,54 @@ void ships_update(float delta_time)
 
 		float distance = sqrtf(x * x + y * y);
 
-		ship->desired_velocity_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
-		ship->desired_velocity_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
+		float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
+		float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
 
-		// TODO: asteroid collision avoidance
+		run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y);
+
+		ship->desired_velocity_x = vel_x;
+		ship->desired_velocity_y = vel_y;
+
 		ship->update();
 		i++;
 	}
 
 	timer += delta_time;
+}
+
+void run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y)
+{
+	std::set<int> to_check;
+
+	float x = ship->x;
+	float y = ship->y;
+
+	int floor_y = (int)y / tile_size - 2;
+	int ceil_y = (int)y / tile_size + 2;
+	int left_x = (int)x / tile_size - 2;
+	int right_x = (int)x / tile_size + 2;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++)
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
+		{
+			int chunk = curr_x + (GAME_width / tile_size) * curr_y;
+			if (collision_check_grid[chunk] == nullptr)
+				continue;
+			std::set<int> curr_set = *(collision_check_grid[chunk]);
+			to_check.insert(curr_set.begin(), curr_set.end());
+		}
+	}
+
+	for (int id : to_check) {
+		if (id == ship->id)
+			continue;
+
+		Entity* other = Entity::active[id];
+
+
+		*vel_x -= (other->x - x) * multiplier;
+		*vel_y -= (other->y - y) * multiplier;
+	}
 }
 
 void render_fovs(RenderWindow* window)
