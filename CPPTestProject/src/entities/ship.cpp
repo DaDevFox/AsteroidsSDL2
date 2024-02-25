@@ -6,7 +6,7 @@
 SDL_Texture* ship_texture;
 
 void render_fovs();
-void run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
+bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 
 std::vector<SDL_Point> search_positions;
 
@@ -30,6 +30,9 @@ void ships_init()
 		ship->w = ship_size;
 		ship->h = ship_size;
 
+		ship->drag_enabled = false;
+		ship->movement_windup_speed = 0.001F;
+
 		std::cout << "initializing ship" << std::endl;
 
 		i++;
@@ -51,9 +54,10 @@ void generate_search_positions()
 void ships_update(float delta_time)
 {
 	static float timer = 0.0F;
-	float search_tick = 40.0F;
+	float search_tick = 100.0F;
 
-	if (timer > search_tick) {
+	if (timer > search_tick)
+	{
 		generate_search_positions();
 		timer = 0.0F;
 	}
@@ -71,13 +75,34 @@ void ships_update(float delta_time)
 
 		float distance = sqrtf(x * x + y * y);
 
+		float critical_distance = 1.0F;
+
 		float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
 		float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
 
-		run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y);
 
-		ship->desired_velocity_x = vel_x;
-		ship->desired_velocity_y = vel_y;
+
+		if (run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y) || distance > critical_distance)
+		{
+			ship->desired_velocity_x = vel_x;
+			ship->desired_velocity_y = vel_y;
+		}
+		else
+		{
+			ship->x = pos.x;
+			ship->y = pos.y;
+			ship->velocity_x = 0.0F;
+			ship->velocity_y = 0.0F;
+			ship->desired_velocity_x = 0.0F;
+			ship->desired_velocity_y = 0.0F;
+		}
+
+		float crit_vel = 0.2F;
+
+		if (distance > crit_vel)
+			ship->rotation = atan2(ship->velocity_y, ship->velocity_x);
+		else
+			ship->rotation = 0.0;
 
 		ship->update();
 		i++;
@@ -86,17 +111,23 @@ void ships_update(float delta_time)
 	timer += delta_time;
 }
 
-void run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y)
+bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y)
 {
+	bool result = false;
 	std::set<int> to_check;
 
 	float x = ship->x;
 	float y = ship->y;
 
-	int floor_y = (int)y / tile_size - 2;
-	int ceil_y = (int)y / tile_size + 2;
-	int left_x = (int)x / tile_size - 2;
-	int right_x = (int)x / tile_size + 2;
+	float speed_per_rad_increase = 0.8F;
+	int look_radius = 2 + (sqrtf(ship->velocity_x * ship->velocity_x + ship->velocity_y * ship->velocity_y) / speed_per_rad_increase);
+	/*if (look_radius > 2)
+		printf("lr: %i \n", look_radius);*/
+
+	int floor_y = (int)y / tile_size - look_radius;
+	int ceil_y = (int)y / tile_size + look_radius;
+	int left_x = (int)x / tile_size - look_radius;
+	int right_x = (int)x / tile_size + look_radius;
 	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++)
 	{
 		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
@@ -113,12 +144,17 @@ void run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 		if (id == ship->id)
 			continue;
 
+
 		Entity* other = Entity::active[id];
+		window.render_rect(other->x, other->y, other->w, other->h, { 0, 0, 255, 255 });
 
 
 		*vel_x -= (other->x - x) * multiplier;
 		*vel_y -= (other->y - y) * multiplier;
+		result = true;
 	}
+
+	return result;
 }
 
 void render_fovs(RenderWindow* window)

@@ -322,8 +322,17 @@ void Entity::render(RenderWindow* window)
 {
 	if (DEBUG_entity_outlines)
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
-	window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
+	if (rotation == 0.0)
+		window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
+	else
+		window->render_rotate(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, rotation, texture);
 
+	if (DEBUG_entity_rotations)
+	{
+		char str[20] = "";
+		sprintf_s(str, "%.4f", rotation);
+		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
+	}
 }
 
 void Entity::update()

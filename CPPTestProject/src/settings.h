@@ -19,6 +19,7 @@ extern float SETTING_camera_zoom_min;
 
 extern bool DEBUG_chunk_gridlines;
 extern bool DEBUG_entity_outlines;
+extern bool DEBUG_entity_rotations;
 
 // Controls
 extern const SDL_KeyCode KEY_up;

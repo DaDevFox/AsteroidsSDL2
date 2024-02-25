@@ -4,7 +4,7 @@
 
 #pragma region Interactive
 
-const char* RESOURCE_ship_texture_path = "./circle.png";
+const char* RESOURCE_ship_texture_path = "./triangle.png";
 
 int SETTING_camera_pan_speed = 10;
 float SETTING_camera_pan_smoothness = 0.995F;
@@ -35,13 +35,14 @@ const SDL_KeyCode KEY_zoom_in_alt = SDLK_PAGEUP;
 const SDL_KeyCode KEY_zoom_out = SDLK_f;
 const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 
-bool DEBUG_chunk_gridlines = true;
-bool DEBUG_entity_outlines = true;
+bool DEBUG_chunk_gridlines = false;
+bool DEBUG_entity_outlines = false;
+bool DEBUG_entity_rotations = false;
 
 #pragma endregion
 
-const int GAME_asteroid_count = 10;
-const int GAME_ship_count = 10;
+const int GAME_asteroid_count = 30;
+const int GAME_ship_count = 2;
 
 
 const Uint32 GAME_asteroid_color_raw = 0xFFFFFFFF;
