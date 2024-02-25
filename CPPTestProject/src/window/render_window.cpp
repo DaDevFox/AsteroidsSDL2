@@ -377,14 +377,17 @@ void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int
 
 	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
 	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
-	if (flag1 && flag2)
+	if (flag1 || flag2)
 	{
+		destination.w = screen_dest_x_end - destination.x;
+		destination.h = screen_dest_y_end - destination.y;
+
 		SDL_Point center = {
 			destination.w >> 1,
 			destination.h >> 1
 		};
 
-		SDL_RenderCopyEx(renderer, texture, &source, &destination, angle, &center, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(renderer, texture, &source, &destination, 180.0 * (angle / PI), &center, SDL_FLIP_NONE);
 	}
 }
 
@@ -486,7 +489,7 @@ void RenderWindow::render_centered_world(float x, float y, const char* text, TTF
 	// NOTE: 1-byte Latin1 text (incl. ASCII) only
 	TTF_SizeText(font, text, &(dst.w), &(dst.h));
 
-	if (world_to_screen((int)x - dst.w >> 1, (int)y - dst.h >> 1, &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
+	if (world_to_screen((int)x - (dst.w >> 1), (int)y - (dst.h >> 1), &(dst.x), &(dst.y)) || on_screen(x + dst.w, y + dst.h))
 	{
 		SDL_Rect src;
 		src.x = 0;
