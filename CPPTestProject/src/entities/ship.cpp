@@ -7,6 +7,7 @@ SDL_Texture* ship_texture;
 
 void render_fovs();
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
+void generate_ship_outline(Entity* ship);
 
 std::vector<SDL_Point> search_positions;
 
@@ -33,10 +34,45 @@ void ships_init()
 		ship->drag_enabled = false;
 		ship->movement_windup_speed = 0.001F;
 
-		std::cout << "initializing ship" << std::endl;
+		generate_ship_outline(ship);
+
+		std::cout << "ship initialized" << std::endl;
 
 		i++;
 	}
+}
+
+void generate_ship_outline(Entity* ship) {
+	std::vector<SDL_Point> outline;
+
+	// edge rows
+	for (int x = 1; x < ship->w - 1; x++)
+	{
+		outline.push_back({ x, 0 });
+		outline.push_back({ x, ship->h });
+	}
+
+	// edge columns
+	for (int y = 1; y < ship->h - 1; y++)
+	{
+		outline.push_back({ 0, y });
+		outline.push_back({ ship->w, y });
+	}
+
+	// corners
+	outline.push_back({ 0, 0 });
+	outline.push_back({ 0, ship->h });
+	outline.push_back({ ship->w, 0 });
+	outline.push_back({ ship->w, ship->h });
+
+	if (outline.size() < 4 * SETTING_MAX_POLYGON_VERTICES)
+	{
+		for (int i = 0; i < outline.size(); i++)
+			ship->outline[i] = outline.at(i);
+		ship->outline_point_count = outline.size();
+	}
+	else
+		SDL_Log("ERROR: outline buffer overflow for ship.\n");
 }
 
 SDL_Point default_position(int i) {
@@ -160,27 +196,26 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 void render_fovs(RenderWindow* window)
 {
 	double fov = M_PI / 3.0;
-	double granularity = 0.05;
-	float radius = 50.0F;
+	double granularity = 0.0125;
+	float radius = 100.0F;
 
 	//TODO: expensive; use texture instead???
 
-	//for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
-	//{
-	//	for (double theta = ship->rotation - fov / 2.0; theta < ship->rotation + fov / 2.0; theta += granularity)
-	//	{
-	//		for (float i = 0.0F; i < radius; i++)
-	//		{
-	//			window->render_rect(ship->x + (ship->w >> 1) + i * cosf(theta), ship->y + (ship->h >> 1) + i * sinf(theta), 1.0F, 1.0F, { 100, 100, 100, 255 });
-
-	//		}
-	//	}
-	//}
+	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
+	{
+		for (double theta = ship->rotation - fov / 2.0; theta < ship->rotation + fov / 2.0; theta += granularity)
+		{
+			for (float i = 0.0F; i < radius; i++)
+			{
+				window->render_rect(ship->x + i * cosf(theta), ship->y + i * sinf(theta), 1.0F, 1.0F, { 100, 100, 100, 255 });
+			}
+		}
+	}
 }
 
 void ships_render_update(RenderWindow* window)
 {
-	render_fovs(window);
+	//render_fovs(window);
 
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
