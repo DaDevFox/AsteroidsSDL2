@@ -2,6 +2,7 @@
 #include "../main.h"
 #include <iostream>
 #include <vector>
+#include <time.h>
 
 SDL_Texture* ship_texture;
 
@@ -196,26 +197,70 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 void render_fovs(RenderWindow* window)
 {
 	double fov = M_PI / 3.0;
-	double granularity = 0.0125;
+	double granularity = 0.0005;
 	float radius = 100.0F;
 
 	//TODO: expensive; use texture instead???
 
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
-		for (double theta = ship->rotation - fov / 2.0; theta < ship->rotation + fov / 2.0; theta += granularity)
+		//for (int x = ship->x - radius; x < ship->x + radius; x++) {
+		//	for (int y = ship->y - radius; y < ship->y + radius; y++) {
+		//		float _x = ship->x - x;
+		//		float _y = ship->y - y;
+
+		//		double theta = atan2(y - ship->y, x - ship->x);
+		//		double angle_max = ship->rotation + fov / 2.0;
+		//		double angle_min = ship->rotation - fov / 2.0;
+
+		//		if (_x * _x + _y * _y > radius * radius)
+		//			continue;
+
+		//		if (theta > angle_min && theta < angle_max) {
+		//			//const SDL_Rect rect = { x, y, ship->w, ship->h };
+		//			//window->render(&rect, ship->texture);
+		//		}
+		//	}
+		//}
+
+
+
+
+		// TODO: multithread/multiprocess
+		// TODO: OpenGL: https://www.libsdl.org/release/SDL-1.2.15/docs/html/guidevideoopengl.html
+
+		double theta = ship->rotation - fov / 2.0;
+
+		float cos_theta = cosf(theta);
+		float sin_theta = sinf(theta);
+		for (float i = 0.0F; i < radius; i++)
 		{
-			for (float i = 0.0F; i < radius; i++)
-			{
-				window->render_rect(ship->x + i * cosf(theta), ship->y + i * sinf(theta), 1.0F, 1.0F, { 100, 100, 100, 255 });
-			}
+			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, { 100, 100, 100, 255 });
+		}
+
+		theta = ship->rotation + fov / 2.0;
+		cos_theta = cosf(theta);
+		sin_theta = sinf(theta);
+		for (float i = 0.0F; i < radius; i++)
+		{
+			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, { 100, 100, 100, 255 });
+		}
+
+		// TODO top barrier + tex
+
+
+
+		double theta_max = ship->rotation + fov / 2.0;
+		for (double theta = ship->rotation - fov / 2.0; theta < theta_max; theta += granularity)
+		{
+
 		}
 	}
 }
 
 void ships_render_update(RenderWindow* window)
 {
-	//render_fovs(window);
+	render_fovs(window);
 
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
