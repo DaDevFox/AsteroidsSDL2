@@ -96,7 +96,7 @@ void Asteroid::rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y
 		}
 
 		*(buffer + open.front()) = GAME_asteroid_color_raw;
-		*pixel_count++;
+		(*pixel_count)++;
 		open.pop();
 
 		if (curr.first < *leftmost_x) {
@@ -186,6 +186,107 @@ void Asteroid::generate()
 
 	SDL_FreeSurface(temp_surface);
 }
+
+// TODO: remove debug flag
+int splitflag = 0;
+
+
+
+Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity)
+{
+	if (splitflag)
+		return nullptr;
+
+	SDL_Point start;
+	SDL_Point end;
+
+	window.camera.teleport(collision_x, collision_y);
+
+	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
+	split_bridge_outline(this);
+	split_bridge_outline(created);
+
+	splitflag = 1;
+	SDL_Log("split asteroid idx: %i; has %i points", GAME_asteroid_count, created->outline_point_count);
+
+	return created;
+}
+
+Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end) {
+	int collision_pixel_x = (int)collision_x - (screen_x - (w >> 1));
+	int collision_pixel_y = (int)collision_y - (screen_y - (h >> 1));
+
+	SDL_Log("split command: (%.1f, %.1f)", collision_x, collision_y);
+	int contact_idx = -1;
+
+	for (int i = 0; i < outline_point_count; i++)
+		if (outline[i].x == collision_pixel_x && outline[i].y == collision_pixel_y)
+			contact_idx = i;
+
+	if (contact_idx == -1)
+		return nullptr;
+
+	Asteroid* created = append_asteroid_to_pool();
+
+	int split_endpoint = -1;
+	while (split_endpoint > 0 && split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x)
+		split_endpoint = rand() % outline_point_count;
+
+	int ax = collision_pixel_x;
+	int ay = collision_pixel_x;
+	int bx = outline[split_endpoint].x;
+	int by = outline[split_endpoint].y;
+
+	*start = { ax, ay };
+	*end = { bx, by };
+
+	// use y > mx + b to sort points to either resultant asteroid
+	float m = (float)(by - ay) / (float)(bx - ax);
+	int b = (int)((float)ay - (float)ax * m);
+	int divider = 0;
+	auto comparator = [m, ay](SDL_Point a, SDL_Point b)->bool {
+		bool a_in = (a.y > (int)(m * (float)a.x + (float)ay));
+		bool b_in = (b.y > (int)(m * (float)b.x + (float)ay));
+
+		return a_in < b_in;
+		};
+
+	std::priority_queue < SDL_Point, std::vector<SDL_Point>, decltype(comparator)> queue(comparator);
+
+	for (int i = 0; i < outline_point_count; i++) {
+		bool in = (outline[i].y > (int)(m * (float)outline[i].x + (float)b));
+		if (!in)
+			divider++;
+		queue.push(outline[i]);
+	}
+
+
+	created->outline_point_count = divider;
+	for (int i = 0; i < divider; i++) {
+		created->outline[i] = (SDL_Point)queue.top();
+		queue.pop();
+	}
+
+	outline_point_count = queue.size() - divider;
+	int i = 0;
+	while (!queue.empty()) {
+		outline[i] = queue.top();
+		queue.pop();
+		i++;
+	}
+
+	return created;
+}
+
+void Asteroid::split_bridge_outline(Asteroid* asteroid) {
+
+}
+
+
+Asteroid* append_asteroid_to_pool() {
+	return (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count++;
+}
+
 
 void Asteroid::create_outline(Uint32* buffer) {
 	std::vector<SDL_Point> outline;
@@ -380,12 +481,6 @@ void Asteroid::cleanup() {
 	SDL_DestroyTexture(texture);
 }
 
-bool Asteroid::in_bounds(int screen_x, int screen_y) const {
-	return
-		screen_x >= (this->screen_x - (w >> 1)) && screen_x <= (this->screen_x + (w >> 1)) &&
-		screen_y >= (this->screen_y - (h >> 1)) && screen_y <= (this->screen_y + (h >> 1));
-}
-
 //void Asteroid::render(RenderWindow* window)
 //{
 //	//char str[8];
@@ -428,7 +523,22 @@ static bool clicking = true;
 
 void player_input_update(SDL_Event* running_event)
 {
+	if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_x) {
+		int mouse_x, mouse_y;
+		SDL_GetMouseState(&mouse_x, &mouse_y);
+		float mouse_world_x = window.camera.screen_to_world_x(mouse_x);
+		float mouse_world_y = window.camera.screen_to_world_y(mouse_y);
 
+		int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / tile_size)) / tile_size;
+		printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
+		if (collision_check_grid[chunk]) {
+			std::set<int> set = *(collision_check_grid[chunk]);
+			printf("%zu\n", set.size());
+			for (int i : set)
+				if (Entity::active[i]->in_bounds(mouse_world_x, mouse_world_y))
+					((Asteroid*)Entity::active[i])->split(mouse_world_x, mouse_world_y, 10.0F);
+		}
+	}
 
 
 	// Direct controlled asteroid
@@ -588,4 +698,14 @@ void asteroids_cleanup()
 		asteroid->cleanup();
 	}
 	delete[] thrust_columns;
+}
+
+void Asteroid::on_collision(Entity* other, int collision_x, int collision_y) {
+	float desired_velocity_x = other->desired_velocity_x;
+	float desired_velocity_y = other->desired_velocity_y;
+	float rel_velocity = sqrtf(desired_velocity_x * desired_velocity_x + desired_velocity_y * desired_velocity_y);
+
+	if (rel_velocity >= ASTEROID_split_minimum_velocity) {
+		split(collision_x, collision_y, rel_velocity);
+	}
 }

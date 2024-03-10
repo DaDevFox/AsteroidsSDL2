@@ -10,9 +10,13 @@ public:
 	void init(int w, int h);
 	void generate();
 	void create_outline(Uint32* buffer);
-	bool in_bounds(int screen_x, int screen_y) const;
+	//bool in_bounds(int screen_x, int screen_y) const;
 	//void render(RenderWindow* window);
 	void cleanup();
+
+	void on_collision(Entity* other, int collision_x, int collision_y) override;
+
+	Asteroid* split(float collision_x, float collision_y, float collision_rel_velocity);
 
 	Asteroid();
 	/*~Asteroid();*/
@@ -20,11 +24,14 @@ private:
 	void rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 	void circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 
+	Asteroid* split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end);
+	void split_bridge_outline(Asteroid* asteroid);
+
 };
 
 extern int ASTEROID_max_asteroid_radius;
 
-extern const int GAME_asteroid_count;
+extern int GAME_asteroid_count;
 extern Asteroid* asteroids;
 extern Asteroid player;
 
@@ -36,3 +43,4 @@ void asteroids_render_update(RenderWindow* window);
 void asteroids_update(float delta_time);
 void asteroids_cleanup();
 
+Asteroid* append_asteroid_to_pool();

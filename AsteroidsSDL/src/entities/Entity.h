@@ -9,15 +9,17 @@ extern const int chunk_height;
 extern const int chunk_width;
 
 extern std::map<int, std::set<int>*> collision_check_grid;
-/// <summary>
-/// WIP
-/// </summary>
 class Entity
 {
 public:
+
 	static std::vector<Entity*> active;
 
 	static int curr_id;
+
+
+#pragma region core data
+
 	int id;
 
 	float x;
@@ -39,12 +41,21 @@ public:
 	int center_x;
 	int center_y;
 
+#pragma endregion
+
+#pragma region physics data
+
+
+
 	float movement_windup_speed;
 	float drag;
 	float mass;
 
 	double rotation;
 
+#pragma endregion
+
+#pragma region graphics + systems data
 	SDL_Texture* texture;
 
 	int collision_chunk;
@@ -52,6 +63,8 @@ public:
 	int outline_point_count;
 	int point_count;
 	SDL_Point outline[4 * SETTING_MAX_POLYGON_VERTICES];
+
+#pragma endregion
 
 public:
 	Entity();
@@ -62,12 +75,15 @@ public:
 	virtual void render(RenderWindow* window);
 	void cleanup();
 
-	bool in_bounds(int screen_x, int screen_y);
+	bool in_bounds(float world_x, float world_y) const;
 	bool in_bounds(Entity other);
+
+	virtual void on_collision(Entity* other, int collision_x, int collision_y) {}
 private:
 	void move();
 	void update_collision_chunk();
 	void check_collisions();
+
 
 	friend class EntityManager;
 };

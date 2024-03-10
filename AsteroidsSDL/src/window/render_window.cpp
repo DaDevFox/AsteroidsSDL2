@@ -510,7 +510,7 @@ void RenderWindow::render_centered_world(float x, float y, const char* text, TTF
 			return;
 		}
 
-
+		
 		SDL_RenderCopy(renderer, message, &src, &dst);
 		SDL_FreeSurface(surfaceMessage);
 		SDL_DestroyTexture(message);

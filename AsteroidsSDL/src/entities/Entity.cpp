@@ -55,6 +55,12 @@ int hash_entity(Entity* entity) {
 	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
 }
 
+bool Entity::in_bounds(float world_x, float world_y) const {
+	return
+		world_x >= (x - (float)(w >> 1)) && world_x <= (x + (float)(w >> 1)) &&
+		world_y >= (y - (float)(h >> 1)) && world_y <= (y + (float)(h >> 1));
+}
+
 Entity::Entity() :
 	id(curr_id++),
 
@@ -285,7 +291,7 @@ void Entity::check_collisions()
 			x -= velocity_x * delta_time * explosive_force;
 			y -= velocity_y * delta_time * explosive_force;
 
-
+			on_collision(other, hit.x, hit.y);
 
 			// full equation for perfectly elastic collision: 
 			// https://phys.libretexts.org/Courses/Joliet_Junior_College/Physics_201_-_Fall_2019v2/Book%3A_Custom_Physics_textbook_for_JJC/09%3A_Linear_Momentum_and_Collisions/9.16%3A_Collisions#:~:text=If%20two%20particles%20are%20involved,m1)v2i.
@@ -321,7 +327,15 @@ void Entity::check_collisions()
 void Entity::render(RenderWindow* window)
 {
 	if (DEBUG_entity_outlines)
+	{
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
+		for (int i = 0; i < outline_point_count; i++)
+			window->render_rect((float)(screen_x - (w >> 1) + outline[i].x), (float)(screen_y - (h >> 1) + outline[i].y), 1.0F, 1.0F, { 0, 0, 255, 255 });
+	}
+
+	if (DEBUG_highlight_capstone_asteroid && id == GAME_ship_count + GAME_asteroid_count - 1)
+		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 255, 0, 0, 255 });
+
 	if (rotation == 0.0)
 		window->render(0, 0, 0, 0, screen_x - (w >> 1), screen_y - (h >> 1), w, h, texture);
 	else
@@ -331,6 +345,13 @@ void Entity::render(RenderWindow* window)
 	{
 		char str[20] = "";
 		sprintf_s(str, "%.4f", rotation);
+		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
+	}
+
+	if (DEBUG_chunk_numbers)
+	{
+		char str[20] = "";
+		sprintf_s(str, "%i", collision_chunk);
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 }
@@ -343,8 +364,14 @@ void Entity::update()
 }
 
 void entities_init() {
-	entities = new Entity[GAME_ship_count + GAME_asteroid_count];
+	if (sizeof(Entity) != sizeof(Asteroid)) {
+		SDL_LogError(SDL_LOG_PRIORITY_ERROR, "entity and asteroid size mismatch; continuous memory block allocation impossible");
+		return;
+	}
 
+	entities = malloc((GAME_ship_count + GAME_asteroid_pool_size) * sizeof(Entity));
+	new(entities) Entity[GAME_ship_count];
+	new((Entity*)entities + GAME_ship_count) Asteroid[GAME_asteroid_pool_size];
 
 	ships_init();
 	asteroids_init();
@@ -356,6 +383,6 @@ void entities_cleanup() {
 	ships_cleanup();
 	asteroids_cleanup();
 
-	delete[] entities;
+	free(entities);
 }
 
