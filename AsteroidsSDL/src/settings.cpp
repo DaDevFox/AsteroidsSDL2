@@ -43,6 +43,7 @@ bool DEBUG_wireframe_mode = false;
 const SDL_KeyCode KEY_DEBUG_chunk_gridlines = SDLK_g;
 bool DEBUG_chunk_gridlines = false;
 
+// TODO: remove below two
 const SDL_KeyCode KEY_DEBUG_highlight_capstone_asteroid = SDLK_g;
 bool DEBUG_highlight_capstone_asteroid = true;
 

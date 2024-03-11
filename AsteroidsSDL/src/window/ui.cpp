@@ -41,11 +41,12 @@ void UI::render_update(RenderWindow* window) {
 	if (DEBUG_master)
 	{
 		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines };
-		const char* text[] = { "wireframe", "grid", "outlines" };
+		const char* text[] = { "wireframe", "grid", "outlines", "stats" };
 
 		window->render_rect(0, 0, WINDOW_width, debug_bar_offset, debug_bar_bg_accent_color);
 		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, { 255, 255, 255, 255 });
 
+		// Debug Mode Indicators
 		for (int i = 0; i < 3; i++) {
 			window->render_rect(
 				i * debug_mode_indicator_width, debug_bar_offset,
@@ -58,7 +59,6 @@ void UI::render_update(RenderWindow* window) {
 				text[i], encode_sans_medium, { 255, 255, 255, 255 });
 		}
 
-
 		if (DEBUG_chunk_gridlines)
 		{
 			for (int x = 0; x < GAME_width; x += chunk_size)
@@ -69,12 +69,16 @@ void UI::render_update(RenderWindow* window) {
 		}
 
 		curr_y += debug_bar_offset + debug_bar_height;
+
+		// FPS HUD
+		char output[40];
+
+		sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
+		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
-	char output[40];
 
-	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
-	window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 50, output, encode_sans_medium, { 255, 255, 255, 255 });
+
 }
 
 
