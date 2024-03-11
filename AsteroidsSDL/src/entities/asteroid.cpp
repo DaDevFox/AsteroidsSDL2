@@ -203,11 +203,11 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	window.camera.teleport(collision_x, collision_y);
 
 	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
-	split_bridge_outline(this);
-	split_bridge_outline(created);
+	split_bridge_outline(this, start, end);
+	split_bridge_outline(created, start, end);
 
 	splitflag = 1;
-	SDL_Log("split asteroid idx: %i; has %i points", GAME_asteroid_count, created->outline_point_count);
+	SDL_Log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
 
 	return created;
 }
@@ -267,7 +267,7 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 		queue.pop();
 	}
 
-	outline_point_count = queue.size() - divider;
+	outline_point_count = queue.size();
 	int i = 0;
 	while (!queue.empty()) {
 		outline[i] = queue.top();
@@ -278,7 +278,63 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	return created;
 }
 
-void Asteroid::split_bridge_outline(Asteroid* asteroid) {
+void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end) {
+	std::vector<SDL_Point> outline_additions;
+
+	int cragginess_resolution = 20;
+	int diff_x = (end.x - start.x);
+	int diff_y = (end.y - start.y);
+
+	float total_distance = (float)(diff_x * diff_x + diff_y * diff_y);
+	total_distance = sqrtf(total_distance);
+	int steps = (int)total_distance / cragginess_resolution;
+
+	int curr_x = start.x;
+	int curr_y = start.y;
+
+	int variance = 15;
+
+	for (int i = 0; i <= steps; i++) {
+		int next_x = (int)((float)diff_x * (float)i / (float)steps);
+		int next_y = (int)((float)diff_y * (float)i / (float)steps);
+		next_x += rand() % variance;
+		next_y += rand() % variance;
+
+		// raster traverse from curr to next
+		int distance = (next_x - curr_x) * (next_x - curr_x) + (next_y - curr_y) * (next_y - curr_y);
+		distance = SDL_sqrtf((float)distance);
+		float theta = atan2f((next_x - curr_x), (next_y - curr_y));
+
+		int x_prev = start.x;
+		int y_prev = start.y;
+		for (int j = 0; j < distance; j++) {
+			int x = (int)(cosf(theta) * (float)distance) + curr_x;
+			int y = (int)(sinf(theta) * (float)distance) + curr_y;
+
+			outline_additions.push_back({ x, y });
+
+			if (x_prev != x && y_prev != y) // if it's a perfect diagonal
+				outline_additions.push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
+
+			x_prev = x;
+			y_prev = y;
+		}
+
+		curr_x = next_x;
+		curr_y = next_y;
+	}
+
+	// append outline_additions to outline
+	if (outline_point_count + outline_additions.size() >= 4 * SETTING_MAX_POLYGON_VERTICES)
+	{
+		SDL_Log("Outline buffer overflow for asteroid id %i", id);
+		return;
+	}
+
+	for (int i = outline_point_count; i < outline_additions.size(); i++)
+		outline[i] = outline_additions[i];
+
+	outline_point_count += outline_additions.size();
 
 }
 
@@ -529,7 +585,7 @@ void player_input_update(SDL_Event* running_event)
 		float mouse_world_x = window.camera.screen_to_world_x(mouse_x);
 		float mouse_world_y = window.camera.screen_to_world_y(mouse_y);
 
-		int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / tile_size)) / tile_size;
+		int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / chunk_size)) / chunk_size;
 		printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
 		if (collision_check_grid[chunk]) {
 			std::set<int> set = *(collision_check_grid[chunk]);
@@ -584,15 +640,6 @@ std::uniform_int_distribution<int> dist(thrust_min_height, thrust_max_height);
 
 void asteroids_render_update(RenderWindow* window)
 {
-	if (DEBUG_chunk_gridlines)
-	{
-		for (int x = 0; x < GAME_width; x += tile_size)
-			window->render_line(x, 0, x, GAME_height, { 200, 200, 200, 255 });
-
-		for (int y = 0; y < GAME_height; y += tile_size)
-			window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
-	}
-
 
 	if (thrust_columns == NULL)
 		thrust_columns = new int[thrust_numColumns];
@@ -625,9 +672,9 @@ void asteroids_render_update(RenderWindow* window)
 			int size_x = size * vel_normalized_x;
 			int size_y = size * vel_normalized_y;
 			window->render_rect(
-				player->x + point.x - (player->w >> 1) - (size_x),
-				player->y + point.y - (player->h >> 1) - (size_y),
-				size_x, size_y, PLAYER_thrusting_outline_color);
+				player->x + (float)(point.x - (player->w >> 1) - (size_x)),
+				player->y + (float)(point.y - (player->h >> 1) - (size_y)),
+				(float)size_x, (float)size_y, PLAYER_thrusting_outline_color);
 		}
 	}
 

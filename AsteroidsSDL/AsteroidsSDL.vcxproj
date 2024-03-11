@@ -146,6 +146,7 @@
     <ClCompile Include="src\entities\asteroid.cpp" />
     <ClCompile Include="src\window\camera.cpp" />
     <ClCompile Include="src\window\render_window.cpp" />
+    <ClCompile Include="src\window\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.png" />

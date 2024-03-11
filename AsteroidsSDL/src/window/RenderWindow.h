@@ -3,11 +3,23 @@
 #include <SDL_ttf.h>
 #include "camera.h"
 
+class RenderWindow;
+
+class UI
+{
+public:
+	void input_update(SDL_Event* running_event);
+	void render_update(RenderWindow* window);
+	void update(float delta_time);
+};
+
+
 class RenderWindow
 {
 
 public:
 	Camera camera;
+	UI ui;
 
 
 	RenderWindow(const char* title, int width, int height);
@@ -17,7 +29,7 @@ public:
 	RenderWindow& operator=(const RenderWindow& other);
 
 
-	void get_info(int* width, int* height);
+	void get_info(int* width, int* height) const;
 
 	void clear();
 	void clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
@@ -35,6 +47,7 @@ public:
 
 	void render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color);
 	void render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color);
+	void render_rect(int screen_x, int screen_y, int screen_w, int screen_h, SDL_Color color);
 
 	/// <summary>
 	/// Changes the current RenderDrawColor and draws a pixel at the given x and y pixel coordinate
@@ -111,3 +124,4 @@ private:
 	int world_to_screen_x(float world_x);
 	int world_to_screen_y(float world_y);
 };
+

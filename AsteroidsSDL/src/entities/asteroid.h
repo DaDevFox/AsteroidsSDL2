@@ -5,8 +5,6 @@
 class Asteroid : public Entity
 {
 public:
-	//int idx;
-
 	void init(int w, int h);
 	void generate();
 	void create_outline(Uint32* buffer);
@@ -25,7 +23,7 @@ private:
 	void circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 
 	Asteroid* split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end);
-	void split_bridge_outline(Asteroid* asteroid);
+	void split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end);
 
 };
 

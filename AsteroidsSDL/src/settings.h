@@ -17,10 +17,21 @@ extern int SETTING_secondary_mouse_button;
 extern float SETTING_camera_zoom_max;
 extern float SETTING_camera_zoom_min;
 
+extern const SDL_KeyCode KEY_DEBUG_master;
+extern bool DEBUG_master;
+
+extern const SDL_KeyCode KEY_DEBUG_wireframe_mode;
+extern bool DEBUG_wireframe_mode;
+
+extern const SDL_KeyCode KEY_DEBUG_chunk_gridlines;
 extern bool DEBUG_chunk_gridlines;
+extern const SDL_KeyCode KEY_DEBUG_highlight_capstone_asteroid;
 extern bool DEBUG_highlight_capstone_asteroid;
-extern bool DEBUG_chunk_numbers;
-extern bool DEBUG_entity_outlines;
+extern const SDL_KeyCode KEY_DEBUG_display_chunk_numbers;
+extern bool DEBUG_display_chunk_numbers;
+extern const SDL_KeyCode KEY_DEBUG_display_entity_outlines;
+extern bool DEBUG_display_entity_outlines;
+
 extern bool DEBUG_entity_rotations;
 
 // Controls

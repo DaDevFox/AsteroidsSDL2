@@ -4,9 +4,9 @@
 #include <map>
 #include <set>
 
-extern const int tile_size;
-extern const int chunk_height;
-extern const int chunk_width;
+extern const int chunk_size;
+extern const int GAME_chunkwise_height;
+extern const int GAME_chunkwise_width;
 
 extern std::map<int, std::set<int>*> collision_check_grid;
 class Entity

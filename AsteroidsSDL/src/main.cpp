@@ -10,6 +10,10 @@
 
 #undef main // needed for cpp compilation
 
+const int chunk_size = ASTEROID_maximum_radius;
+const int GAME_chunkwise_height = GAME_height / chunk_size;
+const int GAME_chunkwise_width = GAME_width / chunk_size;
+
 int WINDOW_height;
 int WINDOW_width;
 
@@ -98,6 +102,7 @@ void resize() {
 void input_update()
 {
 	player_input_update(&running_event);
+	window.ui.input_update(&running_event);
 	window.camera.input_update(&running_event);
 }
 
@@ -115,31 +120,7 @@ void render_update()
 
 	ships_render_update(&window);
 	asteroids_render_update(&window);
-
-	SDL_Color color =
-	{
-		255,
-		255,
-		255,
-		255
-	};
-
-
-	char output[40];
-	bool flag = false;
-	//for (Asteroid* asteroid = asteroids; asteroid < &asteroids[0] + asteroids_count; asteroid++)
-	//	if (abs(asteroid->desired_velocity_x) > 0 || abs(asteroid->desired_velocity_x) > 0)
-	//		sprintf_s(output, "%.3f", asteroid->velocity_x);
-
-	//if(flag)
-	//	strcpy_s(output, 7, "moving");
-	//else
-	//	strcpy_s(output, 7, "   ");
-
-	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window.camera.x, (int)window.camera.y);
-
-
-	window.render_centered_screen(WINDOW_width / 2.0F, 50.0F, output, encode_sans_medium, color);
+	window.ui.render_update(&window);
 }
 
 void update()

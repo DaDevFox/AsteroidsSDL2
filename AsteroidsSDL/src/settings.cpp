@@ -1,7 +1,6 @@
 #include "settings.h"
 #include <SDL.h>
 
-
 #pragma region Interactive
 
 const char* RESOURCE_ship_texture_path = "./triangle.png";
@@ -35,10 +34,24 @@ const SDL_KeyCode KEY_zoom_in_alt = SDLK_PAGEUP;
 const SDL_KeyCode KEY_zoom_out = SDLK_f;
 const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 
+const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
+bool DEBUG_master = false;
+
+const SDL_KeyCode KEY_DEBUG_wireframe_mode = SDLK_q;
+bool DEBUG_wireframe_mode = false;
+
+const SDL_KeyCode KEY_DEBUG_chunk_gridlines = SDLK_g;
 bool DEBUG_chunk_gridlines = false;
+
+const SDL_KeyCode KEY_DEBUG_highlight_capstone_asteroid = SDLK_g;
 bool DEBUG_highlight_capstone_asteroid = true;
-bool DEBUG_chunk_numbers = false;
-bool DEBUG_entity_outlines = true;
+
+const SDL_KeyCode KEY_DEBUG_display_chunk_numbers = SDLK_g;
+bool DEBUG_display_chunk_numbers = false;
+
+const SDL_KeyCode KEY_DEBUG_display_entity_outlines = SDLK_o;
+bool DEBUG_display_entity_outlines = true;
+
 bool DEBUG_entity_rotations = false;
 
 #pragma endregion
