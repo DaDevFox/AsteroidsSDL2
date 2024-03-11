@@ -10,6 +10,10 @@
 
 #undef main // needed for cpp compilation
 
+const int chunk_size = ASTEROID_maximum_radius;
+const int GAME_chunkwise_height = GAME_height / chunk_size;
+const int GAME_chunkwise_width = GAME_width / chunk_size;
+
 int WINDOW_height;
 int WINDOW_width;
 
@@ -98,6 +102,7 @@ void resize() {
 void input_update()
 {
 	player_input_update(&running_event);
+	window.ui.input_update(&running_event);
 	window.camera.input_update(&running_event);
 }
 
@@ -135,6 +140,8 @@ void render_update()
 	//	strcpy_s(output, 7, "moving");
 	//else
 	//	strcpy_s(output, 7, "   ");
+
+	window.ui.render_update(&window);
 
 	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window.camera.x, (int)window.camera.y);
 

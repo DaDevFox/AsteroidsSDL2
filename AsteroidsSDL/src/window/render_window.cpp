@@ -106,7 +106,7 @@ void RenderWindow::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 		SDL_Log("Error on clear RenderWindow: %s\n", SDL_GetError());
 }
 
-void RenderWindow::get_info(int* width, int* height)
+void RenderWindow::get_info(int* width, int* height) const
 {
 	SDL_GetWindowSize(window, width, height);
 }
@@ -163,6 +163,12 @@ void RenderWindow::render_rect_outline(float world_x, float world_y, float world
 	render_line(world_x + world_w, world_y, world_x + world_w, world_y + world_h, color);
 	render_line(world_x + world_w, world_y + world_h, world_x, world_y + world_h, color);
 	render_line(world_x, world_y + world_h, world_x, world_y, color);
+}
+
+void RenderWindow::render_rect(int screen_x, int screen_y, int screen_w, int screen_h, SDL_Color color) {
+	SDL_Rect rect{ screen_x, screen_y, screen_w, screen_h };
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderFillRect(renderer, &rect);
 }
 
 void RenderWindow::render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color) {
@@ -510,7 +516,7 @@ void RenderWindow::render_centered_world(float x, float y, const char* text, TTF
 			return;
 		}
 
-		
+
 		SDL_RenderCopy(renderer, message, &src, &dst);
 		SDL_FreeSurface(surfaceMessage);
 		SDL_DestroyTexture(message);

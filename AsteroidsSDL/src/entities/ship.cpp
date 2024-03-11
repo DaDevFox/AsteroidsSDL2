@@ -161,15 +161,15 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 	/*if (look_radius > 2)
 		printf("lr: %i \n", look_radius);*/
 
-	int floor_y = (int)y / tile_size - look_radius;
-	int ceil_y = (int)y / tile_size + look_radius;
-	int left_x = (int)x / tile_size - look_radius;
-	int right_x = (int)x / tile_size + look_radius;
-	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++)
+	int floor_y = (int)y / chunk_size - look_radius;
+	int ceil_y = (int)y / chunk_size + look_radius;
+	int left_x = (int)x / chunk_size - look_radius;
+	int right_x = (int)x / chunk_size + look_radius;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
 	{
-		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
 		{
-			int chunk = curr_x + (GAME_width / tile_size) * curr_y;
+			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
 			if (collision_check_grid[chunk] == nullptr)
 				continue;
 			std::set<int> curr_set = *(collision_check_grid[chunk]);
@@ -183,7 +183,9 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 
 
 		Entity* other = Entity::active[id];
-		window.render_rect(other->x, other->y, other->w, other->h, { 0, 0, 255, 255 });
+		window.render_rect(
+			other->x, other->y,
+			(float)other->w, (float)other->h, { 0, 0, 255, 255 });
 
 
 		*vel_x -= (other->x - x) * multiplier;

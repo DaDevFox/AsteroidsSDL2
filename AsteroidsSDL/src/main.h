@@ -9,6 +9,10 @@ extern int GAME_width;
 extern int GAME_height;
 extern SDL_Rect GAME_window_rect;
 
+extern const int chunk_size;
+extern const int GAME_chunkwise_height;
+extern const int GAME_chunkwise_width;
+
 extern int WINDOW_width;
 extern int WINDOW_height;
 

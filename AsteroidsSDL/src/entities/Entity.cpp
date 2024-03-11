@@ -6,10 +6,6 @@
 #include <iostream>
 #include "ship.h"
 
-const int tile_size = ASTEROID_maximum_radius;
-const int chunk_height = GAME_height / tile_size;
-const int chunk_width = GAME_width / tile_size;
-
 std::map<int, std::set<int>*> collision_check_grid;
 
 int Entity::curr_id = 0;
@@ -52,7 +48,7 @@ std::set<int> scratch;
 //}
 
 int hash_entity(Entity* entity) {
-	return ((int)entity->x + (GAME_width) * ((int)entity->y / tile_size)) / tile_size;
+	return ((int)entity->x + (GAME_width) * ((int)entity->y / chunk_size)) / chunk_size;
 }
 
 bool Entity::in_bounds(float world_x, float world_y) const {
@@ -182,7 +178,7 @@ void Entity::update_collision_chunk()
 		collision_chunk = curr_chunk;
 	}
 
-	window.render_rect((screen_x / tile_size) * tile_size, (screen_y / tile_size) * tile_size, tile_size, tile_size, { 100, 100, 100, 20 });
+	window.render_rect((screen_x / chunk_size) * chunk_size, (screen_y / chunk_size) * chunk_size, chunk_size, chunk_size, { 100, 100, 100, 20 });
 }
 
 bool collision_between(Entity* a, Entity* b, SDL_Point* hit) {
@@ -226,15 +222,15 @@ void Entity::check_collisions()
 {
 	std::set<int> to_check;
 
-	int floor_y = (int)y / tile_size - 1;
-	int ceil_y = (int)y / tile_size + 1;
-	int left_x = (int)x / tile_size - 1;
-	int right_x = (int)x / tile_size + 1;
-	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, chunk_height); curr_y++)
+	int floor_y = (int)y / chunk_size - 1;
+	int ceil_y = (int)y / chunk_size + 1;
+	int left_x = (int)x / chunk_size - 1;
+	int right_x = (int)x / chunk_size + 1;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
 	{
-		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, chunk_width); curr_x++)
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
 		{
-			int chunk = curr_x + (GAME_width / tile_size) * curr_y;
+			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
 			if (collision_check_grid[chunk] == nullptr)
 				continue;
 			std::set<int> curr_set = *(collision_check_grid[chunk]);
@@ -326,7 +322,7 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
-	if (DEBUG_entity_outlines)
+	if (DEBUG_display_entity_outlines)
 	{
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
 		for (int i = 0; i < outline_point_count; i++)
@@ -348,7 +344,7 @@ void Entity::render(RenderWindow* window)
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
-	if (DEBUG_chunk_numbers)
+	if (DEBUG_display_chunk_numbers)
 	{
 		char str[20] = "";
 		sprintf_s(str, "%i", collision_chunk);
