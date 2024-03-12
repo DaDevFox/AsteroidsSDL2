@@ -9,6 +9,13 @@ void UI::input_update(SDL_Event* running_event) {
 		if (sym == KEY_DEBUG_master)
 			DEBUG_master = !DEBUG_master;
 
+		if (sym == KEY_DEBUG_focused_asteroid_cancel)
+			DEBUG_focused_asteroid = -1;
+		if (sym == KEY_DEBUG_focused_asteroid_increment)
+			DEBUG_focused_asteroid = ++DEBUG_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : DEBUG_focused_asteroid;
+		if (sym == KEY_DEBUG_focused_asteroid_decrement)
+			DEBUG_focused_asteroid = --DEBUG_focused_asteroid < 0 ? -1 : DEBUG_focused_asteroid;
+
 		if (sym == KEY_DEBUG_chunk_gridlines)
 			DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
 		if (sym == KEY_DEBUG_display_chunk_numbers)
@@ -27,6 +34,7 @@ void UI::input_update(SDL_Event* running_event) {
 
 void UI::render_update(RenderWindow* window) {
 	int curr_y = 0;
+	int curr_x = 0;
 
 	int debug_bar_offset = 30;
 	const char* debug_header_text = "debug menu";
@@ -57,6 +65,23 @@ void UI::render_update(RenderWindow* window) {
 				(float)debug_mode_indicator_width * 0.5F + (float)(i * debug_mode_indicator_width),
 				(float)debug_bar_height * 0.5F + debug_bar_offset,
 				text[i], encode_sans_medium, { 255, 255, 255, 255 });
+
+			curr_x += debug_mode_indicator_width;
+		}
+
+		if (DEBUG_focused_asteroid != -1) {
+			window->render_rect(
+				curr_x * debug_mode_indicator_width, debug_bar_offset,
+				debug_mode_indicator_width, debug_bar_height,
+				debug_mode_indicator_color_on);
+
+			char output[16];
+			sprintf_s(output, "focused: %i", DEBUG_focused_asteroid);
+
+			window->render_centered_screen(
+				(float)curr_x * debug_mode_indicator_width + debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
+				(float)debug_bar_height * 0.5F + debug_bar_offset,
+				output, encode_sans_medium, { 255, 255, 255, 255 });
 		}
 
 		if (DEBUG_chunk_gridlines)

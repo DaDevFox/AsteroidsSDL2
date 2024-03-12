@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "../main.h"
 #include <stdio.h>
+#include "../entities/Entity.h"
 
 const int edge_buffer = 512;
 
@@ -109,6 +110,11 @@ void Camera::update(float delta_time) {
 		x = x + (true_desired_x - x) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
 	if (fabs(true_desired_y - y) > 0.1f)
 		y = y + (true_desired_y - y) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
+
+	if (DEBUG_focused_asteroid != -1) {
+		Entity entity = ((Entity*)entities)[GAME_ship_count + DEBUG_focused_asteroid];
+		teleport(entity.x - (float)WINDOW_width * zoom * 0.5F, entity.y - (float)WINDOW_height * zoom * 0.5F);
+	}
 
 	if (true_desired_x + screen_to_world_x(WINDOW_width) > GAME_width + edge_buffer)
 		desired_x = GAME_width - screen_to_world_x(WINDOW_width) + screen_to_world_x(WINDOW_width) / 2.0F + edge_buffer;

@@ -37,6 +37,12 @@ const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
 bool DEBUG_master = false;
 
+const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment = SDLK_b;
+const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement = SDLK_c;
+const SDL_KeyCode KEY_DEBUG_focused_asteroid_cancel = SDLK_z;
+int DEBUG_focused_asteroid = -1;
+
+
 const SDL_KeyCode KEY_DEBUG_wireframe_mode = SDLK_q;
 bool DEBUG_wireframe_mode = false;
 

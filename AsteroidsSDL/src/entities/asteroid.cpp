@@ -244,9 +244,9 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	float m = (float)(by - ay) / (float)(bx - ax);
 	int b = (int)((float)ay - (float)ax * m);
 	int divider = 0;
-	auto comparator = [m, ay](SDL_Point a, SDL_Point b)->bool {
-		bool a_in = (a.y > (int)(m * (float)a.x + (float)ay));
-		bool b_in = (b.y > (int)(m * (float)b.x + (float)ay));
+	auto comparator = [m, b](SDL_Point self, SDL_Point other)->bool {
+		bool a_in = ((float)self.y > (m * (float)self.x + (float)b));
+		bool b_in = ((float)other.y > (m * (float)other.x + (float)b));
 
 		return a_in < b_in;
 		};
@@ -255,6 +255,7 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 
 	for (int i = 0; i < outline_point_count; i++) {
 		bool in = (outline[i].y > (int)(m * (float)outline[i].x + (float)b));
+		//SDL_Log("p (%i, %i): %i", outline[i].x, outline[i].y, in ? 1 : 0);
 		if (!in)
 			divider++;
 		queue.push(outline[i]);
@@ -313,7 +314,7 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 			outline_additions.push_back({ x, y });
 
-			if (x_prev != x && y_prev != y) // if it's a perfect diagonal
+			if (x_prev != x && y_prev != y) // if it's self perfect diagonal
 				outline_additions.push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
 
 			x_prev = x;

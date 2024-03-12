@@ -20,6 +20,11 @@ extern float SETTING_camera_zoom_min;
 extern const SDL_KeyCode KEY_DEBUG_master;
 extern bool DEBUG_master;
 
+extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment;
+extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement;
+extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_cancel;
+extern int DEBUG_focused_asteroid;
+
 extern const SDL_KeyCode KEY_DEBUG_wireframe_mode;
 extern bool DEBUG_wireframe_mode;
 
