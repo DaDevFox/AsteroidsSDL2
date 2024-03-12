@@ -112,8 +112,8 @@ void Camera::update(float delta_time) {
 		y = y + (true_desired_y - y) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
 
 	if (DEBUG_focused_asteroid != -1) {
-		Entity entity = ((Entity*)entities)[GAME_ship_count + DEBUG_focused_asteroid];
-		teleport(entity.x - (float)WINDOW_width * zoom * 0.5F, entity.y - (float)WINDOW_height * zoom * 0.5F);
+		Entity* entity = ((Entity*)entities) + GAME_ship_count + DEBUG_focused_asteroid;
+		teleport(entity->x - (float)WINDOW_width * zoom * 0.5F, entity->y - (float)WINDOW_height * zoom * 0.5F);
 	}
 
 	if (true_desired_x + screen_to_world_x(WINDOW_width) > GAME_width + edge_buffer)
