@@ -21,6 +21,7 @@ extern TTF_Font* encode_sans_bold;
 
 extern void* entities;
 extern RenderWindow window;
+extern float unscaled_delta_time;
 extern float delta_time;
 extern float time_scaling;
 

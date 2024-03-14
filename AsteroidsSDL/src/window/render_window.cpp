@@ -549,7 +549,7 @@ void RenderWindow::render_all_deferred() {
 			continue;
 		}
 
-		render_point(std::get<1>(tuple), std::get<2>(tuple), std::get<3>(tuple));
+		render_rect(std::get<1>(tuple), std::get<2>(tuple), 1.0F, 1.0F, std::get<3>(tuple));
 		it++;
 	}
 

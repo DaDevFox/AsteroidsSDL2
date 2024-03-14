@@ -107,9 +107,9 @@ void Camera::update(float delta_time) {
 	float true_desired_y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
 
 	if (fabs(true_desired_x - x) > 0.1f)
-		x = x + (true_desired_x - x) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
+		x = x + (true_desired_x - x) * unscaled_delta_time * (1.0F - SETTING_camera_pan_smoothness);
 	if (fabs(true_desired_y - y) > 0.1f)
-		y = y + (true_desired_y - y) * delta_time * (1.0F - SETTING_camera_pan_smoothness);
+		y = y + (true_desired_y - y) * unscaled_delta_time * (1.0F - SETTING_camera_pan_smoothness);
 
 	if (DEBUG_focused_asteroid != -1) {
 		Entity* entity = ((Entity*)entities) + GAME_ship_count + DEBUG_focused_asteroid;
