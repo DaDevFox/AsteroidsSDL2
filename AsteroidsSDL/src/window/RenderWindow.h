@@ -2,6 +2,8 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "camera.h"
+#include <vector>
+#include <tuple>
 
 class RenderWindow;
 
@@ -55,7 +57,7 @@ public:
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="color"></param>
-	void render_point(int x, int y, SDL_Color color);
+	void render_point(float x, float y, SDL_Color color);
 	/// <summary>
 	/// Changes the current RenderDrawColor and draws a pixel at the given x and y pixel coordinate
 	/// </summary>
@@ -109,6 +111,10 @@ public:
 	void render_centered_screen(float x, float y, const char* text, TTF_Font* font, SDL_Color color);
 	void render_centered_world(float x, float y, const char* text, TTF_Font* font, SDL_Color color);
 
+	void render_pixel_deferred(float time, float x, float y, SDL_Color color);
+
+	void render_all_deferred();
+
 	void draw();
 
 	SDL_Texture* create_texture_from_surface(SDL_Surface* surface);
@@ -119,6 +125,8 @@ protected:
 	SDL_Renderer* renderer;
 
 private:
+	std::vector<std::tuple<float, float, float, SDL_Color>> deferred_render_calls;
+
 	bool on_screen(float world_x, float world_y);
 	bool world_to_screen(float world_x, float world_y, int* screen_x, int* screen_y);
 	int world_to_screen_x(float world_x);

@@ -34,6 +34,9 @@ const SDL_KeyCode KEY_zoom_in_alt = SDLK_PAGEUP;
 const SDL_KeyCode KEY_zoom_out = SDLK_f;
 const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 
+const SDL_KeyCode KEY_pause = SDLK_p;
+
+// DEBUG
 const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
 bool DEBUG_master = false;
 
@@ -79,7 +82,7 @@ const int ASTEROID_maximum_radius = 128 / 2;
 const int ASTEROID_startpos_variance = 750;
 const float ASTEROID_startspeed_maximum = 0.02F;
 
-const float ASTEROID_split_minimum_velocity = 2.0F;
+const float ASTEROID_split_minimum_velocity = 0.020F;
 
 const float PLAYER_controlspeed_maximum = 0.05F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };

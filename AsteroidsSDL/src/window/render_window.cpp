@@ -157,6 +157,10 @@ int RenderWindow::world_to_screen_y(float world_y) {
 
 #pragma region Basic Geometry
 
+void RenderWindow::render_pixel_deferred(float time, float x, float y, SDL_Color color) {
+	deferred_render_calls.push_back(std::tuple<float, float, float, SDL_Color>(time, x, y, color));
+}
+
 void RenderWindow::render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color)
 {
 	render_line(world_x, world_y, world_x + world_w, world_y, color);
@@ -190,7 +194,7 @@ void RenderWindow::render_rect(float world_x, float world_y, float world_w, floa
 	}
 }
 
-void RenderWindow::render_point(int x, int y, SDL_Color color)
+void RenderWindow::render_point(float x, float y, SDL_Color color)
 {
 	int screen_x;
 	int screen_y;
@@ -530,6 +534,25 @@ void RenderWindow::render_centered_world(float x, float y, const char* text, TTF
 void RenderWindow::draw()
 {
 	SDL_RenderPresent(renderer);
+}
+
+void RenderWindow::render_all_deferred() {
+	if (deferred_render_calls.empty())
+		return;
+
+	auto it = deferred_render_calls.begin();
+	while (it != deferred_render_calls.end()) {
+		std::tuple<float, float, float, SDL_Color> tuple = *it;
+		std::get<0>(tuple) -= delta_time;
+		if (std::get<1>(tuple) < 0.0F) {
+			it = deferred_render_calls.erase(it);
+			continue;
+		}
+
+		render_point(std::get<1>(tuple), std::get<2>(tuple), std::get<3>(tuple));
+		it++;
+	}
+
 }
 
 SDL_Texture* RenderWindow::create_texture_from_surface(SDL_Surface* surface) {

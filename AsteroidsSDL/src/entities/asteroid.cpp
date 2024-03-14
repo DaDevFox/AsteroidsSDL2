@@ -203,8 +203,12 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	window.camera.teleport(collision_x, collision_y);
 
 	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
-	split_bridge_outline(this, start, end);
-	split_bridge_outline(created, start, end);
+	std::vector<SDL_Point> outline_bridge;
+
+	split_bridge_outline(this, start, end, &outline_bridge);
+	split_bridge_outline(created, start, end, &outline_bridge);
+
+	SDL_Log("created asteroid: %i; added %zu", created->outline_point_count, outline_bridge.size());
 
 	splitflag = 1;
 	SDL_Log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
@@ -216,7 +220,6 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	int collision_pixel_x = (int)collision_x - (screen_x - (w >> 1));
 	int collision_pixel_y = (int)collision_y - (screen_y - (h >> 1));
 
-	SDL_Log("split command: (%.1f, %.1f)", collision_x, collision_y);
 	int contact_idx = -1;
 
 	for (int i = 0; i < outline_point_count; i++)
@@ -229,11 +232,13 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	Asteroid* created = append_asteroid_to_pool();
 
 	int split_endpoint = -1;
-	while (split_endpoint > 0 && split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x)
+	while (split_endpoint < 0 || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
 		split_endpoint = rand() % outline_point_count;
 
+	SDL_Log("split command: (%i, %i) to (%i, %i)", collision_pixel_x, collision_pixel_y, outline[split_endpoint].x, outline[split_endpoint].y);
+
 	int ax = collision_pixel_x;
-	int ay = collision_pixel_x;
+	int ay = collision_pixel_y;
 	int bx = outline[split_endpoint].x;
 	int by = outline[split_endpoint].y;
 
@@ -245,10 +250,10 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	int b = (int)((float)ay - (float)ax * m);
 	int divider = 0;
 	auto comparator = [m, b](SDL_Point self, SDL_Point other)->bool {
-		bool a_in = ((float)self.y > (m * (float)self.x + (float)b));
-		bool b_in = ((float)other.y > (m * (float)other.x + (float)b));
+		bool self_in = ((float)self.y > (m * (float)self.x + (float)b));
+		bool other_in = ((float)other.y > (m * (float)other.x + (float)b));
 
-		return a_in < b_in;
+		return self_in > other_in;
 		};
 
 	std::priority_queue < SDL_Point, std::vector<SDL_Point>, decltype(comparator)> queue(comparator);
@@ -279,64 +284,142 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	return created;
 }
 
-void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end) {
-	std::vector<SDL_Point> outline_additions;
+void printBinary(int num);
 
-	int cragginess_resolution = 20;
-	int diff_x = (end.x - start.x);
-	int diff_y = (end.y - start.y);
+void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions) {
+	//std::vector<SDL_Point> outline_additions;
 
-	float total_distance = (float)(diff_x * diff_x + diff_y * diff_y);
-	total_distance = sqrtf(total_distance);
-	int steps = (int)total_distance / cragginess_resolution;
+	if (outline_additions->size() == 0)
+	{
+		int cragginess_resolution = 10;
+		int diff_x = (end.x - start.x);
+		int diff_y = (end.y - start.y);
 
-	int curr_x = start.x;
-	int curr_y = start.y;
+		window.render_pixel_deferred(10.0F, asteroid->x + start.x, asteroid->y + start.y, { 0, 255, 0, 255 });
+		window.render_pixel_deferred(10.0F, asteroid->x + end.x, asteroid->y + end.y, { 0, 150, 0, 255 });
 
-	int variance = 15;
+		float total_distance = (float)(diff_x * diff_x + diff_y * diff_y);
+		total_distance = sqrtf(total_distance);
+		int steps = (int)total_distance / cragginess_resolution;
 
-	for (int i = 0; i <= steps; i++) {
-		int next_x = (int)((float)diff_x * (float)i / (float)steps);
-		int next_y = (int)((float)diff_y * (float)i / (float)steps);
-		next_x += rand() % variance;
-		next_y += rand() % variance;
+		int curr_x = start.x;
+		int curr_y = start.y;
 
-		// raster traverse from curr to next
-		int distance = (next_x - curr_x) * (next_x - curr_x) + (next_y - curr_y) * (next_y - curr_y);
-		distance = SDL_sqrtf((float)distance);
-		float theta = atan2f((next_x - curr_x), (next_y - curr_y));
+		int variance = 3;
 
-		int x_prev = start.x;
-		int y_prev = start.y;
-		for (int j = 0; j < distance; j++) {
-			int x = (int)(cosf(theta) * (float)distance) + curr_x;
-			int y = (int)(sinf(theta) * (float)distance) + curr_y;
+		for (int i = 1; i <= steps; i++) {
+			int next_x = start.x + (int)((float)diff_x * ((float)i / (float)steps));
+			int next_y = start.y + (int)((float)diff_y * ((float)i / (float)steps));
 
-			outline_additions.push_back({ x, y });
+			if (next_x != end.x && next_y != end.y) {
+				next_x += rand() % variance;
+				next_y += rand() % variance;
+			}
+			else
+				SDL_Log("test; %d %d to %d %d", curr_x, curr_y, next_x, next_y);
 
-			if (x_prev != x && y_prev != y) // if it's self perfect diagonal
-				outline_additions.push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
+			// raster traverse from curr to next
+			int distance = (next_x - curr_x) * (next_x - curr_x) + (next_y - curr_y) * (next_y - curr_y);
+			distance = SDL_sqrtf((float)distance);
+			float theta = atan2f((next_y - curr_y), (next_x - curr_x));
 
-			x_prev = x;
-			y_prev = y;
+			int x_prev = -1;
+			int y_prev = -1;
+			int x, y;
+
+			float resolution = 0.5F;
+
+			for (float j = 0; j <= distance; j += resolution) {
+				x = (int)(cosf(theta) * j) + curr_x;
+				y = (int)(sinf(theta) * j) + curr_y;
+
+				if (x == next_x && y == next_y)
+					SDL_Log("link point");
+
+				if (y == 0 || x == 0)
+					SDL_Log("edge point");
+
+				if (x_prev == x && y_prev == y)
+					continue;
+
+				outline_additions->push_back({ x, y });
+
+				if (x_prev != x && y_prev != y) // if it's self perfect diagonal
+					outline_additions->push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
+
+				x_prev = x;
+				y_prev = y;
+			}
+
+			curr_x = next_x;
+			curr_y = next_y;
 		}
 
-		curr_x = next_x;
-		curr_y = next_y;
+		///*int distance = (DIFF_X) * (next_x - curr_x) + (next_y - curr_y) * (next_y - curr_y);
+		//distance = SDL_sqrtf((float)distance);*/
+		//float theta = atan2f(diff_y, diff_x);
+
+		//int x_prev = curr_x;
+		//int y_prev = curr_y;
+		//for (int j = 0; j < total_distance; j++) {
+		//	int x = (int)(cosf(theta) * (float)j) + curr_x;
+		//	int y = (int)(sinf(theta) * (float)j) + curr_y;
+
+		//	SDL_Log("Point %i, %i\n", x, y);
+
+		//	if (x_prev == x && y_prev == y)
+		//		continue;
+
+		//	outline_additions->push_back({ x, y });
+
+		//	if (x_prev != x && y_prev != y) // if it's self perfect diagonal
+		//		outline_additions->push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
+
+		//	x_prev = x;
+		//	y_prev = y;
+		//}
 	}
 
+
 	// append outline_additions to outline
-	if (outline_point_count + outline_additions.size() >= 4 * SETTING_MAX_POLYGON_VERTICES)
+
+	if (asteroid->outline_point_count + outline_additions->size() >= 4 * SETTING_MAX_POLYGON_VERTICES)
 	{
 		SDL_Log("Outline buffer overflow for asteroid id %i", id);
 		return;
 	}
 
-	for (int i = outline_point_count; i < outline_additions.size(); i++)
-		outline[i] = outline_additions[i];
+	printf("outline_point_count = ");
+	//printBinary(outline_point_count);
+	printf("\n");
 
-	outline_point_count += outline_additions.size();
+	//((Entity*)entities + 32)
 
+	for (int i = asteroid->outline_point_count; i < asteroid->outline_point_count + outline_additions->size(); i++)
+		asteroid->outline[i] = (*outline_additions)[i - asteroid->outline_point_count];
+
+
+	printf("%x", asteroid->outline_point_count);
+
+	asteroid->outline_point_count += outline_additions->size();
+}
+
+
+void printBinary(int num) {
+	// Size of an integer in bits
+	int size = sizeof(int) * 8;
+
+	// Mask to isolate each bit of the number
+	unsigned int mask = 1 << (size - 1);
+
+	// Loop through each bit
+	for (int i = 0; i < size; i++) {
+		// Print 1 if the bit is set, otherwise print 0
+		printf("%d", (num & mask) ? 1 : 0);
+
+		// Shift the mask to the right
+		mask >>= 1;
+	}
 }
 
 

@@ -21,4 +21,6 @@ extern TTF_Font* encode_sans_medium;
 extern void* entities;
 extern RenderWindow window;
 extern float delta_time;
+extern float time_scaling;
+
 extern bool game_running;

@@ -32,6 +32,7 @@ RenderWindow window(window_title, WIDTH, HEIGHT);
 bool game_running;
 
 float delta_time;
+float time_scaling = 1.0F;
 
 Uint32 last_tick;
 Uint32 current_tick;
@@ -121,6 +122,9 @@ void render_update()
 	ships_render_update(&window);
 	asteroids_render_update(&window);
 	window.ui.render_update(&window);
+
+	if (DEBUG_master)
+		window.render_all_deferred();
 }
 
 void update()
@@ -139,6 +143,7 @@ void update()
 
 void game_loop()
 {
+	//printf("%i", ((Entity*)entities)[32].outline_point_count);
 	while (SDL_PollEvent(&running_event))
 	{
 		if (running_event.type == SDL_QUIT)

@@ -3,8 +3,8 @@
 
 void UI::input_update(SDL_Event* running_event) {
 	if (running_event->type == SDL_KEYDOWN) {
-#pragma region debug input
 		SDL_Keycode sym = running_event->key.keysym.sym;
+#pragma region debug input
 
 		if (sym == KEY_DEBUG_master)
 			DEBUG_master = !DEBUG_master;
@@ -29,6 +29,9 @@ void UI::input_update(SDL_Event* running_event) {
 
 #pragma endregion
 
+		if (sym == KEY_pause) {
+			time_scaling = time_scaling > 0.0F ? 0.0F : 1.0F;
+		}
 	}
 }
 
@@ -79,7 +82,7 @@ void UI::render_update(RenderWindow* window) {
 			sprintf_s(output, "focused: %i", DEBUG_focused_asteroid);
 
 			window->render_centered_screen(
-				(float)curr_x * debug_mode_indicator_width + debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
+				debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
 				(float)debug_bar_height * 0.5F + debug_bar_offset,
 				output, encode_sans_medium, { 255, 255, 255, 255 });
 		}
@@ -94,14 +97,13 @@ void UI::render_update(RenderWindow* window) {
 		}
 
 		curr_y += debug_bar_offset + debug_bar_height;
-
-		// FPS HUD
-		char output[40];
-
-		sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
-		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
+	// FPS HUD
+	char output[40];
+
+	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
+	window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
 
 
 }

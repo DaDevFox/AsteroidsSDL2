@@ -23,7 +23,7 @@ private:
 	void circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 
 	Asteroid* split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end);
-	void split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end);
+	void split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions);
 
 };
 
