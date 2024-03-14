@@ -17,6 +17,8 @@ extern int SETTING_secondary_mouse_button;
 extern float SETTING_camera_zoom_max;
 extern float SETTING_camera_zoom_min;
 
+extern bool UI_FPSHUD_enabled;
+
 extern const SDL_KeyCode KEY_pause;
 
 extern const SDL_KeyCode KEY_DEBUG_master;

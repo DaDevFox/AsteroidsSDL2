@@ -99,16 +99,23 @@ void UI::render_update(RenderWindow* window) {
 		curr_y += debug_bar_offset + debug_bar_height;
 	}
 
-	// FPS HUD
-	char output[40];
+	if (delta_time == 0.0F) {
+		// FPS HUD
+		char output[40] = "PAUSED";
+		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_bold, { 255, 255, 255, 255 });
+		curr_y += 20;
+	}
 
-	sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
-	window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
+	if (UI_FPSHUD_enabled)
+	{
+		// FPS HUD
+		char output[40];
 
-
+		sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
+		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
+	}
 }
 
 
 void UI::update(float delta_time) {
-
 }

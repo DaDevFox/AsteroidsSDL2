@@ -36,6 +36,11 @@ const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 
 const SDL_KeyCode KEY_pause = SDLK_p;
 
+// UI
+bool UI_FPSHUD_enabled = true;
+
+
+
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
 bool DEBUG_master = false;

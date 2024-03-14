@@ -17,6 +17,7 @@ extern int WINDOW_width;
 extern int WINDOW_height;
 
 extern TTF_Font* encode_sans_medium;
+extern TTF_Font* encode_sans_bold;
 
 extern void* entities;
 extern RenderWindow window;

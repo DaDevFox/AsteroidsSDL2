@@ -43,6 +43,7 @@ SDL_Color game_frame_color{ 120, 120, 120, 255 };
 
 // resources
 TTF_Font* encode_sans_medium;
+TTF_Font* encode_sans_bold;
 
 void resize(void);
 
@@ -79,6 +80,13 @@ bool game_init() {
 	if (encode_sans_medium == nullptr)
 	{
 		SDL_Log("Error loading encode sans medium font: %s\n", SDL_GetError());
+		return false;
+	}
+
+	encode_sans_bold = TTF_OpenFont("./EncodeSans-Bold.ttf", 18);
+	if (encode_sans_bold == nullptr)
+	{
+		SDL_Log("Error loading encode sans bold font: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -130,7 +138,7 @@ void render_update()
 void update()
 {
 	current_tick = SDL_GetTicks();
-	delta_time = (float)((current_tick - last_tick));
+	delta_time = (float)((current_tick - last_tick)) * time_scaling;
 
 	window.camera.update(delta_time);
 	ships_update(delta_time);
