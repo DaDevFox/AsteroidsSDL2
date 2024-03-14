@@ -43,7 +43,7 @@ bool UI_FPSHUD_enabled = true;
 
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
-bool DEBUG_master = false;
+bool DEBUG_master = true;
 
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment = SDLK_b;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement = SDLK_c;

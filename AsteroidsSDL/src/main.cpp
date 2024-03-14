@@ -32,6 +32,7 @@ RenderWindow window(window_title, WIDTH, HEIGHT);
 bool game_running;
 
 float delta_time;
+float unscaled_delta_time;
 float time_scaling = 1.0F;
 
 Uint32 last_tick;
@@ -138,7 +139,9 @@ void render_update()
 void update()
 {
 	current_tick = SDL_GetTicks();
-	delta_time = (float)((current_tick - last_tick)) * time_scaling;
+	unscaled_delta_time = (float)((current_tick - last_tick));
+	delta_time = unscaled_delta_time * time_scaling;
+
 
 	window.camera.update(delta_time);
 	ships_update(delta_time);

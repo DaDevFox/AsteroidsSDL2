@@ -200,7 +200,6 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	SDL_Point start;
 	SDL_Point end;
 
-	window.camera.teleport(collision_x, collision_y);
 
 	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
 	std::vector<SDL_Point> outline_bridge;
@@ -212,6 +211,9 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 
 	splitflag = 1;
 	SDL_Log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
+
+	time_scaling = 0.0F;
+	window.camera.teleport(collision_x, collision_y);
 
 	return created;
 }
@@ -284,8 +286,6 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	return created;
 }
 
-void printBinary(int num);
-
 void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions) {
 	//std::vector<SDL_Point> outline_additions;
 
@@ -295,8 +295,10 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 		int diff_x = (end.x - start.x);
 		int diff_y = (end.y - start.y);
 
-		window.render_pixel_deferred(10.0F, asteroid->x + start.x, asteroid->y + start.y, { 0, 255, 0, 255 });
-		window.render_pixel_deferred(10.0F, asteroid->x + end.x, asteroid->y + end.y, { 0, 150, 0, 255 });
+		if (DEBUG_master) {
+			window.render_pixel_deferred(1.0F, asteroid->x - (asteroid->w >> 1) + start.x, asteroid->y - (asteroid->h >> 1) + start.y, { 0, 255, 0, 255 });
+			window.render_pixel_deferred(1.0F, asteroid->x - (asteroid->w >> 1) + end.x, asteroid->y - (asteroid->h >> 1) + end.y, { 0, 150, 0, 255 });
+		}
 
 		float total_distance = (float)(diff_x * diff_x + diff_y * diff_y);
 		total_distance = sqrtf(total_distance);
@@ -329,15 +331,9 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 			float resolution = 0.5F;
 
-			for (float j = 0; j <= distance; j += resolution) {
+			for (float j = 0; j <= distance + 2; j += resolution) {
 				x = (int)(cosf(theta) * j) + curr_x;
 				y = (int)(sinf(theta) * j) + curr_y;
-
-				if (x == next_x && y == next_y)
-					SDL_Log("link point");
-
-				if (y == 0 || x == 0)
-					SDL_Log("edge point");
 
 				if (x_prev == x && y_prev == y)
 					continue;
@@ -354,34 +350,7 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 			curr_x = next_x;
 			curr_y = next_y;
 		}
-
-		///*int distance = (DIFF_X) * (next_x - curr_x) + (next_y - curr_y) * (next_y - curr_y);
-		//distance = SDL_sqrtf((float)distance);*/
-		//float theta = atan2f(diff_y, diff_x);
-
-		//int x_prev = curr_x;
-		//int y_prev = curr_y;
-		//for (int j = 0; j < total_distance; j++) {
-		//	int x = (int)(cosf(theta) * (float)j) + curr_x;
-		//	int y = (int)(sinf(theta) * (float)j) + curr_y;
-
-		//	SDL_Log("Point %i, %i\n", x, y);
-
-		//	if (x_prev == x && y_prev == y)
-		//		continue;
-
-		//	outline_additions->push_back({ x, y });
-
-		//	if (x_prev != x && y_prev != y) // if it's self perfect diagonal
-		//		outline_additions->push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
-
-		//	x_prev = x;
-		//	y_prev = y;
-		//}
 	}
-
-
-	// append outline_additions to outline
 
 	if (asteroid->outline_point_count + outline_additions->size() >= 4 * SETTING_MAX_POLYGON_VERTICES)
 	{
@@ -389,38 +358,13 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 		return;
 	}
 
-	printf("outline_point_count = ");
-	//printBinary(outline_point_count);
-	printf("\n");
-
-	//((Entity*)entities + 32)
-
 	for (int i = asteroid->outline_point_count; i < asteroid->outline_point_count + outline_additions->size(); i++)
 		asteroid->outline[i] = (*outline_additions)[i - asteroid->outline_point_count];
 
 
-	printf("%x", asteroid->outline_point_count);
-
 	asteroid->outline_point_count += outline_additions->size();
 }
 
-
-void printBinary(int num) {
-	// Size of an integer in bits
-	int size = sizeof(int) * 8;
-
-	// Mask to isolate each bit of the number
-	unsigned int mask = 1 << (size - 1);
-
-	// Loop through each bit
-	for (int i = 0; i < size; i++) {
-		// Print 1 if the bit is set, otherwise print 0
-		printf("%d", (num & mask) ? 1 : 0);
-
-		// Shift the mask to the right
-		mask >>= 1;
-	}
-}
 
 
 Asteroid* append_asteroid_to_pool() {
