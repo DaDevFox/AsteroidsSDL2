@@ -24,7 +24,7 @@ private:
 
 	Asteroid* split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end);
 	void split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions);
-
+	void fill_pixels_from_outline(Asteroid* asteroid);
 };
 
 extern int ASTEROID_max_asteroid_radius;
