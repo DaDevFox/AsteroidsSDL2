@@ -125,7 +125,7 @@ void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost
 
 	int octaves = 1;
 	int min_reach_initial = 5;
-	int max_reach_initial = 25 + (rand() % (2 * reach_max_variance + 1) - reach_max_variance);
+	int max_reach_initial = ((2 * ASTEROID_maximum_radius) / 5) + (rand() % (2 * reach_max_variance + 1) - reach_max_variance);
 	int variance = 1;
 
 	float theta;
@@ -189,10 +189,25 @@ void Asteroid::generate()
 	SDL_FreeSurface(temp_surface);
 }
 
+bool const operator<(const SDL_Point a, const SDL_Point b) {
+	return hash(a.x, a.y) - hash(b.x, b.y) > 0;
+}
+
+bool const operator>(const SDL_Point a, const SDL_Point b) {
+	return hash(a.x, a.y) - hash(b.x, b.y) < 0;
+}
+
+bool const operator==(const SDL_Point a, const SDL_Point b) {
+	return hash(a.x, a.y) - hash(b.x, b.y) == 0;
+}
+
+bool const operator!=(const SDL_Point a, const SDL_Point b) {
+	return hash(a.x, a.y) - hash(b.x, b.y) != 0;
+}
+
 SDL_Point operator+(SDL_Point a, SDL_Point b) {
 	return { a.x + b.x, a.y + b.y };
 }
-
 
 SDL_Point operator/(SDL_Point a, SDL_Point b) {
 	return { a.x / b.x, a.y / b.y };
@@ -211,13 +226,58 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
 
 	Uint32* buffer = (Uint32*)temp_surface->pixels;
 
-	int pixels;
-	int leftmost_x;
-	int leftmost_y;
+	// ADD OUTLINE POINTS
+	std::set<SDL_Point> added;
+	if (asteroid->outline_point_count > 0) {
+		added.insert(asteroid->outline, asteroid->outline + asteroid->outline_point_count);
 
-	SDL_Point start = (asteroid->outline[0] + asteroid->outline[1]) / 2;
-	while (!outline_contains(asteroid->outline, asteroid->outline_point_count, start)) {
-		start = (asteroid->outline[0] + asteroid->outline[rand() % asteroid->outline_point_count]) / 2;
+		// get start pos for flood fill (CoM of asteroid)
+		// DANGER: designed for circular asteroids only, IE asteroids with no/few protrusions
+		SDL_Point start = { 0, 0 };
+		for (int i = 0; i < asteroid->outline_point_count; i++)
+			start = start + asteroid->outline[i];
+		start = start / asteroid->outline_point_count;
+
+
+		// FLOOD FILL TO ADD INTERIOR POINTS
+		std::set<SDL_Point> open_set;
+		open_set.insert(start);
+		while (open_set.size() > 0) {
+			SDL_Point current = *open_set.begin();
+			//TODO: figure out why it doesn't fill above (+x, +y) start point
+			if (current.y >= ASTEROID_maximum_radius * 2 || current.y < 0 || current.x < 0 || current.x > ASTEROID_maximum_radius * 2) {
+				open_set.erase({ current.x, current.y });
+				continue;
+			}
+
+			if (added.find(SDL_Point{ current.x, current.y + 1 }) == added.end()
+				&& open_set.find(SDL_Point{ current.x, current.y + 1 }) == open_set.end()
+				&& current.y + 1 < ASTEROID_maximum_radius * 2) // neighbor is not in added set or open set
+				open_set.insert(SDL_Point{ current.x, current.y + 1 });
+			if (added.find(SDL_Point{ current.x, current.y - 1 }) == added.end()
+				&& open_set.find(SDL_Point{ current.x, current.y - 1 }) == open_set.end()
+				&& current.y - 1 > 0)
+				open_set.insert(SDL_Point{ current.x, current.y - 1 });
+			if (added.find(SDL_Point{ current.x + 1, current.y }) == added.end()
+				&& open_set.find(SDL_Point{ current.x + 1, current.y }) == open_set.end()
+				&& current.x + 1 < ASTEROID_maximum_radius * 2)
+				open_set.insert(SDL_Point{ current.x + 1, current.y });
+			if (added.find(SDL_Point{ current.x - 1, current.y }) == added.end()
+				&& open_set.find(SDL_Point{ current.x - 1, current.y }) == open_set.end()
+				&& current.x - 1 > 0)
+				open_set.insert(SDL_Point{ current.x - 1, current.y });
+
+			added.insert(current);
+			open_set.erase(current);
+		}
+	}
+
+	// WRITE ALL ADDED 
+	auto iterator = added.begin();
+	while (iterator != added.end()) {
+		*(buffer + pixel_to_index(iterator->x, iterator->y, w)) = GAME_asteroid_color_raw;
+
+		iterator++;
 	}
 
 	SDL_UnlockSurface(temp_surface); // allow external read/writes when finished writing
@@ -252,6 +312,9 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 
 	split_bridge_outline(this, start, end, &outline_bridge);
 	split_bridge_outline(created, start, end, &outline_bridge);
+
+	fill_pixels_from_outline(this);
+	fill_pixels_from_outline(created);
 
 	SDL_Log("created asteroid: %i; added %zu", created->outline_point_count, outline_bridge.size());
 
@@ -294,7 +357,7 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	int split_endpoint = -1;
 	while (split_endpoint < 0
 		|| !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x)
-		&& ((outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y)) > outline_point_count / 10)
+		&& ((outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y)) < (int)((double)outline_point_count / (M_PI)))
 		split_endpoint = rand() % outline_point_count;
 
 	SDL_Log("split command: (%i, %i) to (%i, %i)", collision_pixel_x, collision_pixel_y, outline[split_endpoint].x, outline[split_endpoint].y);
