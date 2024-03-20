@@ -66,7 +66,7 @@ void generate_ship_outline(Entity* ship) {
 	outline.push_back({ ship->w, 0 });
 	outline.push_back({ ship->w, ship->h });
 
-	if (outline.size() < 4 * SETTING_MAX_POLYGON_VERTICES)
+	if (outline.size() < 4 * SETTING_MAX_POINT_COUNT)
 	{
 		for (int i = 0; i < outline.size(); i++)
 			ship->outline[i] = outline.at(i);

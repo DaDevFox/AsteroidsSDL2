@@ -62,7 +62,7 @@ public:
 
 	int outline_point_count;
 	int point_count;
-	SDL_Point outline[4 * SETTING_MAX_POLYGON_VERTICES];
+	SDL_Point outline[4 * SETTING_ENTITY_DIMENSION]; // assuming used correctly; max amount of points in outline is max(perimeter of rect, circumference of inscribed circle in rect)?
 
 #pragma endregion
 

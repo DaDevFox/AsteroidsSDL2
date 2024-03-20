@@ -82,7 +82,7 @@ const Uint32 GAME_blank_space_color = 0x00000000;
 // Asteroid Generation
 const float ASTEROID_minimum_mass = 1.0F;
 const float ASTEROID_maximum_mass = 5.0F;
-const int ASTEROID_maximum_radius = 128 / 2;
+const int ASTEROID_maximum_radius = SETTING_ENTITY_DIMENSION / 2;
 
 const int ASTEROID_startpos_variance = 750;
 const float ASTEROID_startspeed_maximum = 0.02F;

@@ -3,7 +3,8 @@
 
 #define PI 3.14159265358979323F
 
-#define SETTING_MAX_POLYGON_VERTICES 512
+#define SETTING_ENTITY_DIMENSION 128
+#define SETTING_MAX_POINT_COUNT 512
 
 extern const char* RESOURCE_ship_texture_path;
 

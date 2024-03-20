@@ -354,11 +354,15 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 
 	Asteroid* created = append_asteroid_to_pool();
 
-	int split_endpoint = -1;
-	while (split_endpoint < 0
-		|| !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x)
-		&& ((outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y)) < (int)((double)outline_point_count / (M_PI)))
-		split_endpoint = rand() % outline_point_count;
+	int split_endpoint = 0;
+	while (split_endpoint < outline_point_count
+		&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
+			|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
+		split_endpoint++;
+
+	if (split_endpoint == outline_point_count)
+		while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
+			split_endpoint = rand() % outline_point_count;
 
 	SDL_Log("split command: (%i, %i) to (%i, %i)", collision_pixel_x, collision_pixel_y, outline[split_endpoint].x, outline[split_endpoint].y);
 
@@ -475,7 +479,7 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 		}
 	}
 
-	if (asteroid->outline_point_count + outline_additions->size() >= 4 * SETTING_MAX_POLYGON_VERTICES)
+	if (asteroid->outline_point_count + outline_additions->size() >= 4 * SETTING_MAX_POINT_COUNT)
 	{
 		SDL_Log("Outline buffer overflow for asteroid id %i", id);
 		return;
@@ -764,7 +768,7 @@ void Asteroid::create_outline(Uint32* buffer) {
 	this->center_x = sum_x / count;
 	this->center_y = sum_y / count;
 
-	if (outline.size() < 4 * SETTING_MAX_POLYGON_VERTICES)
+	if (outline.size() < 4 * SETTING_MAX_POINT_COUNT)
 	{
 		int i = 0;
 		for (SDL_Point point : outline) {
@@ -817,7 +821,7 @@ void asteroids_init()
 
 		//asteroid->id = i;
 
-		asteroid->init(ASTEROID_maximum_radius * 2, ASTEROID_maximum_radius * 2);
+		asteroid->init(SETTING_ENTITY_DIMENSION, SETTING_ENTITY_DIMENSION);
 
 		std::cout << "asteroid initialized w/ main index " << asteroid->id << std::endl;
 		i++;

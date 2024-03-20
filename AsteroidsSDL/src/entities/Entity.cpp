@@ -62,8 +62,8 @@ Entity::Entity() :
 
 	x(0.0F),
 	y(0.0F),
-	w(512),
-	h(512),
+	w(SETTING_ENTITY_DIMENSION),
+	h(SETTING_ENTITY_DIMENSION),
 
 	velocity_x(0.0F),
 	velocity_y(0.0F),
