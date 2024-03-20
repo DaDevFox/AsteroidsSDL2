@@ -10,6 +10,8 @@ void render_fovs(RenderWindow* window);
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 void generate_ship_outline(Entity* ship);
 
+void select_targets(Entity* ship);
+
 std::vector<SDL_Point> search_positions;
 int* ship_targets;
 float* ship_attack_timers;
@@ -18,6 +20,11 @@ void ships_init()
 {
 	ship_targets = new int[GAME_ship_count];
 	ship_attack_timers = new float[GAME_ship_count];
+	for (int i = 0; i < GAME_ship_count; i++)
+	{
+		ship_targets[i] = 0;
+		ship_attack_timers[i] = 0.0F;
+	}
 
 	ship_texture = window.load_texture(RESOURCE_ship_texture_path);
 
@@ -48,7 +55,8 @@ void ships_init()
 	}
 }
 
-void generate_ship_outline(Entity* ship) {
+void generate_ship_outline(Entity* ship)
+{
 	std::vector<SDL_Point> outline;
 
 	// edge rows
@@ -81,7 +89,8 @@ void generate_ship_outline(Entity* ship) {
 		SDL_Log("ERROR: outline buffer overflow for ship.\n");
 }
 
-SDL_Point default_position(int i) {
+SDL_Point default_position(int i)
+{
 	int radius = GAME_width >> 2;
 	return { (int)((float)(GAME_width >> 1) + cosf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius), (int)((float)(GAME_height >> 1) + sinf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius) };
 }
@@ -107,44 +116,56 @@ void ships_update(float delta_time)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
-		if (search_positions.size() == 0)
-			continue;
-
-		SDL_Point pos = search_positions[i];
-		float x = (float)pos.x - ship->x;
-		float y = (float)pos.y - ship->y;
-		float theta = atan2f(y, x);
-
-		float distance = sqrtf(x * x + y * y);
-
-		float critical_distance = 1.0F;
-
-		float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
-		float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
-
-
-
-		if (run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y) || distance > critical_distance)
+		if (ship_attack_timers[i] > 0.0F)
 		{
-			ship->desired_velocity_x = vel_x;
-			ship->desired_velocity_y = vel_y;
+
+
+
+
+
 		}
 		else
 		{
-			ship->x = pos.x;
-			ship->y = pos.y;
-			ship->velocity_x = 0.0F;
-			ship->velocity_y = 0.0F;
-			ship->desired_velocity_x = 0.0F;
-			ship->desired_velocity_y = 0.0F;
+			// searching behavior
+			if (search_positions.size() == 0)
+				continue;
+
+			SDL_Point pos = search_positions[i];
+			float x = (float)pos.x - ship->x;
+			float y = (float)pos.y - ship->y;
+			float theta = atan2f(y, x);
+
+			float distance = sqrtf(x * x + y * y);
+
+			float critical_distance = 1.0F;
+
+			float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
+			float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
+
+
+
+			if (run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y) || distance > critical_distance)
+			{
+				ship->desired_velocity_x = vel_x;
+				ship->desired_velocity_y = vel_y;
+			}
+			else
+			{
+				ship->x = pos.x;
+				ship->y = pos.y;
+				ship->velocity_x = 0.0F;
+				ship->velocity_y = 0.0F;
+				ship->desired_velocity_x = 0.0F;
+				ship->desired_velocity_y = 0.0F;
+			}
+
+			float crit_vel = 0.2F;
+
+			if (distance > crit_vel)
+				ship->rotation = atan2(ship->velocity_y, ship->velocity_x);
+			else
+				ship->rotation = 0.0;
 		}
-
-		float crit_vel = 0.2F;
-
-		if (distance > crit_vel)
-			ship->rotation = atan2(ship->velocity_y, ship->velocity_x);
-		else
-			ship->rotation = 0.0;
 
 		ship->update();
 		i++;
@@ -182,7 +203,8 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 		}
 	}
 
-	for (int id : to_check) {
+	for (int id : to_check)
+	{
 		if (id == ship->id)
 			continue;
 
@@ -239,8 +261,11 @@ void render_fovs(RenderWindow* window)
 	}
 }
 
-void select_targets(Entity* ship) {
+void select_targets(Entity* ship)
+{
 	std::set<int> to_check;
+	if (ship_attack_timers[ship->id] > 0.0F)
+		return;
 
 	float x = ship->x;
 	float y = ship->y;
@@ -264,11 +289,17 @@ void select_targets(Entity* ship) {
 		}
 	}
 
-	for (int id : to_check) {
+	for (int id : to_check)
+	{
 		if (id == ship->id)
 			continue;
 
-
+		if (((Entity*)entities)[id].point_count > 50)
+		{
+			ship_targets[ship->id] = id;
+			ship_attack_timers[ship->id] = SHIP_attack_time + SHIP_attack_targetting_time + SHIP_attack_cooldown_time;
+			return;
+		}
 	}
 
 

@@ -79,3 +79,6 @@ extern const float PLAYER_controlspeed_maximum;
 extern const SDL_Color PLAYER_thrusting_outline_color;
 
 extern const float SHIP_speed_maximum;
+extern const float SHIP_attack_cooldown_time;
+extern const float SHIP_attack_targetting_time;
+extern const float SHIP_attack_time;

@@ -47,11 +47,13 @@ std::set<int> scratch;
 //
 //}
 
-int hash_entity(Entity* entity) {
+int hash_entity(Entity* entity)
+{
 	return ((int)entity->x + (GAME_width) * ((int)entity->y / chunk_size)) / chunk_size;
 }
 
-bool Entity::in_bounds(float world_x, float world_y) const {
+bool Entity::in_bounds(float world_x, float world_y) const
+{
 	return
 		world_x >= (x - (float)(w >> 1)) && world_x <= (x + (float)(w >> 1)) &&
 		world_y >= (y - (float)(h >> 1)) && world_y <= (y + (float)(h >> 1));
@@ -181,7 +183,8 @@ void Entity::update_collision_chunk()
 	window.render_rect((screen_x / chunk_size) * chunk_size, (screen_y / chunk_size) * chunk_size, chunk_size, chunk_size, { 100, 100, 100, 20 });
 }
 
-bool collision_between(Entity* a, Entity* b, SDL_Point* hit) {
+bool collision_between(Entity* a, Entity* b, SDL_Point* hit)
+{
 	if (!(a->outline_point_count || b->outline_point_count))
 		return false;
 
@@ -214,7 +217,8 @@ bool collision_between(Entity* a, Entity* b, SDL_Point* hit) {
 	return false;
 }
 
-int hash(int x, int y) {
+int hash(int x, int y)
+{
 	return x + GAME_width * y;
 }
 
@@ -363,8 +367,10 @@ void Entity::update()
 	check_collisions();
 }
 
-void entities_init() {
-	if (sizeof(Entity) != sizeof(Asteroid)) {
+void entities_init()
+{
+	if (sizeof(Entity) != sizeof(Asteroid))
+	{
 		SDL_LogError(SDL_LOG_PRIORITY_ERROR, "entity and asteroid size mismatch; continuous memory block allocation impossible");
 		return;
 	}
@@ -377,7 +383,8 @@ void entities_init() {
 	asteroids_init();
 }
 
-void entities_cleanup() {
+void entities_cleanup()
+{
 	//TODO
 
 	ships_cleanup();
