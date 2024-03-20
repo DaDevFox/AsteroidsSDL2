@@ -329,7 +329,7 @@ void Entity::render(RenderWindow* window)
 			window->render_rect((float)(screen_x - (w >> 1) + outline[i].x), (float)(screen_y - (h >> 1) + outline[i].y), 1.0F, 1.0F, { 0, 0, 255, 255 });
 	}
 
-	if (DEBUG_master && (DEBUG_highlight_capstone_asteroid || DEBUG_wireframe_mode) && id == GAME_ship_count + GAME_asteroid_count - 1)
+	if (DEBUG_master && DEBUG_wireframe_mode && id == GAME_ship_count + GAME_asteroid_count - 1)
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 255, 0, 0, 255 });
 
 	if (DEBUG_master && DEBUG_entity_rotations)

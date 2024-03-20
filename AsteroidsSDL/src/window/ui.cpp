@@ -22,8 +22,8 @@ void UI::input_update(SDL_Event* running_event) {
 			DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
 		if (sym == KEY_DEBUG_display_entity_outlines)
 			DEBUG_display_entity_outlines = !DEBUG_display_entity_outlines;
-		if (sym == KEY_DEBUG_highlight_capstone_asteroid)
-			DEBUG_highlight_capstone_asteroid = !DEBUG_highlight_capstone_asteroid;
+		if (sym == KEY_DEBUG_ships_fire_at_will)
+			DEBUG_ships_fire_at_will = !DEBUG_ships_fire_at_will;
 		if (sym == KEY_DEBUG_wireframe_mode)
 			DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
 
@@ -51,14 +51,14 @@ void UI::render_update(RenderWindow* window) {
 
 	if (DEBUG_master)
 	{
-		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines };
-		const char* text[] = { "wireframe", "grid", "outlines", "stats" };
+		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will };
+		const char* text[] = { "wireframe", "grid", "outlines", "fire at will", "stats" };
 
 		window->render_rect(0, 0, WINDOW_width, debug_bar_offset, debug_bar_bg_accent_color);
 		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, { 255, 255, 255, 255 });
 
 		// Debug Mode Indicators
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < sizeof(modes) / sizeof(bool); i++) {
 			window->render_rect(
 				i * debug_mode_indicator_width, debug_bar_offset,
 				debug_mode_indicator_width, debug_bar_height,

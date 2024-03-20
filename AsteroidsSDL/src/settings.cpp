@@ -57,9 +57,8 @@ bool DEBUG_wireframe_mode = false;
 const SDL_KeyCode KEY_DEBUG_chunk_gridlines = SDLK_g;
 bool DEBUG_chunk_gridlines = false;
 
-// TODO: remove below two
-const SDL_KeyCode KEY_DEBUG_highlight_capstone_asteroid = SDLK_g;
-bool DEBUG_highlight_capstone_asteroid = true;
+const SDL_KeyCode KEY_DEBUG_ships_fire_at_will = SDLK_x;
+bool DEBUG_ships_fire_at_will = false;
 
 const SDL_KeyCode KEY_DEBUG_display_chunk_numbers = SDLK_g;
 bool DEBUG_display_chunk_numbers = false;
@@ -92,7 +91,12 @@ const float ASTEROID_split_minimum_velocity = 0.020F;
 const float PLAYER_controlspeed_maximum = 0.05F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
 
+// Ships
 const float SHIP_speed_maximum = 0.5F;
+
+const float SHIP_attack_cooldown = 3.0F;
+const float SHIP_attack_targetting_time = 1.5F;
+const float SHIP_attack_time = 0.5F;
 
 
 

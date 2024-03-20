@@ -6,14 +6,19 @@
 
 SDL_Texture* ship_texture;
 
-void render_fovs();
+void render_fovs(RenderWindow* window);
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 void generate_ship_outline(Entity* ship);
 
 std::vector<SDL_Point> search_positions;
+int* ship_targets;
+float* ship_attack_timers;
 
 void ships_init()
 {
+	ship_targets = new int[GAME_ship_count];
+	ship_attack_timers = new float[GAME_ship_count];
+
 	ship_texture = window.load_texture(RESOURCE_ship_texture_path);
 
 	int i = 0;
@@ -234,6 +239,41 @@ void render_fovs(RenderWindow* window)
 	}
 }
 
+void select_targets(Entity* ship) {
+	std::set<int> to_check;
+
+	float x = ship->x;
+	float y = ship->y;
+
+	float speed_per_rad_increase = 0.8F;
+	int check_radius = 2;
+
+	int floor_y = (int)y / chunk_size - check_radius;
+	int ceil_y = (int)y / chunk_size + check_radius;
+	int left_x = (int)x / chunk_size - check_radius;
+	int right_x = (int)x / chunk_size + check_radius;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
+		{
+			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
+			if (collision_check_grid[chunk] == nullptr)
+				continue;
+			std::set<int> curr_set = *(collision_check_grid[chunk]);
+			to_check.insert(curr_set.begin(), curr_set.end());
+		}
+	}
+
+	for (int id : to_check) {
+		if (id == ship->id)
+			continue;
+
+
+	}
+
+
+}
+
 void ships_render_update(RenderWindow* window)
 {
 	render_fovs(window);
@@ -248,4 +288,6 @@ void ships_render_update(RenderWindow* window)
 void ships_cleanup()
 {
 	SDL_DestroyTexture(ship_texture);
+	delete[] ship_targets;
+	delete[] ship_attack_timers;
 }

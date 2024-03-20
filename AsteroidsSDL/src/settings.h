@@ -35,8 +35,8 @@ extern bool DEBUG_wireframe_mode;
 
 extern const SDL_KeyCode KEY_DEBUG_chunk_gridlines;
 extern bool DEBUG_chunk_gridlines;
-extern const SDL_KeyCode KEY_DEBUG_highlight_capstone_asteroid;
-extern bool DEBUG_highlight_capstone_asteroid;
+extern const SDL_KeyCode KEY_DEBUG_ships_fire_at_will;
+extern bool DEBUG_ships_fire_at_will;
 extern const SDL_KeyCode KEY_DEBUG_display_chunk_numbers;
 extern bool DEBUG_display_chunk_numbers;
 extern const SDL_KeyCode KEY_DEBUG_display_entity_outlines;
