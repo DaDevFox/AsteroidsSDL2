@@ -5,6 +5,9 @@
 #include <time.h>
 
 SDL_Texture* ship_texture;
+SDL_Texture* laser_beam_texture;
+SDL_Texture* highlighter_beam_texture;
+
 
 void render_fovs(RenderWindow* window);
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
@@ -27,6 +30,8 @@ void ships_init()
 	}
 
 	ship_texture = window.load_texture(RESOURCE_ship_texture_path);
+	laser_beam_texture = window.load_texture(RESOURCE_laser_beam_texture_path);
+	highlighter_beam_texture = window.load_texture(RESOURCE_highlighter_beam_texture_path);
 
 	int i = 0;
 
@@ -116,13 +121,46 @@ void ships_update(float delta_time)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
+		if (DEBUG_master && DEBUG_ships_fire_at_will)
+			select_targets(ship);
 		if (ship_attack_timers[i] > 0.0F)
 		{
+			Entity* target = ((Entity*)entities) + ship_targets[i];
 
+			// cooling down
+			if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
+			{
+				ship->velocity_x = 0.0F;
+				ship->velocity_y = 0.0F;
+				ship->desired_velocity_x = ship->velocity_x;
+				ship->desired_velocity_y = ship->velocity_y;
+			}
+			// currently attacking (animate projectile)
+			else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
+			{
+				// slight recoil
+				float diff_x = target->x - ship->x;
+				float diff_y = target->y - ship->y;
+				float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
 
+				ship->velocity_x = -diff_x * recoil_percentage;
+				ship->velocity_y = -diff_y * recoil_percentage;
+				ship->desired_velocity_x = ship->velocity_x;
+				ship->desired_velocity_y = ship->velocity_y;
+			}
+			// charging up
+			else
+			{
+				// rotate towards target; stay in place
+				ship->rotation = atan2(target->y - ship->y, target->x - ship->x);
 
+				ship->velocity_x = 0.0F;
+				ship->velocity_y = 0.0F;
+				ship->desired_velocity_x = ship->velocity_x;
+				ship->desired_velocity_y = ship->velocity_y;
+			}
 
-
+			ship_attack_timers[i] -= (delta_time / 1000.0F);
 		}
 		else
 		{
@@ -210,9 +248,9 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 
 
 		Entity* other = Entity::active[id];
-		window.render_rect(
-			other->x, other->y,
-			(float)other->w, (float)other->h, { 0, 0, 255, 255 });
+		//window.render_rect(
+		//	other->x, other->y,
+		//	(float)other->w, (float)other->h, { 0, 0, 255, 255 });
 
 
 		*vel_x -= (other->x - x) * multiplier;
@@ -294,7 +332,7 @@ void select_targets(Entity* ship)
 		if (id == ship->id)
 			continue;
 
-		if (((Entity*)entities)[id].point_count > 50)
+		if (((Entity*)entities)[id].outline_point_count > 50)
 		{
 			ship_targets[ship->id] = id;
 			ship_attack_timers[ship->id] = SHIP_attack_time + SHIP_attack_targetting_time + SHIP_attack_cooldown_time;
@@ -309,9 +347,52 @@ void ships_render_update(RenderWindow* window)
 {
 	render_fovs(window);
 
+	float base_beam_width = 30;
+	float variance_percentage = 0.6F;
+	int blips = 2;
+
+	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
+		if (ship_attack_timers[i] > 0.0F)
+		{
+			Entity* target = ((Entity*)entities) + ship_targets[i];
+
+			float diff_x = target->x - ship->x;
+			float diff_y = target->y - ship->y;
+
+			int beam_width = base_beam_width;
+			float height = sqrtf(diff_x * diff_x + diff_y * diff_y);
+
+			// cooling down
+			if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
+			{
+			}
+			// currently attacking (animate projectile)
+			else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
+			{
+				float value_normalized = sinf((ship_attack_timers[i] - SHIP_attack_cooldown_time) / SHIP_attack_time * 2.0F * PI * (float)blips);
+				value_normalized = value_normalized * 0.5F + 0.5F;
+
+				beam_width = base_beam_width * variance_percentage + base_beam_width * (1.0F - variance_percentage) * value_normalized;
+				// rotates around (0,0) aka origin for beam
+				window->render_rotate(0, 0, 0, 0, ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width, 0, beam_width >> 1, ship->rotation, laser_beam_texture);
+			}
+			// charging up
+			else
+			{
+				//window->render_rotate(0, 0, 0, 0, ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width, 0, beam_width >> 1, ship->rotation, highlighter_beam_texture);
+			}
+
+			/*char buffer[16] = "";
+			sprintf_s(buffer, "%.4f", ship_attack_timers[i]);
+			window->render_centered_world(ship->x, ship->y, buffer, encode_sans_medium, { 255, 255, 255, 255 });*/
+
+			// decerements time in ships_update() func already (above is mirror functionality for render stage)
+		}
+
 		ship->render(window);
+		i++;
 	}
 }
 
@@ -319,6 +400,8 @@ void ships_render_update(RenderWindow* window)
 void ships_cleanup()
 {
 	SDL_DestroyTexture(ship_texture);
+	SDL_DestroyTexture(laser_beam_texture);
+	SDL_DestroyTexture(highlighter_beam_texture);
 	delete[] ship_targets;
 	delete[] ship_attack_timers;
 }

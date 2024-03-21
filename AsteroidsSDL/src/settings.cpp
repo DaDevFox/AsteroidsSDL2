@@ -4,6 +4,8 @@
 #pragma region Interactive
 
 const char* RESOURCE_ship_texture_path = "./triangle.png";
+const char* RESOURCE_laser_beam_texture_path = "./laser_beam.png";
+const char* RESOURCE_highlighter_beam_texture_path = "./highlighter_beam.png";
 
 int SETTING_camera_pan_speed = 10;
 float SETTING_camera_pan_smoothness = 0.995F;
@@ -94,7 +96,7 @@ const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
 // Ships
 const float SHIP_speed_maximum = 0.5F;
 
-const float SHIP_attack_cooldown_time = 3.0F;
+const float SHIP_attack_cooldown_time = 0.5F;
 const float SHIP_attack_targetting_time = 1.5F;
 const float SHIP_attack_time = 0.5F;
 
