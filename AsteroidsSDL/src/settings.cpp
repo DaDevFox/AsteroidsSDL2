@@ -96,9 +96,10 @@ const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
 // Ships
 const float SHIP_speed_maximum = 0.5F;
 
-const float SHIP_attack_cooldown_time = 0.5F;
+const float SHIP_attack_cooldown_time = 3.0F;
 const float SHIP_attack_targetting_time = 1.5F;
 const float SHIP_attack_time = 0.5F;
+const float SHIP_max_attack_range = 100.0F;
 
 
 

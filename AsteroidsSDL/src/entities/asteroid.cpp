@@ -61,7 +61,8 @@ Asteroid::Asteroid()
 	init(ASTEROID_maximum_radius * 2, ASTEROID_maximum_radius * 2);
 }
 
-void Asteroid::init(int w, int h) {
+void Asteroid::init(int w, int h)
+{
 	this->w = w;
 	this->h = h;
 
@@ -69,11 +70,13 @@ void Asteroid::init(int w, int h) {
 }
 
 
-int pixel_to_index(int x, int y, int w) {
+int pixel_to_index(int x, int y, int w)
+{
 	return x + y * w;
 }
 
-std::pair<int, int> index_to_pixel(int idx, int w) {
+std::pair<int, int> index_to_pixel(int idx, int w)
+{
 	return { idx % w, idx / w };
 }
 
@@ -101,7 +104,8 @@ void Asteroid::rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y
 		(*pixel_count)++;
 		open.pop();
 
-		if (curr.first < *leftmost_x) {
+		if (curr.first < *leftmost_x)
+		{
 			*leftmost_x = curr.first;
 			*leftmost_y = curr.second;
 		}
@@ -189,37 +193,45 @@ void Asteroid::generate()
 	SDL_FreeSurface(temp_surface);
 }
 
-bool const operator<(const SDL_Point a, const SDL_Point b) {
+bool const operator<(const SDL_Point a, const SDL_Point b)
+{
 	return hash(a.x, a.y) - hash(b.x, b.y) > 0;
 }
 
-bool const operator>(const SDL_Point a, const SDL_Point b) {
+bool const operator>(const SDL_Point a, const SDL_Point b)
+{
 	return hash(a.x, a.y) - hash(b.x, b.y) < 0;
 }
 
-bool const operator==(const SDL_Point a, const SDL_Point b) {
+bool const operator==(const SDL_Point a, const SDL_Point b)
+{
 	return hash(a.x, a.y) - hash(b.x, b.y) == 0;
 }
 
-bool const operator!=(const SDL_Point a, const SDL_Point b) {
+bool const operator!=(const SDL_Point a, const SDL_Point b)
+{
 	return hash(a.x, a.y) - hash(b.x, b.y) != 0;
 }
 
-SDL_Point operator+(SDL_Point a, SDL_Point b) {
+SDL_Point operator+(SDL_Point a, SDL_Point b)
+{
 	return { a.x + b.x, a.y + b.y };
 }
 
-SDL_Point operator/(SDL_Point a, SDL_Point b) {
+SDL_Point operator/(SDL_Point a, SDL_Point b)
+{
 	return { a.x / b.x, a.y / b.y };
 }
 
-SDL_Point operator/(SDL_Point a, int b) {
+SDL_Point operator/(SDL_Point a, int b)
+{
 	return { a.x / b, a.y / b };
 }
 
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point);
 
-void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
+void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
+{
 	SDL_DestroyTexture(asteroid->texture);
 	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 	SDL_LockSurface(temp_surface); // locks the surface from outside read/writing; so we can write to it
@@ -228,7 +240,8 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
 
 	// ADD OUTLINE POINTS
 	std::set<SDL_Point> added;
-	if (asteroid->outline_point_count > 0) {
+	if (asteroid->outline_point_count > 0)
+	{
 		added.insert(asteroid->outline, asteroid->outline + asteroid->outline_point_count);
 
 		// get start pos for flood fill (CoM of asteroid)
@@ -242,10 +255,12 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
 		// FLOOD FILL TO ADD INTERIOR POINTS
 		std::set<SDL_Point> open_set;
 		open_set.insert(start);
-		while (open_set.size() > 0) {
+		while (open_set.size() > 0)
+		{
 			SDL_Point current = *open_set.begin();
 			//TODO: figure out why it doesn't fill above (+x, +y) start point
-			if (current.y >= ASTEROID_maximum_radius * 2 || current.y < 0 || current.x < 0 || current.x > ASTEROID_maximum_radius * 2) {
+			if (current.y >= ASTEROID_maximum_radius * 2 || current.y < 0 || current.x < 0 || current.x > ASTEROID_maximum_radius * 2)
+			{
 				open_set.erase({ current.x, current.y });
 				continue;
 			}
@@ -274,7 +289,8 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
 
 	// WRITE ALL ADDED 
 	auto iterator = added.begin();
-	while (iterator != added.end()) {
+	while (iterator != added.end())
+	{
 		*(buffer + pixel_to_index(iterator->x, iterator->y, w)) = GAME_asteroid_color_raw;
 
 		iterator++;
@@ -290,7 +306,8 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid) {
 // TODO: remove debug flag
 int splitflag = 0;
 
-bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point) {
+bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point)
+{
 	for (SDL_Point* current = outline; current < outline + outline_point_count; current++)
 		if (current->x == point.x && current->y == point.y)
 			return true;
@@ -300,12 +317,8 @@ bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point poi
 
 Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity)
 {
-	if (DEBUG_master && splitflag)
-		return nullptr;
-
 	SDL_Point start;
 	SDL_Point end;
-
 
 	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
 	std::vector<SDL_Point> outline_bridge;
@@ -318,7 +331,6 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 
 	SDL_Log("created asteroid: %i; added %zu", created->outline_point_count, outline_bridge.size());
 
-
 	created->x = x + 1;
 	created->y = y + 1;
 
@@ -327,19 +339,12 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	created->desired_velocity_x = desired_velocity_x;
 	created->desired_velocity_y = desired_velocity_y;
 
-
 	SDL_Log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
-
-	if (DEBUG_master) {
-		splitflag = 1;
-		time_scaling = 0.0F;
-		window.camera.teleport(collision_x, collision_y);
-	}
-
 	return created;
 }
 
-Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end) {
+Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end)
+{
 	int collision_pixel_x = (int)collision_x - (screen_x - (w >> 1));
 	int collision_pixel_y = (int)collision_y - (screen_y - (h >> 1));
 
@@ -378,16 +383,18 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	float m = (float)(by - ay) / (float)(bx - ax);
 	int b = (int)((float)ay - (float)ax * m);
 	int divider = 0;
-	auto comparator = [m, b](SDL_Point self, SDL_Point other)->bool {
-		bool self_in = ((float)self.y > (m * (float)self.x + (float)b));
-		bool other_in = ((float)other.y > (m * (float)other.x + (float)b));
+	auto comparator = [m, b](SDL_Point self, SDL_Point other)->bool
+		{
+			bool self_in = ((float)self.y > (m * (float)self.x + (float)b));
+			bool other_in = ((float)other.y > (m * (float)other.x + (float)b));
 
-		return self_in > other_in;
+			return self_in > other_in;
 		};
 
 	std::priority_queue < SDL_Point, std::vector<SDL_Point>, decltype(comparator)> queue(comparator);
 
-	for (int i = 0; i < outline_point_count; i++) {
+	for (int i = 0; i < outline_point_count; i++)
+	{
 		bool in = (outline[i].y > (int)(m * (float)outline[i].x + (float)b));
 		//SDL_Log("p (%i, %i): %i", outline[i].x, outline[i].y, in ? 1 : 0);
 		if (!in)
@@ -397,14 +404,16 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 
 
 	created->outline_point_count = divider;
-	for (int i = 0; i < divider; i++) {
+	for (int i = 0; i < divider; i++)
+	{
 		created->outline[i] = (SDL_Point)queue.top();
 		queue.pop();
 	}
 
 	outline_point_count = queue.size();
 	int i = 0;
-	while (!queue.empty()) {
+	while (!queue.empty())
+	{
 		outline[i] = queue.top();
 		queue.pop();
 		i++;
@@ -413,7 +422,8 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	return created;
 }
 
-void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions) {
+void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions)
+{
 	//std::vector<SDL_Point> outline_additions;
 
 	if (outline_additions->size() == 0)
@@ -421,11 +431,6 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 		int cragginess_resolution = 10;
 		int diff_x = (end.x - start.x);
 		int diff_y = (end.y - start.y);
-
-		if (DEBUG_master) {
-			window.render_pixel_deferred(1.0F, asteroid->x - (asteroid->w >> 1) + start.x, asteroid->y - (asteroid->h >> 1) + start.y, { 0, 255, 0, 255 });
-			window.render_pixel_deferred(1.0F, asteroid->x - (asteroid->w >> 1) + end.x, asteroid->y - (asteroid->h >> 1) + end.y, { 0, 150, 0, 255 });
-		}
 
 		float total_distance = (float)(diff_x * diff_x + diff_y * diff_y);
 		total_distance = sqrtf(total_distance);
@@ -436,11 +441,13 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 		int variance = 3;
 
-		for (int i = 1; i <= steps; i++) {
+		for (int i = 1; i <= steps; i++)
+		{
 			int next_x = start.x + (int)((float)diff_x * ((float)i / (float)steps));
 			int next_y = start.y + (int)((float)diff_y * ((float)i / (float)steps));
 
-			if (next_x != end.x && next_y != end.y) {
+			if (next_x != end.x && next_y != end.y)
+			{
 				next_x += rand() % variance;
 				next_y += rand() % variance;
 			}
@@ -458,7 +465,8 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 			float resolution = 0.5F;
 
-			for (float j = 0; j <= distance + 2; j += resolution) {
+			for (float j = 0; j <= distance + 2; j += resolution)
+			{
 				x = (int)(cosf(theta) * j) + curr_x;
 				y = (int)(sinf(theta) * j) + curr_y;
 
@@ -494,12 +502,14 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 
 
-Asteroid* append_asteroid_to_pool() {
+Asteroid* append_asteroid_to_pool()
+{
 	return (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count++;
 }
 
 
-void Asteroid::create_outline(Uint32* buffer) {
+void Asteroid::create_outline(Uint32* buffer)
+{
 #ifndef INNER_ASTEROID_OUTLINES
 
 	std::vector<SDL_Point> outline;
@@ -712,52 +722,60 @@ void Asteroid::create_outline(Uint32* buffer) {
 
 			if (curr_x + 1 < w &&
 				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x + 1, curr_y - 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_x + 1 < w &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_x + 1 < w &&
 				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x + 1, curr_y + 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_x - 1 > 0 &&
 				curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x - 1, curr_y + 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_x - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_x - 1 > 0 &&
 				curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x - 1, curr_y - 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_y + 1 < h &&
-				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x, curr_y + 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
 
 			if (curr_y - 1 > 0 &&
-				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == GAME_blank_space_color) {
+				*(buffer + pixel_to_index(curr_x, curr_y - 1, w)) == GAME_blank_space_color)
+			{
 				outline.push_back({ curr_x, curr_y });
 				continue;
 			}
@@ -771,7 +789,8 @@ void Asteroid::create_outline(Uint32* buffer) {
 	if (outline.size() < 4 * SETTING_MAX_POINT_COUNT)
 	{
 		int i = 0;
-		for (SDL_Point point : outline) {
+		for (SDL_Point point : outline)
+		{
 			this->outline[i] = point;
 			i++;
 		}
@@ -786,7 +805,8 @@ void Asteroid::create_outline(Uint32* buffer) {
 #endif
 }
 
-void Asteroid::cleanup() {
+void Asteroid::cleanup()
+{
 	SDL_DestroyTexture(texture);
 }
 
@@ -832,7 +852,8 @@ static bool clicking = true;
 
 void player_input_update(SDL_Event* running_event)
 {
-	if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_x) {
+	if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_x)
+	{
 		int mouse_x, mouse_y;
 		SDL_GetMouseState(&mouse_x, &mouse_y);
 		float mouse_world_x = window.camera.screen_to_world_x(mouse_x);
@@ -840,7 +861,8 @@ void player_input_update(SDL_Event* running_event)
 
 		int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / chunk_size)) / chunk_size;
 		printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
-		if (collision_check_grid[chunk]) {
+		if (collision_check_grid[chunk])
+		{
 			std::set<int> set = *(collision_check_grid[chunk]);
 			printf("%zu\n", set.size());
 			for (int i : set)
@@ -876,7 +898,8 @@ void player_input_update(SDL_Event* running_event)
 //}
 }
 
-inline bool operator==(const SDL_Color& self, const SDL_Color& b) {
+inline bool operator==(const SDL_Color& self, const SDL_Color& b)
+{
 	return self.r == b.r && self.g == b.g && self.b == b.b && self.a == b.a;
 }
 
@@ -1000,12 +1023,5 @@ void asteroids_cleanup()
 	delete[] thrust_columns;
 }
 
-void Asteroid::on_collision(Entity* other, int collision_x, int collision_y) {
-	float desired_velocity_x = other->desired_velocity_x;
-	float desired_velocity_y = other->desired_velocity_y;
-	float rel_velocity = sqrtf(desired_velocity_x * desired_velocity_x + desired_velocity_y * desired_velocity_y);
-
-	if (rel_velocity >= ASTEROID_split_minimum_velocity) {
-		split(collision_x, collision_y, rel_velocity);
-	}
-}
+void Asteroid::on_collision(Entity* other, int collision_x, int collision_y)
+{}

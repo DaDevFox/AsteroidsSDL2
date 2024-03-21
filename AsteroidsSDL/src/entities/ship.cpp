@@ -1,4 +1,5 @@
 #include "ship.h"
+#include "asteroid.h"
 #include "../main.h"
 #include <iostream>
 #include <vector>
@@ -100,6 +101,8 @@ SDL_Point default_position(int i)
 	return { (int)((float)(GAME_width >> 1) + cosf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius), (int)((float)(GAME_height >> 1) + sinf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius) };
 }
 
+Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int ignore_id, SDL_Point* hit);
+
 void generate_search_positions()
 {
 	if (search_positions.size() == 0)
@@ -160,7 +163,29 @@ void ships_update(float delta_time)
 				ship->desired_velocity_y = ship->velocity_y;
 			}
 
+
+			float old_attack_timer = ship_attack_timers[i];
+
 			ship_attack_timers[i] -= (delta_time / 1000.0F);
+
+			if (old_attack_timer > SHIP_attack_cooldown_time &&
+				ship_attack_timers[i] < SHIP_attack_cooldown_time)
+			{
+				// who the raycast hit affects (could be diff from target)
+				SDL_Point hit;
+				Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+
+				if (effected == NULL)
+					continue;
+
+				SDL_Log("hit something; splitting; %i", effected->id);
+
+				// functional effect  (here and not in update to avoid double-raycast)
+				effected->velocity_x = 0.0F;
+				effected->velocity_y = 0.0F;
+
+				((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
+			}
 		}
 		else
 		{
@@ -356,13 +381,18 @@ void ships_render_update(RenderWindow* window)
 	{
 		if (ship_attack_timers[i] > 0.0F)
 		{
+			// what the ship is trying to hit
 			Entity* target = ((Entity*)entities) + ship_targets[i];
 
-			float diff_x = target->x - ship->x;
-			float diff_y = target->y - ship->y;
+			// who the raycast hit affects (could be diff from target)
+			SDL_Point hit;
+			Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+
+			float diff_x = (effected != NULL ? effected->x : target->x) - ship->x;
+			float diff_y = (effected != NULL ? effected->y : target->y) - ship->y;
 
 			int beam_width = base_beam_width;
-			float height = sqrtf(diff_x * diff_x + diff_y * diff_y);
+			float height = SDL_min(sqrtf(diff_x * diff_x + diff_y * diff_y), SHIP_max_attack_range);
 
 			// cooling down
 			if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
@@ -376,7 +406,10 @@ void ships_render_update(RenderWindow* window)
 
 				beam_width = base_beam_width * variance_percentage + base_beam_width * (1.0F - variance_percentage) * value_normalized;
 				// rotates around (0,0) aka origin for beam
-				window->render_rotate(0, 0, 0, 0, ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width, 0, beam_width >> 1, ship->rotation, laser_beam_texture);
+				window->render_rotate(0, 0, 0, 0,
+					ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width,
+					0, beam_width >> 1, ship->rotation,
+					laser_beam_texture);
 			}
 			// charging up
 			else
@@ -396,6 +429,79 @@ void ships_render_update(RenderWindow* window)
 	}
 }
 
+Entity* check_overlap(float x, float y, int ignore_id);
+
+Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int ignore_id, SDL_Point* hit)
+{
+	float resolution = 1.0F;
+	int x, y;
+	int x_prev = 0, y_prev = 0;
+	for (float j = 0; j <= max_dist; j += resolution)
+	{
+		x = (int)(cosf(theta) * j) + origin_x;
+		y = (int)(sinf(theta) * j) + origin_y;
+
+		if (DEBUG_master && DEBUG_display_entity_outlines)
+			window.render_rect((float)x, (float)y, 1.0F, 1.0F, SDL_Color{ 255, 0, 0, 255 });
+
+		if (x_prev == x && y_prev == y)
+			continue;
+
+		Entity* other;
+		if ((other = check_overlap(x, y, ignore_id)))
+		{
+			*hit = { x, y };
+			return other;
+		}
+
+		x_prev = x;
+		y_prev = y;
+	}
+
+	return nullptr;
+}
+
+Entity* check_overlap(float x, float y, int ignore_id)
+{
+	std::set<int> to_check;
+
+	float speed_per_rad_increase = 0.8F;
+	int check_radius = 1;
+
+	int floor_y = (int)y / chunk_size - check_radius;
+	int ceil_y = (int)y / chunk_size + check_radius;
+	int left_x = (int)x / chunk_size - check_radius;
+	int right_x = (int)x / chunk_size + check_radius;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
+		{
+			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
+			if (collision_check_grid[chunk] == nullptr)
+				continue;
+			std::set<int> curr_set = *(collision_check_grid[chunk]);
+			to_check.insert(curr_set.begin(), curr_set.end());
+		}
+	}
+
+	for (int id : to_check)
+	{
+		if (id == ignore_id)
+			continue;
+		Entity* other = Entity::active[id];
+		if (!other->in_bounds(x, y))
+			continue;
+
+		for (int i = 0; i < other->outline_point_count; i++)
+		{
+			if ((int)x - (other->screen_x - (other->w >> 1)) == other->outline[i].x &&
+				(int)y - (other->screen_y - (other->h >> 1)) == other->outline[i].y)
+				return other;
+		}
+	}
+
+	return nullptr;
+}
 
 void ships_cleanup()
 {

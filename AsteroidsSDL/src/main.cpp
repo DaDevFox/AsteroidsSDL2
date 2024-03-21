@@ -52,7 +52,8 @@ void resize(void);
 /// Inits SDL2 and required systems. returns false if failure occurs
 /// </summary>
 /// <returns></returns>
-bool game_init() {
+bool game_init()
+{
 	game_running = true;
 	srand(12);
 
@@ -98,14 +99,16 @@ bool game_init() {
 
 void window_update()
 {
-	switch (running_event.window.event) {
+	switch (running_event.window.event)
+	{
 	case SDL_WINDOWEVENT_RESIZED:
 		resize();
 		break;
 	}
 }
 
-void resize() {
+void resize()
+{
 	window.get_info(&WINDOW_width, &WINDOW_height);
 }
 
@@ -173,14 +176,16 @@ void game_loop()
 	update();
 }
 
-void game_cleanup() {
+void game_cleanup()
+{
 
 	entities_cleanup();
 	IMG_Quit();
 	SDL_Quit();
 }
 
-int main() {
+int main()
+{
 	if (!game_init())
 		exit(1);
 

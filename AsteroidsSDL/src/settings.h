@@ -84,3 +84,4 @@ extern const float SHIP_speed_maximum;
 extern const float SHIP_attack_cooldown_time;
 extern const float SHIP_attack_targetting_time;
 extern const float SHIP_attack_time;
+extern const float SHIP_max_attack_range;
