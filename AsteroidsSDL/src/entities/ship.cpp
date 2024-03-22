@@ -179,11 +179,6 @@ void ships_update(float delta_time)
 					continue;
 
 				SDL_Log("hit something; splitting; %i", effected->id);
-
-				// functional effect  (here and not in update to avoid double-raycast)
-				effected->velocity_x = 0.0F;
-				effected->velocity_y = 0.0F;
-
 				((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
 			}
 		}

@@ -852,24 +852,24 @@ static bool clicking = true;
 
 void player_input_update(SDL_Event* running_event)
 {
-	if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_x)
-	{
-		int mouse_x, mouse_y;
-		SDL_GetMouseState(&mouse_x, &mouse_y);
-		float mouse_world_x = window.camera.screen_to_world_x(mouse_x);
-		float mouse_world_y = window.camera.screen_to_world_y(mouse_y);
+	//if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_x)
+	//{
+	//	int mouse_x, mouse_y;
+	//	SDL_GetMouseState(&mouse_x, &mouse_y);
+	//	float mouse_world_x = window.camera.screen_to_world_x(mouse_x);
+	//	float mouse_world_y = window.camera.screen_to_world_y(mouse_y);
 
-		int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / chunk_size)) / chunk_size;
-		printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
-		if (collision_check_grid[chunk])
-		{
-			std::set<int> set = *(collision_check_grid[chunk]);
-			printf("%zu\n", set.size());
-			for (int i : set)
-				if (Entity::active[i]->in_bounds(mouse_world_x, mouse_world_y))
-					((Asteroid*)Entity::active[i])->split(mouse_world_x, mouse_world_y, 10.0F);
-		}
-	}
+	//	int chunk = ((int)mouse_world_x + GAME_width * ((int)mouse_world_y / chunk_size)) / chunk_size;
+	//	//printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
+	//	if (collision_check_grid[chunk])
+	//	{
+	//		std::set<int> set = *(collision_check_grid[chunk]);
+	//		//printf("%zu\n", set.size());
+	//		for (int i : set)
+	//			if (Entity::active[i]->in_bounds(mouse_world_x, mouse_world_y))
+	//				((Asteroid*)Entity::active[i])->split(mouse_world_x, mouse_world_y, 10.0F);
+	//	}
+	//}
 
 
 	// Direct controlled asteroid
@@ -998,8 +998,12 @@ void asteroids_update(float delta_time)
 		float x_diff = (heading_x - player->x);
 		float y_diff = (heading_y - player->y);
 
-		x_diff = SDL_clamp(x_diff, -PLAYER_controlspeed_maximum, PLAYER_controlspeed_maximum);
-		y_diff = SDL_clamp(y_diff, -PLAYER_controlspeed_maximum, PLAYER_controlspeed_maximum);
+		float magnitude = sqrtf(x_diff * x_diff + y_diff * y_diff);
+		x_diff /= magnitude;
+		y_diff /= magnitude;
+
+		x_diff *= PLAYER_controlspeed_maximum;
+		y_diff *= PLAYER_controlspeed_maximum;
 
 
 
