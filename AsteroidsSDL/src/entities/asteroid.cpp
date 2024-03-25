@@ -14,10 +14,10 @@ float mass_per_pixel = (ASTEROID_maximum_mass - ASTEROID_minimum_mass) / (4.0F *
 const char* asteroid_texture_path = "./circle.png";
 
 
-int controlled_asteroid = 0;
 
 #pragma region deprecated
 
+//int /*controlled_asteroid*/ = 0;
 float speed = 1.0F;
 
 int downup = 0;
@@ -879,10 +879,10 @@ void player_input_update(SDL_Event* running_event)
 			continue;*/
 
 			// ESC to deselect 
-	if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE)
+	/*if (running_event->type == SDL_EventType::SDL_KEYUP && running_event->key.keysym.sym == SDL_KeyCode::SDLK_ESCAPE)
 	{
 		controlled_asteroid = -1;
-	}
+	}*/
 
 	// CLICK to set heading
 	if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
@@ -935,7 +935,7 @@ void asteroids_render_update(RenderWindow* window)
 
 
 		// Select player asteroid
-		Asteroid* player = ((Asteroid*)entities + GAME_ship_count + 1);
+		Asteroid* player = ((Asteroid*)entities + PLAYER_entity_id);
 
 		float vel_magnitude = sqrt((player->desired_velocity_x * player->desired_velocity_x) + (player->desired_velocity_y * player->desired_velocity_y));
 		float vel_normalized_x = player->desired_velocity_x / vel_magnitude;
@@ -984,7 +984,7 @@ void asteroids_update(float delta_time)
 	if (clicking)
 	{
 		// Select player asteroid
-		Asteroid* player = ((Asteroid*)entities + GAME_ship_count + 1);
+		Asteroid* player = ((Asteroid*)entities + PLAYER_entity_id);
 
 		int mouse_x, mouse_y;
 		SDL_GetMouseState(&mouse_x, &mouse_y);

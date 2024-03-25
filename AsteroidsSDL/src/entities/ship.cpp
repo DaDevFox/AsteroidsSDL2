@@ -16,7 +16,8 @@ void generate_ship_outline(Entity* ship);
 
 void select_targets(Entity* ship);
 
-std::vector<SDL_Point> search_positions;
+std::vector<SDL_Point> target_positions;
+std::vector<std::vector<int>*> shadowing_targets;
 int* ship_targets;
 float* ship_attack_timers;
 
@@ -59,6 +60,8 @@ void ships_init()
 
 		i++;
 	}
+
+	search_for_targets();
 }
 
 void generate_ship_outline(Entity* ship)
@@ -103,21 +106,87 @@ SDL_Point default_position(int i)
 
 Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int ignore_id, SDL_Point* hit);
 
-void generate_search_positions()
+int last_chunk_id = 0;
+
+void search_for_targets()
 {
-	if (search_positions.size() == 0)
+	if (target_positions.size() == 0)
+	{
 		for (int i = 0; i < GAME_ship_count; i++)
-			search_positions.push_back(default_position(i));
+		{
+			target_positions.push_back(default_position(i));
+			shadowing_targets.push_back(new std::vector<int>());
+		}
+		return;
+	}
+
+	int i = GAME_ship_count;
+	int chunk = last_chunk_id;
+	while (i > 0)
+	{
+		int check_radius = 2;
+
+		int floor_y = chunk / GAME_chunkwise_width - check_radius;
+		int ceil_y = chunk / GAME_chunkwise_width + check_radius;
+		int left_x = chunk % GAME_chunkwise_width - check_radius;
+		int right_x = chunk % GAME_chunkwise_width + check_radius;
+
+		if (collision_check_grid[chunk] == nullptr)
+		{
+			chunk++;
+			chunk %= GAME_chunkwise_height * GAME_chunkwise_width;
+			continue;
+		}
+
+		i--;
+		shadowing_targets[i]->clear();
+
+		for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
+		{
+			for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
+			{
+				int curr_chunk = curr_x + (GAME_chunkwise_width)*curr_y;
+				if (collision_check_grid[curr_chunk] == nullptr)
+					continue;
+
+				std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
+				shadowing_targets[i]->insert(shadowing_targets[i]->end(), curr_set->begin(), curr_set->end());
+			}
+		}
+
+		chunk++;
+		chunk %= GAME_chunkwise_height * GAME_chunkwise_width;
+	}
+
+	last_chunk_id = chunk;
+}
+
+void update_target_position(int i);
+
+void update_target_position(int i)
+{
+	float x_accumulate = 0.0F;
+	float y_accumulate = 0.0F;
+	for (int id : *shadowing_targets[i])
+	{
+		Asteroid* asteroid = ((Asteroid*)entities + id);
+		x_accumulate += asteroid->x;
+		y_accumulate += asteroid->y;
+	}
+
+	x_accumulate /= (float)shadowing_targets[i]->size();
+	y_accumulate /= (float)shadowing_targets[i]->size();
+	target_positions[i] = { (int)x_accumulate, (int)y_accumulate };
 }
 
 void ships_update(float delta_time)
 {
 	static float timer = 0.0F;
-	float search_tick = 100.0F;
+	float search_tick = 15.0F;
 
 	if (timer > search_tick)
 	{
-		generate_search_positions();
+		search_for_targets();
 		timer = 0.0F;
 	}
 
@@ -184,11 +253,13 @@ void ships_update(float delta_time)
 		}
 		else
 		{
-			// searching behavior
-			if (search_positions.size() == 0)
+			// follow target behavior
+			if (target_positions.size() == 0)
 				continue;
 
-			SDL_Point pos = search_positions[i];
+			update_target_position(i);
+
+			SDL_Point pos = target_positions[i];
 			float x = (float)pos.x - ship->x;
 			float y = (float)pos.y - ship->y;
 			float theta = atan2f(y, x);
@@ -202,7 +273,7 @@ void ships_update(float delta_time)
 
 
 
-			if (run_ship_avoidance(ship, 0.005F, &vel_x, &vel_y) || distance > critical_distance)
+			if (run_ship_avoidance(ship, 0.0075F, &vel_x, &vel_y) || distance > critical_distance)
 			{
 				ship->desired_velocity_x = vel_x;
 				ship->desired_velocity_y = vel_y;
@@ -229,7 +300,7 @@ void ships_update(float delta_time)
 		i++;
 	}
 
-	timer += delta_time;
+	timer += delta_time / 1000.0F; // timer is in seconds
 }
 
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y)
@@ -417,6 +488,12 @@ void ships_render_update(RenderWindow* window)
 			window->render_centered_world(ship->x, ship->y, buffer, encode_sans_medium, { 255, 255, 255, 255 });*/
 
 			// decerements time in ships_update() func already (above is mirror functionality for render stage)
+		}
+
+		if (DEBUG_mode && DEBUG_ship_targets)
+		{
+			float size = 5.0F;
+			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
 		}
 
 		ship->render(window);

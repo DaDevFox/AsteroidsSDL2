@@ -10,6 +10,9 @@
 
 #undef main // needed for cpp compilation
 
+const int PLAYER_asteroid_id = 0;
+const int PLAYER_entity_id = GAME_ship_count + PLAYER_asteroid_id;
+
 const int chunk_size = ASTEROID_maximum_radius;
 const int GAME_chunkwise_height = GAME_height / chunk_size;
 const int GAME_chunkwise_width = GAME_width / chunk_size;
@@ -19,8 +22,6 @@ int WINDOW_width;
 
 int GAME_height = 1024;
 int GAME_width = 1024;
-
-const int ships_count = 10;
 
 SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 

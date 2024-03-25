@@ -32,13 +32,15 @@ extern bool DEBUG_mode;
 extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment;
 extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement;
 extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_cancel;
-extern int DEBUG_focused_asteroid;
+extern int CAMERA_focused_asteroid;
 
 extern const SDL_KeyCode KEY_DEBUG_wireframe_mode;
 extern bool DEBUG_wireframe_mode;
 
 extern const SDL_KeyCode KEY_DEBUG_chunk_gridlines;
 extern bool DEBUG_chunk_gridlines;
+extern const SDL_KeyCode KEY_DEBUG_ship_targets;
+extern bool DEBUG_ship_targets;
 extern const SDL_KeyCode KEY_DEBUG_ships_fire_at_will;
 extern bool DEBUG_ships_fire_at_will;
 extern const SDL_KeyCode KEY_DEBUG_display_chunk_numbers;

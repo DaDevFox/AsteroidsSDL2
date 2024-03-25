@@ -5,6 +5,9 @@
 #define WIDTH 680
 #define HEIGHT 400
 
+extern const int PLAYER_asteroid_id;
+extern const int PLAYER_entity_id;
+
 extern int GAME_width;
 extern int GAME_height;
 extern SDL_Rect GAME_window_rect;

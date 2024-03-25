@@ -14,14 +14,16 @@ void UI::input_update(SDL_Event* running_event)
 				DEBUG_mode = !DEBUG_mode;
 
 			if (sym == KEY_DEBUG_focused_asteroid_cancel)
-				DEBUG_focused_asteroid = -1;
+				CAMERA_focused_asteroid = -1;
 			if (sym == KEY_DEBUG_focused_asteroid_increment)
-				DEBUG_focused_asteroid = ++DEBUG_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : DEBUG_focused_asteroid;
+				CAMERA_focused_asteroid = ++CAMERA_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : CAMERA_focused_asteroid;
 			if (sym == KEY_DEBUG_focused_asteroid_decrement)
-				DEBUG_focused_asteroid = --DEBUG_focused_asteroid < 0 ? -1 : DEBUG_focused_asteroid;
+				CAMERA_focused_asteroid = --CAMERA_focused_asteroid < 0 ? -1 : CAMERA_focused_asteroid;
 
 			if (sym == KEY_DEBUG_chunk_gridlines)
 				DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
+			if (sym == KEY_DEBUG_ship_targets)
+				DEBUG_ship_targets = !DEBUG_ship_targets;
 			if (sym == KEY_DEBUG_display_chunk_numbers)
 				DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
 			if (sym == KEY_DEBUG_display_entity_outlines)
@@ -31,6 +33,8 @@ void UI::input_update(SDL_Event* running_event)
 			if (sym == KEY_DEBUG_wireframe_mode)
 				DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
 		}
+		else
+			CAMERA_focused_asteroid = PLAYER_asteroid_id;
 
 #pragma endregion
 
@@ -58,8 +62,8 @@ void UI::render_update(RenderWindow* window)
 
 	if (DEBUG_mode)
 	{
-		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will };
-		const char* text[] = { "wireframe", "grid", "outlines", "fire at will", "stats" };
+		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will, DEBUG_ship_targets };
+		const char* text[] = { "wireframe", "grid", "outlines", "fire at will", "show ship targets" };
 
 		window->render_rect(0, 0, WINDOW_width, debug_bar_offset, debug_bar_bg_accent_color);
 		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, { 255, 255, 255, 255 });
@@ -80,7 +84,7 @@ void UI::render_update(RenderWindow* window)
 			curr_x += debug_mode_indicator_width;
 		}
 
-		if (DEBUG_focused_asteroid != -1)
+		if (CAMERA_focused_asteroid != -1)
 		{
 			window->render_rect(
 				curr_x * debug_mode_indicator_width, debug_bar_offset,
@@ -88,7 +92,7 @@ void UI::render_update(RenderWindow* window)
 				debug_mode_indicator_color_on);
 
 			char output[16];
-			sprintf_s(output, "focused: %i", DEBUG_focused_asteroid);
+			sprintf_s(output, "focused: %i", CAMERA_focused_asteroid);
 
 			window->render_centered_screen(
 				debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),

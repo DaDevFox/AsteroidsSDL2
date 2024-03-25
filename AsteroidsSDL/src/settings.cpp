@@ -42,7 +42,7 @@ const SDL_KeyCode KEY_pause = SDLK_p;
 bool UI_FPSHUD_enabled = DEBUG_master;
 
 
-const bool DEBUG_master = false;
+const bool DEBUG_master = true;
 
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_mode = SDLK_u;
@@ -51,7 +51,7 @@ bool DEBUG_mode = false;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment = SDLK_b;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement = SDLK_c;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_cancel = SDLK_z;
-int DEBUG_focused_asteroid = -1;
+int CAMERA_focused_asteroid = -1;
 
 
 const SDL_KeyCode KEY_DEBUG_wireframe_mode = SDLK_q;
@@ -59,6 +59,9 @@ bool DEBUG_wireframe_mode = false;
 
 const SDL_KeyCode KEY_DEBUG_chunk_gridlines = SDLK_g;
 bool DEBUG_chunk_gridlines = false;
+
+const SDL_KeyCode KEY_DEBUG_ship_targets = SDLK_t;
+bool DEBUG_ship_targets = false;
 
 const SDL_KeyCode KEY_DEBUG_ships_fire_at_will = SDLK_x;
 bool DEBUG_ships_fire_at_will = false;
