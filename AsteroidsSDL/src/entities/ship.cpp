@@ -274,7 +274,7 @@ void ships_update(float delta_time)
 
 
 
-			if (run_ship_avoidance(ship, 0.0075F, &vel_x, &vel_y) || distance > critical_distance)
+			if (run_ship_avoidance(ship, 0.001F, &vel_x, &vel_y) || distance > critical_distance)
 			{
 				ship->desired_velocity_x = vel_x;
 				ship->desired_velocity_y = vel_y;
@@ -345,8 +345,8 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 		//	(float)other->w, (float)other->h, { 0, 0, 255, 255 });
 
 
-		*vel_x -= (other->x - x) * multiplier;
-		*vel_y -= (other->y - y) * multiplier;
+		*vel_x += (other->x - x) * multiplier;
+		*vel_y += (other->y - y) * multiplier;
 		result = true;
 	}
 

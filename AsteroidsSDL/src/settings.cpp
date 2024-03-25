@@ -42,7 +42,7 @@ const SDL_KeyCode KEY_pause = SDLK_p;
 bool UI_FPSHUD_enabled = DEBUG_master;
 
 
-const bool DEBUG_master = false;
+const bool DEBUG_master = true;
 
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_mode = SDLK_u;
@@ -98,7 +98,7 @@ const float PLAYER_controlspeed_maximum = 0.05F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
 
 // Ships
-const float SHIP_speed_maximum = 0.5F;
+const float SHIP_speed_maximum = 0.2F;
 
 const float SHIP_attack_cooldown_time = 3.0F;
 const float SHIP_attack_targetting_time = 1.5F;
