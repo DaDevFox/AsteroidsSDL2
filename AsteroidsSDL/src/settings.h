@@ -24,8 +24,10 @@ extern bool UI_FPSHUD_enabled;
 
 extern const SDL_KeyCode KEY_pause;
 
-extern const SDL_KeyCode KEY_DEBUG_master;
-extern bool DEBUG_master;
+extern const bool DEBUG_master;
+
+extern const SDL_KeyCode KEY_DEBUG_mode;
+extern bool DEBUG_mode;
 
 extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment;
 extern const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement;

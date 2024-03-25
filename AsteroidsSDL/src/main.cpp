@@ -135,7 +135,7 @@ void render_update()
 	asteroids_render_update(&window);
 	window.ui.render_update(&window);
 
-	if (DEBUG_master)
+	if (DEBUG_mode)
 		window.render_all_deferred();
 }
 

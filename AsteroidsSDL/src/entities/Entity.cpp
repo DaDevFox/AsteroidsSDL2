@@ -326,31 +326,31 @@ void Entity::check_collisions()
 
 void Entity::render(RenderWindow* window)
 {
-	if (DEBUG_master && (DEBUG_display_entity_outlines || DEBUG_wireframe_mode))
+	if (DEBUG_mode && (DEBUG_display_entity_outlines || DEBUG_wireframe_mode))
 	{
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
 		for (int i = 0; i < outline_point_count; i++)
 			window->render_rect((float)(screen_x - (w >> 1) + outline[i].x), (float)(screen_y - (h >> 1) + outline[i].y), 1.0F, 1.0F, { 0, 0, 255, 255 });
 	}
 
-	if (DEBUG_master && DEBUG_wireframe_mode && id == GAME_ship_count + GAME_asteroid_count - 1)
+	if (DEBUG_mode && DEBUG_wireframe_mode && id == GAME_ship_count + GAME_asteroid_count - 1)
 		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 255, 0, 0, 255 });
 
-	if (DEBUG_master && DEBUG_entity_rotations)
+	if (DEBUG_mode && DEBUG_entity_rotations)
 	{
 		char str[20] = "";
 		sprintf_s(str, "%.4f", rotation);
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
-	if (DEBUG_master && DEBUG_chunk_gridlines)
+	if (DEBUG_mode && DEBUG_chunk_gridlines)
 	{
 		char str[20] = "";
 		sprintf_s(str, "%i", collision_chunk);
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
-	if ((DEBUG_master && DEBUG_wireframe_mode))
+	if ((DEBUG_mode && DEBUG_wireframe_mode))
 		return;
 
 	if (rotation == 0.0)

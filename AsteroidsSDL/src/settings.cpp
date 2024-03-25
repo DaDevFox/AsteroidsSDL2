@@ -39,13 +39,14 @@ const SDL_KeyCode KEY_zoom_out_alt = SDLK_PAGEDOWN;
 const SDL_KeyCode KEY_pause = SDLK_p;
 
 // UI
-bool UI_FPSHUD_enabled = true;
+bool UI_FPSHUD_enabled = DEBUG_master;
 
 
+const bool DEBUG_master = false;
 
 // DEBUG
-const SDL_KeyCode KEY_DEBUG_master = SDLK_u;
-bool DEBUG_master = true;
+const SDL_KeyCode KEY_DEBUG_mode = SDLK_u;
+bool DEBUG_mode = false;
 
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment = SDLK_b;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement = SDLK_c;

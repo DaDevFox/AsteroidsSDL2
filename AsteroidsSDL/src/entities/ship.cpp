@@ -124,7 +124,7 @@ void ships_update(float delta_time)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
-		if (DEBUG_master && DEBUG_ships_fire_at_will)
+		if (DEBUG_mode && DEBUG_ships_fire_at_will)
 			select_targets(ship);
 		if (ship_attack_timers[i] > 0.0F)
 		{
@@ -436,7 +436,7 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 		x = (int)(cosf(theta) * j) + origin_x;
 		y = (int)(sinf(theta) * j) + origin_y;
 
-		if (DEBUG_master && DEBUG_display_entity_outlines)
+		if (DEBUG_mode && DEBUG_display_entity_outlines)
 			window.render_rect((float)x, (float)y, 1.0F, 1.0F, SDL_Color{ 255, 0, 0, 255 });
 
 		if (x_prev == x && y_prev == y)

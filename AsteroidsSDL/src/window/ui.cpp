@@ -1,41 +1,48 @@
 #include "../main.h"
 #include <stdio.h>
 
-void UI::input_update(SDL_Event* running_event) {
-	if (running_event->type == SDL_KEYDOWN) {
+void UI::input_update(SDL_Event* running_event)
+{
+	if (running_event->type == SDL_KEYDOWN)
+	{
 		SDL_Keycode sym = running_event->key.keysym.sym;
 #pragma region debug input
 
-		if (sym == KEY_DEBUG_master)
-			DEBUG_master = !DEBUG_master;
+		if (DEBUG_master)
+		{
+			if (sym == KEY_DEBUG_mode)
+				DEBUG_mode = !DEBUG_mode;
 
-		if (sym == KEY_DEBUG_focused_asteroid_cancel)
-			DEBUG_focused_asteroid = -1;
-		if (sym == KEY_DEBUG_focused_asteroid_increment)
-			DEBUG_focused_asteroid = ++DEBUG_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : DEBUG_focused_asteroid;
-		if (sym == KEY_DEBUG_focused_asteroid_decrement)
-			DEBUG_focused_asteroid = --DEBUG_focused_asteroid < 0 ? -1 : DEBUG_focused_asteroid;
+			if (sym == KEY_DEBUG_focused_asteroid_cancel)
+				DEBUG_focused_asteroid = -1;
+			if (sym == KEY_DEBUG_focused_asteroid_increment)
+				DEBUG_focused_asteroid = ++DEBUG_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : DEBUG_focused_asteroid;
+			if (sym == KEY_DEBUG_focused_asteroid_decrement)
+				DEBUG_focused_asteroid = --DEBUG_focused_asteroid < 0 ? -1 : DEBUG_focused_asteroid;
 
-		if (sym == KEY_DEBUG_chunk_gridlines)
-			DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
-		if (sym == KEY_DEBUG_display_chunk_numbers)
-			DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
-		if (sym == KEY_DEBUG_display_entity_outlines)
-			DEBUG_display_entity_outlines = !DEBUG_display_entity_outlines;
-		if (sym == KEY_DEBUG_ships_fire_at_will)
-			DEBUG_ships_fire_at_will = !DEBUG_ships_fire_at_will;
-		if (sym == KEY_DEBUG_wireframe_mode)
-			DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
+			if (sym == KEY_DEBUG_chunk_gridlines)
+				DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
+			if (sym == KEY_DEBUG_display_chunk_numbers)
+				DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
+			if (sym == KEY_DEBUG_display_entity_outlines)
+				DEBUG_display_entity_outlines = !DEBUG_display_entity_outlines;
+			if (sym == KEY_DEBUG_ships_fire_at_will)
+				DEBUG_ships_fire_at_will = !DEBUG_ships_fire_at_will;
+			if (sym == KEY_DEBUG_wireframe_mode)
+				DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
+		}
 
 #pragma endregion
 
-		if (sym == KEY_pause) {
+		if (sym == KEY_pause)
+		{
 			time_scaling = time_scaling > 0.0F ? 0.0F : 1.0F;
 		}
 	}
 }
 
-void UI::render_update(RenderWindow* window) {
+void UI::render_update(RenderWindow* window)
+{
 	int curr_y = 0;
 	int curr_x = 0;
 
@@ -49,7 +56,7 @@ void UI::render_update(RenderWindow* window) {
 	int debug_mode_indicator_width = 150;
 
 
-	if (DEBUG_master)
+	if (DEBUG_mode)
 	{
 		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will };
 		const char* text[] = { "wireframe", "grid", "outlines", "fire at will", "stats" };
@@ -58,7 +65,8 @@ void UI::render_update(RenderWindow* window) {
 		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, { 255, 255, 255, 255 });
 
 		// Debug Mode Indicators
-		for (int i = 0; i < sizeof(modes) / sizeof(bool); i++) {
+		for (int i = 0; i < sizeof(modes) / sizeof(bool); i++)
+		{
 			window->render_rect(
 				i * debug_mode_indicator_width, debug_bar_offset,
 				debug_mode_indicator_width, debug_bar_height,
@@ -72,7 +80,8 @@ void UI::render_update(RenderWindow* window) {
 			curr_x += debug_mode_indicator_width;
 		}
 
-		if (DEBUG_focused_asteroid != -1) {
+		if (DEBUG_focused_asteroid != -1)
+		{
 			window->render_rect(
 				curr_x * debug_mode_indicator_width, debug_bar_offset,
 				debug_mode_indicator_width, debug_bar_height,
@@ -99,7 +108,8 @@ void UI::render_update(RenderWindow* window) {
 		curr_y += debug_bar_offset + debug_bar_height;
 	}
 
-	if (delta_time == 0.0F) {
+	if (delta_time == 0.0F)
+	{
 		// FPS HUD
 		char output[40] = "PAUSED";
 		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_bold, { 255, 255, 255, 255 });
@@ -117,5 +127,5 @@ void UI::render_update(RenderWindow* window) {
 }
 
 
-void UI::update(float delta_time) {
-}
+void UI::update(float delta_time)
+{}
