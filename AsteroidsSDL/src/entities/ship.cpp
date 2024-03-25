@@ -13,6 +13,7 @@ SDL_Texture* highlighter_beam_texture;
 void render_fovs(RenderWindow* window);
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 void generate_ship_outline(Entity* ship);
+void search_for_targets();
 
 void select_targets(Entity* ship);
 
