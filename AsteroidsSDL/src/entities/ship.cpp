@@ -140,7 +140,9 @@ void set_ship_shadowing_chunk(int shipID, int chunk)
 				continue;
 
 			std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
-			shadowing_targets[shipID]->insert(shadowing_targets[shipID]->end(), curr_set->begin(), curr_set->end());
+			for (int id : *curr_set)
+				if (id >= GAME_ship_count) // if it's not a ship
+					shadowing_targets[shipID]->push_back(id);
 		}
 	}
 }
@@ -337,7 +339,7 @@ void ship_check_states(int i)
 	float y = ship->y;
 
 	float speed_per_rad_increase = 0.8F;
-	int check_radius = 2;
+	int check_radius = 4;
 
 	int floor_y = (int)y / chunk_size - check_radius;
 	int ceil_y = (int)y / chunk_size + check_radius;
@@ -371,7 +373,7 @@ void ship_check_states(int i)
 		const float warn_crit_vel_player = 0.005F;
 
 		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
-			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= warn_crit_vel_player * warn_crit_vel_player)
+			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= 0.0F)
 		{
 			set_ship_shadowing_chunk(i, other->collision_chunk);
 			ship_warn_timers[i] = SHIP_warning_time;
