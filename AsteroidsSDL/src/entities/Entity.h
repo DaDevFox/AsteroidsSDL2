@@ -33,8 +33,6 @@ public:
 	float desired_velocity_x;
 	float desired_velocity_y;
 
-	bool drag_enabled;
-
 	int screen_x;
 	int screen_y;
 
@@ -48,9 +46,11 @@ public:
 
 
 	float movement_windup_speed;
+	float rotation_windup_speed;
 	float drag;
 	float mass;
 
+	double desired_rotation;
 	double rotation;
 
 #pragma endregion

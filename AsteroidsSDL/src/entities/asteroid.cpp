@@ -837,7 +837,6 @@ void asteroids_init()
 		asteroid->velocity_y /= asteroid->mass;
 		asteroid->desired_velocity_x = asteroid->velocity_x;
 		asteroid->desired_velocity_y = asteroid->velocity_y;
-		asteroid->drag_enabled = true;
 
 		//asteroid->id = i;
 
@@ -914,6 +913,39 @@ const int thrust_numColumns = 10;
 std::random_device rand_device;
 std::uniform_int_distribution<int> dist(thrust_min_height, thrust_max_height);
 
+void render_thrust(RenderWindow* window, Entity* entity, const SDL_Color& color)
+{
+	if (thrust_columns == NULL)
+		thrust_columns = new int[thrust_numColumns];
+
+	thrust_elapsed += delta_time;
+	if (thrust_elapsed > thrust_random_tick)
+	{
+		for (int i = 0; i < thrust_numColumns; i++)
+		{
+			thrust_columns[i] = dist(rand_device);
+		}
+
+		thrust_elapsed = 0.0F;
+	}
+
+	float vel_magnitude = sqrt((entity->desired_velocity_x * entity->desired_velocity_x) + (entity->desired_velocity_y * entity->desired_velocity_y));
+	float vel_normalized_x = entity->desired_velocity_x / vel_magnitude;
+	float vel_normalized_y = entity->desired_velocity_y / vel_magnitude;
+
+	for (int i = 0; i < entity->outline_point_count; i++)
+	{
+		SDL_Point point = entity->outline[i];
+		int size = thrust_outline_thickness * thrust_columns[(int)((float)thrust_numColumns * ((float)i / (float)entity->outline_point_count))];
+		int size_x = size * vel_normalized_x;
+		int size_y = size * vel_normalized_y;
+		window->render_rect(
+			entity->x + (float)(point.x - (entity->w >> 1) - (size_x)),
+			entity->y + (float)(point.y - (entity->h >> 1) - (size_y)),
+			(float)size_x, (float)size_y, color);
+	}
+}
+
 void asteroids_render_update(RenderWindow* window)
 {
 
@@ -937,21 +969,7 @@ void asteroids_render_update(RenderWindow* window)
 		// Select player asteroid
 		Asteroid* player = ((Asteroid*)entities + PLAYER_entity_id);
 
-		float vel_magnitude = sqrt((player->desired_velocity_x * player->desired_velocity_x) + (player->desired_velocity_y * player->desired_velocity_y));
-		float vel_normalized_x = player->desired_velocity_x / vel_magnitude;
-		float vel_normalized_y = player->desired_velocity_y / vel_magnitude;
-
-		for (int i = 0; i < player->outline_point_count; i++)
-		{
-			SDL_Point point = player->outline[i];
-			int size = thrust_outline_thickness * thrust_columns[(int)((float)thrust_numColumns * ((float)i / (float)player->outline_point_count))];
-			int size_x = size * vel_normalized_x;
-			int size_y = size * vel_normalized_y;
-			window->render_rect(
-				player->x + (float)(point.x - (player->w >> 1) - (size_x)),
-				player->y + (float)(point.y - (player->h >> 1) - (size_y)),
-				(float)size_x, (float)size_y, PLAYER_thrusting_outline_color);
-		}
+		render_thrust(window, player, PLAYER_thrusting_outline_color);
 	}
 
 	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)

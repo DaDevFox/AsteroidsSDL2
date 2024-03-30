@@ -73,8 +73,6 @@ Entity::Entity() :
 	desired_velocity_x(0.0F),
 	desired_velocity_y(0.0F),
 
-	drag_enabled(true),
-
 	screen_x(0),
 	screen_y(0),
 
@@ -82,9 +80,11 @@ Entity::Entity() :
 	center_y(0),
 
 	movement_windup_speed(0.005f),
-	drag(0.0001F),
+	rotation_windup_speed(0.02f),
+	drag(SETTING_default_entity_drag),
 	mass(1.0F),
 
+	desired_rotation(0.0),
 	rotation(0.0),
 
 	texture(nullptr),
@@ -111,18 +111,18 @@ Entity::Entity(const Entity& copy)
 	desired_velocity_x(copy.desired_velocity_x),
 	desired_velocity_y(copy.desired_velocity_y),
 
-	drag_enabled(copy.drag_enabled),
-
 	screen_x(copy.screen_x),
 	screen_y(copy.screen_y),
 
 	center_x(copy.center_x),
 	center_y(copy.center_y),
 
+	rotation_windup_speed(copy.rotation_windup_speed),
 	movement_windup_speed(copy.movement_windup_speed),
 	drag(copy.drag),
 	mass(copy.mass),
 
+	desired_rotation(copy.desired_rotation),
 	rotation(copy.rotation),
 
 	texture(copy.texture),
@@ -144,11 +144,11 @@ void Entity::move()
 	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;
 	velocity_y = velocity_y + (desired_velocity_y - velocity_y) * delta_time * movement_windup_speed;
 
-	if (drag_enabled)
-	{
-		desired_velocity_x *= (1.0F - drag);
-		desired_velocity_y *= (1.0F - drag);
-	}
+	rotation = rotation + (desired_rotation - rotation) * delta_time * rotation_windup_speed;
+
+	desired_velocity_x *= (1.0F - drag);
+	desired_velocity_y *= (1.0F - drag);
+
 
 	x += velocity_x * delta_time;
 	y += velocity_y * delta_time;

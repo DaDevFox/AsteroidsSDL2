@@ -20,6 +20,8 @@ extern int SETTING_secondary_mouse_button;
 extern float SETTING_camera_zoom_max;
 extern float SETTING_camera_zoom_min;
 
+extern const int SETTING_default_entity_drag;
+
 extern bool UI_FPSHUD_enabled;
 
 extern const SDL_KeyCode KEY_pause;
@@ -84,6 +86,8 @@ extern const float ASTEROID_split_minimum_velocity;
 extern const float PLAYER_controlspeed_maximum;
 extern const SDL_Color PLAYER_thrusting_outline_color;
 
+extern const float SHIP_warning_time;
+extern const float SHIP_min_warning_focus_time;
 extern const float SHIP_speed_maximum;
 extern const float SHIP_attack_cooldown_time;
 extern const float SHIP_attack_targetting_time;

@@ -9,22 +9,31 @@ SDL_Texture* ship_texture;
 SDL_Texture* laser_beam_texture;
 SDL_Texture* highlighter_beam_texture;
 
+// TODO: warning and shadowing override
+//			warn if high speed or player
+//			while warning; shadow center of mass + avg vel * attack time
+// TODO: warning halo
+// TODO: accumulated warning attack system
+// TODO: attack halo
+
 
 void render_fovs(RenderWindow* window);
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y);
 void generate_ship_outline(Entity* ship);
 void search_for_targets();
 
-void select_targets(Entity* ship);
+void ship_check_states(int i);
 
 std::vector<SDL_Point> target_positions;
 std::vector<std::vector<int>*> shadowing_targets;
+float* ship_warn_timers;
 int* ship_targets;
 float* ship_attack_timers;
 
 void ships_init()
 {
 	ship_targets = new int[GAME_ship_count];
+	ship_warn_timers = new float[GAME_ship_count];
 	ship_attack_timers = new float[GAME_ship_count];
 	for (int i = 0; i < GAME_ship_count; i++)
 	{
@@ -52,7 +61,7 @@ void ships_init()
 		ship->w = ship_size;
 		ship->h = ship_size;
 
-		ship->drag_enabled = false;
+		ship->drag = 0.0F;
 		ship->movement_windup_speed = 0.001F;
 
 		generate_ship_outline(ship);
@@ -109,6 +118,33 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 
 int last_chunk_id = 0;
 
+void set_ship_shadowing_chunk(int shipID, int chunk);
+
+void set_ship_shadowing_chunk(int shipID, int chunk)
+{
+	int check_radius = 2;
+
+	int floor_y = chunk / GAME_chunkwise_width - check_radius;
+	int ceil_y = chunk / GAME_chunkwise_width + check_radius;
+	int left_x = chunk % GAME_chunkwise_width - check_radius;
+	int right_x = chunk % GAME_chunkwise_width + check_radius;
+
+	shadowing_targets[shipID]->clear();
+
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
+		{
+			int curr_chunk = curr_x + (GAME_chunkwise_width)*curr_y;
+			if (collision_check_grid[curr_chunk] == nullptr)
+				continue;
+
+			std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
+			shadowing_targets[shipID]->insert(shadowing_targets[shipID]->end(), curr_set->begin(), curr_set->end());
+		}
+	}
+}
+
 void search_for_targets()
 {
 	if (target_positions.size() == 0)
@@ -125,12 +161,11 @@ void search_for_targets()
 	int chunk = last_chunk_id;
 	while (i > 0)
 	{
-		int check_radius = 2;
-
-		int floor_y = chunk / GAME_chunkwise_width - check_radius;
-		int ceil_y = chunk / GAME_chunkwise_width + check_radius;
-		int left_x = chunk % GAME_chunkwise_width - check_radius;
-		int right_x = chunk % GAME_chunkwise_width + check_radius;
+		if (ship_warn_timers[i] > 0.0F)
+		{
+			i--;
+			continue;
+		}
 
 		if (collision_check_grid[chunk] == nullptr)
 		{
@@ -140,20 +175,7 @@ void search_for_targets()
 		}
 
 		i--;
-		shadowing_targets[i]->clear();
-
-		for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
-		{
-			for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
-			{
-				int curr_chunk = curr_x + (GAME_chunkwise_width)*curr_y;
-				if (collision_check_grid[curr_chunk] == nullptr)
-					continue;
-
-				std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
-				shadowing_targets[i]->insert(shadowing_targets[i]->end(), curr_set->begin(), curr_set->end());
-			}
-		}
+		set_ship_shadowing_chunk(i, chunk);
 
 		chunk++;
 		chunk %= GAME_chunkwise_height * GAME_chunkwise_width;
@@ -166,19 +188,34 @@ void update_target_position(int i);
 
 void update_target_position(int i)
 {
+	Entity* ship = (Entity*)entities + i;
+
 	float x_accumulate = 0.0F;
 	float y_accumulate = 0.0F;
 	for (int id : *shadowing_targets[i])
 	{
+		if (id < GAME_ship_count)
+			continue;
+
 		Asteroid* asteroid = ((Asteroid*)entities + id);
 		x_accumulate += asteroid->x;
 		y_accumulate += asteroid->y;
+
+		if (ship_warn_timers[i] > 0.0F)
+		{
+			x_accumulate += asteroid->velocity_x * (SHIP_attack_targetting_time + SHIP_attack_time);
+			x_accumulate += asteroid->velocity_y * (SHIP_attack_targetting_time + SHIP_attack_time);
+		}
 	}
 
 	x_accumulate /= (float)shadowing_targets[i]->size();
 	y_accumulate /= (float)shadowing_targets[i]->size();
 	target_positions[i] = { (int)x_accumulate, (int)y_accumulate };
 }
+
+void ships_tick_warning(int i);
+
+void ship_tick_attack(int i);
 
 void ships_update(float delta_time)
 {
@@ -194,114 +231,218 @@ void ships_update(float delta_time)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
-		if (DEBUG_mode && DEBUG_ships_fire_at_will)
-			select_targets(ship);
+		//if (DEBUG_mode && DEBUG_ships_fire_at_will)
+		ship_check_states(i);
+
 		if (ship_attack_timers[i] > 0.0F)
+			ship_tick_attack(i);
+
+		if (ship_warn_timers[i] > 0.0F)
+			ships_tick_warning(i);
+
+		// follow target behavior
+		if (target_positions.size() == 0)
 		{
-			Entity* target = ((Entity*)entities) + ship_targets[i];
+			i++;
+			continue;
+		}
 
-			// cooling down
-			if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
-			{
-				ship->velocity_x = 0.0F;
-				ship->velocity_y = 0.0F;
-				ship->desired_velocity_x = ship->velocity_x;
-				ship->desired_velocity_y = ship->velocity_y;
-			}
-			// currently attacking (animate projectile)
-			else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
-			{
-				// slight recoil
-				float diff_x = target->x - ship->x;
-				float diff_y = target->y - ship->y;
-				float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
+		update_target_position(i);
 
-				ship->velocity_x = -diff_x * recoil_percentage;
-				ship->velocity_y = -diff_y * recoil_percentage;
-				ship->desired_velocity_x = ship->velocity_x;
-				ship->desired_velocity_y = ship->velocity_y;
-			}
-			// charging up
-			else
-			{
-				// rotate towards target; stay in place
-				ship->rotation = atan2(target->y - ship->y, target->x - ship->x);
+		SDL_Point pos = target_positions[i];
+		float x = (float)pos.x - ship->x;
+		float y = (float)pos.y - ship->y;
+		float theta = atan2f(y, x);
 
-				ship->velocity_x = 0.0F;
-				ship->velocity_y = 0.0F;
-				ship->desired_velocity_x = ship->velocity_x;
-				ship->desired_velocity_y = ship->velocity_y;
-			}
+		float distance = sqrtf(x * x + y * y);
+
+		float critical_distance = 1.0F;
+
+		float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
+		float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
 
 
-			float old_attack_timer = ship_attack_timers[i];
 
-			ship_attack_timers[i] -= (delta_time / 1000.0F);
-
-			if (old_attack_timer > SHIP_attack_cooldown_time &&
-				ship_attack_timers[i] < SHIP_attack_cooldown_time)
-			{
-				// who the raycast hit affects (could be diff from target)
-				SDL_Point hit;
-				Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
-
-				if (effected == NULL)
-					continue;
-
-				SDL_Log("hit something; splitting; %i", effected->id);
-				((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
-			}
+		if (run_ship_avoidance(ship, 0.001F, &vel_x, &vel_y) || distance > critical_distance)
+		{
+			ship->desired_velocity_x = vel_x;
+			ship->desired_velocity_y = vel_y;
 		}
 		else
 		{
-			// follow target behavior
-			if (target_positions.size() == 0)
-				continue;
-
-			update_target_position(i);
-
-			SDL_Point pos = target_positions[i];
-			float x = (float)pos.x - ship->x;
-			float y = (float)pos.y - ship->y;
-			float theta = atan2f(y, x);
-
-			float distance = sqrtf(x * x + y * y);
-
-			float critical_distance = 1.0F;
-
-			float vel_x = cosf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
-			float vel_y = sinf(theta) * SDL_clamp(SHIP_speed_maximum, 0, distance);
-
-
-
-			if (run_ship_avoidance(ship, 0.001F, &vel_x, &vel_y) || distance > critical_distance)
-			{
-				ship->desired_velocity_x = vel_x;
-				ship->desired_velocity_y = vel_y;
-			}
-			else
-			{
-				ship->x = pos.x;
-				ship->y = pos.y;
-				ship->velocity_x = 0.0F;
-				ship->velocity_y = 0.0F;
-				ship->desired_velocity_x = 0.0F;
-				ship->desired_velocity_y = 0.0F;
-			}
-
-			float crit_vel = 0.2F;
-
-			if (distance > crit_vel)
-				ship->rotation = atan2(ship->velocity_y, ship->velocity_x);
-			else
-				ship->rotation = 0.0;
+			ship->x = pos.x;
+			ship->y = pos.y;
+			ship->velocity_x = 0.0F;
+			ship->velocity_y = 0.0F;
+			ship->desired_velocity_x = 0.0F;
+			ship->desired_velocity_y = 0.0F;
 		}
+
+		float crit_vel = 0.2F;
+
+		if (distance > crit_vel)
+			ship->desired_rotation = atan2(ship->velocity_y, ship->velocity_x);
+		else
+			ship->desired_rotation = 0.0;
+
 
 		ship->update();
 		i++;
 	}
 
 	timer += delta_time / 1000.0F; // timer is in seconds
+}
+
+void ship_check_states(int i)
+{
+	Entity* ship = (Entity*)entities + i;
+
+	std::set<int> to_check;
+	if (ship_attack_timers[ship->id] > 0.0F) // if attacking skip
+		return;
+
+	// check currently warned ships for attack-worthy movements
+	if (ship_warn_timers[i] > 0.0F)
+	{
+		for (int id : *shadowing_targets[i])
+		{
+			Entity* other = ((Entity*)entities) + id;
+
+			float vel_x = other->velocity_x;
+			float vel_y = other->velocity_y;
+			float desired_vel_x = other->desired_velocity_x;
+			float desired_vel_y = other->desired_velocity_y;
+
+			const float attack_crit_vel_general = 0.5F;
+			const float attack_crit_vel_player = 0.01F;
+
+			if (DEBUG_mode && DEBUG_ships_fire_at_will ||
+				vel_x * vel_x + vel_y * vel_y >= attack_crit_vel_general * attack_crit_vel_general
+				|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= attack_crit_vel_player * attack_crit_vel_player)
+			{
+				ship_warn_timers[i] = SHIP_warning_time;
+				ship_targets[ship->id] = id;
+				ship_attack_timers[ship->id] = SHIP_attack_time + SHIP_attack_targetting_time + SHIP_attack_cooldown_time;
+				return;
+			}
+		}
+	}
+
+	// and return if in focus mode (no changes in attention)
+	if (ship_warn_timers[i] > SHIP_min_warning_focus_time)
+		return;
+
+	// otherwise check in visible range for new groups to warn (or move on if none available)
+	float x = ship->x;
+	float y = ship->y;
+
+	float speed_per_rad_increase = 0.8F;
+	int check_radius = 2;
+
+	int floor_y = (int)y / chunk_size - check_radius;
+	int ceil_y = (int)y / chunk_size + check_radius;
+	int left_x = (int)x / chunk_size - check_radius;
+	int right_x = (int)x / chunk_size + check_radius;
+	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
+	{
+		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
+		{
+			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
+			if (collision_check_grid[chunk] == nullptr)
+				continue;
+			std::set<int> curr_set = *(collision_check_grid[chunk]);
+			to_check.insert(curr_set.begin(), curr_set.end());
+		}
+	}
+
+	for (int id : to_check)
+	{
+		if (id == ship->id)
+			continue;
+
+		Entity* other = ((Entity*)entities) + id;
+
+		float vel_x = other->velocity_x;
+		float vel_y = other->velocity_y;
+		float desired_vel_x = other->desired_velocity_x;
+		float desired_vel_y = other->desired_velocity_y;
+
+		const float warn_crit_vel_general = 0.02F;
+		const float warn_crit_vel_player = 0.005F;
+
+		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
+			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= warn_crit_vel_player * warn_crit_vel_player)
+		{
+			set_ship_shadowing_chunk(i, other->collision_chunk);
+			ship_warn_timers[i] = SHIP_warning_time;
+		}
+	}
+}
+
+void ship_tick_attack(int i)
+{
+	Entity* ship = (Entity*)entities + i;
+	Entity* target = ((Entity*)entities) + ship_targets[i];
+
+	// cooling down
+	if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
+	{
+		/*ship->velocity_x = 0.0F;
+		ship->velocity_y = 0.0F;
+		ship->desired_velocity_x = ship->velocity_x;
+		ship->desired_velocity_y = ship->velocity_y;*/
+	}
+	// currently attacking (animate projectile)
+	else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
+	{
+		// slight recoil
+		float diff_x = target->x - ship->x;
+		float diff_y = target->y - ship->y;
+		float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
+
+		ship->velocity_x = -diff_x * recoil_percentage;
+		ship->velocity_y = -diff_y * recoil_percentage;
+		ship->desired_velocity_x = ship->velocity_x;
+		ship->desired_velocity_y = ship->velocity_y;
+	}
+	// charging up
+	else
+	{
+		// rotate towards target; stay in place
+		ship->desired_rotation = atan2(target->y - ship->y, target->x - ship->x);
+
+		/*ship->velocity_x = 0.0F;
+		ship->velocity_y = 0.0F;
+		ship->desired_velocity_x = ship->velocity_x;
+		ship->desired_velocity_y = ship->velocity_y;*/
+	}
+
+
+	float old_attack_timer = ship_attack_timers[i];
+
+	ship_attack_timers[i] -= (delta_time / 1000.0F);
+
+	if (old_attack_timer > SHIP_attack_cooldown_time &&
+		ship_attack_timers[i] < SHIP_attack_cooldown_time)
+	{
+		// who the raycast hit affects (could be diff from target)
+		SDL_Point hit;
+		Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+
+		if (effected == NULL)
+			return;
+
+		SDL_Log("hit something; splitting; %i", effected->id);
+		((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
+	}
+}
+
+void ships_tick_warning(int i)
+{
+	if (ship_warn_timers[i] > 0.0F)
+		ship_warn_timers[i] -= (delta_time / 1000.0F);
+	else
+		ship_warn_timers[i] = 0.0F;
 }
 
 bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel_y)
@@ -314,8 +455,6 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 
 	float speed_per_rad_increase = 0.8F;
 	int look_radius = 2 + (sqrtf(ship->velocity_x * ship->velocity_x + ship->velocity_y * ship->velocity_y) / speed_per_rad_increase);
-	/*if (look_radius > 2)
-		printf("lr: %i \n", look_radius);*/
 
 	int floor_y = (int)y / chunk_size - look_radius;
 	int ceil_y = (int)y / chunk_size + look_radius;
@@ -345,8 +484,8 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 		//	(float)other->w, (float)other->h, { 0, 0, 255, 255 });
 
 
-		*vel_x += (other->x - x) * multiplier;
-		*vel_y += (other->y - y) * multiplier;
+		*vel_x -= (other->x - x) * multiplier;
+		*vel_y -= (other->y - y) * multiplier;
 		result = true;
 	}
 
@@ -389,50 +528,6 @@ void render_fovs(RenderWindow* window)
 			window->render_rect(ship->x + cosf(theta) * radius, ship->y + sinf(theta) * radius, 1.0F, 1.0F, { 100, 100, 100, 255 });
 		}
 	}
-}
-
-void select_targets(Entity* ship)
-{
-	std::set<int> to_check;
-	if (ship_attack_timers[ship->id] > 0.0F)
-		return;
-
-	float x = ship->x;
-	float y = ship->y;
-
-	float speed_per_rad_increase = 0.8F;
-	int check_radius = 2;
-
-	int floor_y = (int)y / chunk_size - check_radius;
-	int ceil_y = (int)y / chunk_size + check_radius;
-	int left_x = (int)x / chunk_size - check_radius;
-	int right_x = (int)x / chunk_size + check_radius;
-	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
-	{
-		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
-		{
-			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
-			if (collision_check_grid[chunk] == nullptr)
-				continue;
-			std::set<int> curr_set = *(collision_check_grid[chunk]);
-			to_check.insert(curr_set.begin(), curr_set.end());
-		}
-	}
-
-	for (int id : to_check)
-	{
-		if (id == ship->id)
-			continue;
-
-		if (((Entity*)entities)[id].outline_point_count > 50)
-		{
-			ship_targets[ship->id] = id;
-			ship_attack_timers[ship->id] = SHIP_attack_time + SHIP_attack_targetting_time + SHIP_attack_cooldown_time;
-			return;
-		}
-	}
-
-
 }
 
 void ships_render_update(RenderWindow* window)
@@ -491,10 +586,15 @@ void ships_render_update(RenderWindow* window)
 			// decerements time in ships_update() func already (above is mirror functionality for render stage)
 		}
 
-		if (DEBUG_mode && DEBUG_ship_targets)
+		if (DEBUG_mode && DEBUG_ship_targets || ship_warn_timers[i] > 0.0F)
 		{
-			float size = 5.0F;
+			float size = 20.0F;
 			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
+			for (int id : *shadowing_targets[i])
+			{
+				Entity* other = (Entity*)entities + id;
+				window->render_rect_outline(other->x - (other->w >> 1), other->y - (other->h >> 1), other->w, other->h, { 255, 255, 0, 255 });
+			}
 		}
 
 		ship->render(window);
@@ -582,5 +682,6 @@ void ships_cleanup()
 	SDL_DestroyTexture(laser_beam_texture);
 	SDL_DestroyTexture(highlighter_beam_texture);
 	delete[] ship_targets;
+	delete[] ship_warn_timers;
 	delete[] ship_attack_timers;
 }

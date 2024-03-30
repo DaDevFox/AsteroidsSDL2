@@ -20,6 +20,8 @@ float SETTING_camera_zoom_min = 0.2F;
 
 bool SETTING_thrust_animation;
 
+const int SETTING_default_entity_drag = 0.0001F;
+
 // Movement Controls
 const SDL_KeyCode KEY_up = SDLK_UP;
 const SDL_KeyCode KEY_up_alt = SDLK_w;
@@ -100,8 +102,11 @@ const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 200, 255 };
 // Ships
 const float SHIP_speed_maximum = 0.2F;
 
+const float SHIP_warning_time = 10.0F;
+const float SHIP_min_warning_focus_time = 5.0F; // min amount of time to dedicate to a new warning target (attention can't be stolen for __ seconds)
+
 const float SHIP_attack_cooldown_time = 3.0F;
-const float SHIP_attack_targetting_time = 1.5F;
+const float SHIP_attack_targetting_time = 0.5F;
 const float SHIP_attack_time = 0.5F;
 const float SHIP_max_attack_range = 100.0F;
 

@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\entities\ship.cpp" />
+    <ClCompile Include="src\entities\thrust_renderer.cpp" />
     <ClCompile Include="src\math\polygon_math.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\entities\Entity.cpp" />
