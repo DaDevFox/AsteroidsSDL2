@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="src\entities\EntityManager.h" />
     <ClInclude Include="src\entities\ship.h" />
+    <ClInclude Include="src\entities\thrust_renderer.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\entities\Entity.h" />
     <ClInclude Include="src\main.h" />

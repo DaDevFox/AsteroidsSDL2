@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include "thrust_renderer.h"
 
 SDL_Texture* ship_texture;
 SDL_Texture* laser_beam_texture;
@@ -598,7 +599,8 @@ void ships_render_update(RenderWindow* window)
 			for (int id : *shadowing_targets[i])
 			{
 				Entity* other = (Entity*)entities + id;
-				window->render_rect_outline(other->x - (other->w >> 1), other->y - (other->h >> 1), other->w, other->h, { 255, 255, 0, 255 });
+				//window->render_rect_outline(other->x - (other->w >> 1), other->y - (other->h >> 1), other->w, other->h, { 255, 255, 0, 255 });
+				render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
 			}
 		}
 
