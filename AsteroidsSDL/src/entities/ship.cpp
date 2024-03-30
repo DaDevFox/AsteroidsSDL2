@@ -595,7 +595,7 @@ void ships_render_update(RenderWindow* window)
 		if (DEBUG_mode && DEBUG_ship_targets || ship_warn_timers[i] > 0.0F)
 		{
 			float size = 20.0F;
-			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
+			//window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
 			for (int id : *shadowing_targets[i])
 			{
 				Entity* other = (Entity*)entities + id;
