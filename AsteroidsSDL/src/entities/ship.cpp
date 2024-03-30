@@ -578,11 +578,13 @@ void ships_render_update(RenderWindow* window)
 					ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width,
 					0, beam_width >> 1, ship->rotation,
 					laser_beam_texture);
+				render_thrust(window, target, { 255, 0, 0, 255 }, 3, 4, 26.0F, true);
 			}
 			// charging up
 			else
 			{
 				//window->render_rotate(0, 0, 0, 0, ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width, 0, beam_width >> 1, ship->rotation, highlighter_beam_texture);
+				render_thrust(window, target, { 255, 0, 0, 255 }, 3, 4, 26.0F, true);
 			}
 
 			/*char buffer[16] = "";
@@ -590,19 +592,26 @@ void ships_render_update(RenderWindow* window)
 			window->render_centered_world(ship->x, ship->y, buffer, encode_sans_medium, { 255, 255, 255, 255 });*/
 
 			// decerements time in ships_update() func already (above is mirror functionality for render stage)
-		}
 
-		if (DEBUG_mode && DEBUG_ship_targets || ship_warn_timers[i] > 0.0F)
+
+		}
+		else if (ship_warn_timers[i] > 0.0F)
 		{
-			float size = 20.0F;
-			//window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
 			for (int id : *shadowing_targets[i])
 			{
 				Entity* other = (Entity*)entities + id;
-				//window->render_rect_outline(other->x - (other->w >> 1), other->y - (other->h >> 1), other->w, other->h, { 255, 255, 0, 255 });
 				render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
 			}
 		}
+
+		//else
+			//render_thrust(window, ship, { 0, 255, 255, 255 });
+		if (DEBUG_mode && DEBUG_ship_targets)
+		{
+			float size = 20.0F;
+			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
+		}
+
 
 		ship->render(window);
 		i++;
@@ -639,6 +648,12 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 	}
 
 	return nullptr;
+}
+
+void alert_ship_warning(Entity* ship, Entity* alertee)
+{
+	set_ship_shadowing_chunk(ship->id, alertee->collision_chunk);
+	ship_warn_timers[ship->id] = SHIP_warning_time;
 }
 
 Entity* check_overlap(float x, float y, int ignore_id)

@@ -2,6 +2,7 @@
 
 #include "../main.h"
 #include "asteroid.h"
+#include "ship.h"
 #include "thrust_renderer.h"
 
 #include <queue>
@@ -1032,4 +1033,9 @@ void asteroids_cleanup()
 }
 
 void Asteroid::on_collision(Entity* other, int collision_x, int collision_y)
-{}
+{
+	if (other->id < GAME_ship_count) // other is ship
+	{
+		alert_ship_warning(other, this);
+	}
+}
