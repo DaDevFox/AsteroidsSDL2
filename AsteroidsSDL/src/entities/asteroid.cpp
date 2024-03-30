@@ -500,10 +500,11 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 	asteroid->outline_point_count += outline_additions->size();
 }
 
-
-
 Asteroid* append_asteroid_to_pool()
 {
+	if (GAME_asteroid_count == GAME_asteroid_pool_size)
+		return nullptr;
+
 	return (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count++;
 }
 

@@ -236,6 +236,18 @@ void ships_update(float delta_time)
 		//if (DEBUG_mode && DEBUG_ships_fire_at_will)
 		ship_check_states(i);
 
+		SDL_Point pos = target_positions[i];
+		float x = (float)pos.x - ship->x;
+		float y = (float)pos.y - ship->y;
+		float distance = sqrtf(x * x + y * y);
+
+		float crit_vel = 0.2F;
+
+		if (distance > crit_vel)
+			ship->desired_rotation = atan2(ship->velocity_y, ship->velocity_x);
+		else
+			ship->desired_rotation = 0.0;
+
 		if (ship_attack_timers[i] > 0.0F)
 			ship_tick_attack(i);
 
@@ -251,12 +263,11 @@ void ships_update(float delta_time)
 
 		update_target_position(i);
 
-		SDL_Point pos = target_positions[i];
-		float x = (float)pos.x - ship->x;
-		float y = (float)pos.y - ship->y;
+
+
 		float theta = atan2f(y, x);
 
-		float distance = sqrtf(x * x + y * y);
+
 
 		float critical_distance = 1.0F;
 
@@ -279,13 +290,6 @@ void ships_update(float delta_time)
 			ship->desired_velocity_x = 0.0F;
 			ship->desired_velocity_y = 0.0F;
 		}
-
-		float crit_vel = 0.2F;
-
-		if (distance > crit_vel)
-			ship->desired_rotation = atan2(ship->velocity_y, ship->velocity_x);
-		else
-			ship->desired_rotation = 0.0;
 
 
 		ship->update();
@@ -315,12 +319,12 @@ void ship_check_states(int i)
 			float desired_vel_x = other->desired_velocity_x;
 			float desired_vel_y = other->desired_velocity_y;
 
-			const float attack_crit_vel_general = 0.5F;
-			const float attack_crit_vel_player = 0.01F;
+			const float attack_crit_vel_general = 0.1F;
+			const float attack_crit_vel_player = 0.05F;
 
 			if (DEBUG_mode && DEBUG_ships_fire_at_will ||
 				vel_x * vel_x + vel_y * vel_y >= attack_crit_vel_general * attack_crit_vel_general
-				|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= attack_crit_vel_player * attack_crit_vel_player)
+				|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= attack_crit_vel_player * attack_crit_vel_player)
 			{
 				ship_warn_timers[i] = SHIP_warning_time;
 				ship_targets[ship->id] = id;
@@ -339,7 +343,7 @@ void ship_check_states(int i)
 	float y = ship->y;
 
 	float speed_per_rad_increase = 0.8F;
-	int check_radius = 4;
+	int check_radius = 2;
 
 	int floor_y = (int)y / chunk_size - check_radius;
 	int ceil_y = (int)y / chunk_size + check_radius;
@@ -369,11 +373,11 @@ void ship_check_states(int i)
 		float desired_vel_x = other->desired_velocity_x;
 		float desired_vel_y = other->desired_velocity_y;
 
-		const float warn_crit_vel_general = 0.02F;
-		const float warn_crit_vel_player = 0.005F;
+		const float warn_crit_vel_general = 0.05F;
+		const float warn_crit_vel_player = 0.025F;
 
 		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
-			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_x >= 0.0F)
+			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
 		{
 			set_ship_shadowing_chunk(i, other->collision_chunk);
 			ship_warn_timers[i] = SHIP_warning_time;
@@ -401,11 +405,10 @@ void ship_tick_attack(int i)
 		float diff_x = target->x - ship->x;
 		float diff_y = target->y - ship->y;
 		float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
+		ship->desired_rotation = atan2(diff_y, diff_x);
 
-		ship->velocity_x = -diff_x * recoil_percentage;
-		ship->velocity_y = -diff_y * recoil_percentage;
-		ship->desired_velocity_x = ship->velocity_x;
-		ship->desired_velocity_y = ship->velocity_y;
+		ship->desired_velocity_x = -diff_x * recoil_percentage;
+		ship->desired_velocity_y = -diff_y * recoil_percentage;
 	}
 	// charging up
 	else
