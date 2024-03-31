@@ -3,10 +3,12 @@
 #include "../main.h"
 #include <iostream>
 #include <vector>
+#include <set>
 #include <time.h>
 #include "thrust_renderer.h"
 
 SDL_Texture* ship_texture;
+SDL_Texture* pip_texture;
 SDL_Texture* laser_beam_texture;
 SDL_Texture* highlighter_beam_texture;
 
@@ -26,23 +28,35 @@ void search_for_targets();
 void ship_check_states(int i);
 
 std::vector<SDL_Point> target_positions;
-std::vector<std::vector<int>*> shadowing_targets;
+std::vector<std::set<int>*> shadowing_targets;
+
 float* ship_warn_timers;
 int* ship_targets;
 float* ship_attack_timers;
+
+int* ship_healths;
+float* ship_health_damaged_timers;
 
 void ships_init()
 {
 	ship_targets = new int[GAME_ship_count];
 	ship_warn_timers = new float[GAME_ship_count];
 	ship_attack_timers = new float[GAME_ship_count];
+
+	ship_healths = new int[GAME_ship_count];
+	ship_health_damaged_timers = new float[GAME_ship_count];
+
 	for (int i = 0; i < GAME_ship_count; i++)
 	{
 		ship_targets[i] = 0;
+		ship_warn_timers[i] = 0.0F;
 		ship_attack_timers[i] = 0.0F;
+		ship_healths[i] = SHIP_initial_health;
+		ship_health_damaged_timers[i] = 0.0F;
 	}
 
 	ship_texture = window.load_texture(RESOURCE_ship_texture_path);
+	pip_texture = window.load_texture(RESOURCE_pip_texture_path);
 	laser_beam_texture = window.load_texture(RESOURCE_laser_beam_texture_path);
 	highlighter_beam_texture = window.load_texture(RESOURCE_highlighter_beam_texture_path);
 
@@ -143,7 +157,7 @@ void set_ship_shadowing_chunk(int shipID, int chunk)
 			std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
 			for (int id : *curr_set)
 				if (id >= GAME_ship_count) // if it's not a ship
-					shadowing_targets[shipID]->push_back(id);
+					shadowing_targets[shipID]->insert(id);
 		}
 	}
 }
@@ -155,7 +169,7 @@ void search_for_targets()
 		for (int i = 0; i < GAME_ship_count; i++)
 		{
 			target_positions.push_back(default_position(i));
-			shadowing_targets.push_back(new std::vector<int>());
+			shadowing_targets.push_back(new std::set<int>());
 		}
 		return;
 	}
@@ -255,6 +269,11 @@ void ships_update(float delta_time)
 		if (ship_warn_timers[i] > 0.0F)
 			ships_tick_warning(i);
 
+		if (ship_health_damaged_timers[i] > 0.0F)
+			ship_health_damaged_timers[i] -= (delta_time / 1000.0F);
+		else
+			ship_health_damaged_timers[i] = 0.0F;
+
 		// follow target behavior
 		if (target_positions.size() == 0)
 		{
@@ -320,8 +339,8 @@ void ship_check_states(int i)
 			float desired_vel_x = other->desired_velocity_x;
 			float desired_vel_y = other->desired_velocity_y;
 
-			const float attack_crit_vel_general = 0.1F;
-			const float attack_crit_vel_player = 0.05F;
+			const float attack_crit_vel_general = 0.06F;
+			const float attack_crit_vel_player = 0.01F;
 
 			if (DEBUG_mode && DEBUG_ships_fire_at_will ||
 				vel_x * vel_x + vel_y * vel_y >= attack_crit_vel_general * attack_crit_vel_general
@@ -367,6 +386,9 @@ void ship_check_states(int i)
 		if (id == ship->id)
 			continue;
 
+		if ((*shadowing_targets[ship->id]).find(id) != (*shadowing_targets[ship->id]).end())
+			continue;
+
 		Entity* other = ((Entity*)entities) + id;
 
 		float vel_x = other->velocity_x;
@@ -375,13 +397,13 @@ void ship_check_states(int i)
 		float desired_vel_y = other->desired_velocity_y;
 
 		const float warn_crit_vel_general = 0.05F;
-		const float warn_crit_vel_player = 0.025F;
+		const float warn_crit_vel_player = 0.01F;
 
 		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
 			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
 		{
 			set_ship_shadowing_chunk(i, other->collision_chunk);
-			ship_warn_timers[i] = SHIP_warning_time;
+			ship_warn_timers[i] += SHIP_warning_time;
 		}
 	}
 }
@@ -536,9 +558,41 @@ void render_fovs(RenderWindow* window)
 	}
 }
 
+void render_health(RenderWindow* window, Entity* ship)
+{
+	int id = ship->id;
+	if (ship_health_damaged_timers[id] <= 0.0F)
+		return;
+
+	float pip_height = 5.0F;
+	float pip_width = 5.0F;
+	float padding_per_pip = 1.0F;
+	float opacity = 0.0F;
+
+	// pulses at start; solid opacity in middle; fade out at end
+	if (ship_health_damaged_timers[id] <= SHIP_health_damaged_fadetime)
+		opacity = 1.0F - ship_health_damaged_timers[id] / SHIP_health_damaged_fadetime;
+	else if (ship_health_damaged_timers[id] <= SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime)
+		opacity = 1.0F;
+	else
+	{
+		float progress = 1.0F - ((ship_health_damaged_timers[id] - SHIP_health_damaged_fadetime - SHIP_health_damaged_showtime) / SHIP_health_damaged_pulsetime);
+		float theta = progress * PI * 2 * SHIP_health_damaged_pulses;
+		opacity = sinf(theta) * 0.5F + 0.5F;
+	}
+
+	float x = ship->x - (pip_width + 2 * padding_per_pip) * SHIP_initial_health;
+	for (int i = 0; i < SHIP_initial_health; i++)
+	{
+		window->render_alphamod(0, 0, 64, 64, (int)(x + padding_per_pip), (int)(ship->y - (ship->h >> 1) - pip_height), pip_width, pip_height, pip_texture, (Uint8)(opacity * 255.0F));
+		x += pip_width + 2 * padding_per_pip;
+	}
+}
+
 void ships_render_update(RenderWindow* window)
 {
-	render_fovs(window);
+	if (DEBUG_mode && DEBUG_ship_targets)
+		render_fovs(window);
 
 	float base_beam_width = 30;
 	float variance_percentage = 0.6F;
@@ -603,17 +657,34 @@ void ships_render_update(RenderWindow* window)
 				render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
 			}
 		}
-
 		//else
 			//render_thrust(window, ship, { 0, 255, 255, 255 });
+
 		if (DEBUG_mode && DEBUG_ship_targets)
 		{
+			float text_height = 30.0F;
 			float size = 20.0F;
 			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
+
+			if (ship_health_damaged_timers[i] > 0.0F)
+			{
+				char health_text[8] = "";
+				snprintf(health_text, 8, "%.3f", ship_health_damaged_timers[i]);
+				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, health_text, encode_sans_medium, { 0, 255, 0, 255 });
+				text_height += 30.0F;
+			}
+
+			if (ship_warn_timers[i] > 0.0F)
+			{
+				char warn_text[8] = "";
+				snprintf(warn_text, 8, "%.3f, %.3f", ship_warn_timers[i], ship_attack_timers[i]);
+				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, warn_text, encode_sans_medium, { 255, 0, 255, 255 });
+			}
 		}
 
 
 		ship->render(window);
+		render_health(window, ship);
 		i++;
 	}
 }
@@ -653,7 +724,16 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 void alert_ship_warning(Entity* ship, Entity* alertee)
 {
 	set_ship_shadowing_chunk(ship->id, alertee->collision_chunk);
-	ship_warn_timers[ship->id] = SHIP_warning_time;
+	if (shadowing_targets[ship->id]->find(alertee->id) != shadowing_targets[ship->id]->end()) // if alertee is in shadowing targets
+		ship_warn_timers[ship->id] += SHIP_warning_time;
+	else
+		ship_warn_timers[ship->id] = SHIP_warning_time;
+}
+
+void ship_damage(Entity* ship, int amount)
+{
+	ship_healths[ship->id] -= amount;
+	ship_health_damaged_timers[ship->id] = SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime + SHIP_health_damaged_pulsetime;
 }
 
 Entity* check_overlap(float x, float y, int ignore_id)
@@ -701,6 +781,7 @@ Entity* check_overlap(float x, float y, int ignore_id)
 void ships_cleanup()
 {
 	SDL_DestroyTexture(ship_texture);
+	SDL_DestroyTexture(pip_texture);
 	SDL_DestroyTexture(laser_beam_texture);
 	SDL_DestroyTexture(highlighter_beam_texture);
 	delete[] ship_targets;

@@ -1036,6 +1036,11 @@ void Asteroid::on_collision(Entity* other, int collision_x, int collision_y)
 {
 	if (other->id < GAME_ship_count) // other is ship
 	{
+		float crit_vel = 0.02F;
 		alert_ship_warning(other, this);
+		if (velocity_x * velocity_x + velocity_y * velocity_y >= crit_vel * crit_vel)
+		{
+			ship_damage(other, 1);
+		}
 	}
 }

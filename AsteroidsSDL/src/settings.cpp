@@ -4,6 +4,7 @@
 #pragma region Interactive
 
 const char* RESOURCE_ship_texture_path = "./triangle.png";
+const char* RESOURCE_pip_texture_path = "./pip.png";
 const char* RESOURCE_laser_beam_texture_path = "./laser_beam.png";
 const char* RESOURCE_highlighter_beam_texture_path = "./highlighter_beam.png";
 
@@ -100,6 +101,13 @@ const float PLAYER_controlspeed_maximum = 0.05F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 255, 255 };
 
 // Ships
+const int SHIP_initial_health = 3;
+
+const float SHIP_health_damaged_showtime = 2.0F;
+const float SHIP_health_damaged_fadetime = 0.0F;
+const int SHIP_health_damaged_pulses = 3;
+const float SHIP_health_damaged_pulsetime = 1.0F;
+
 const float SHIP_speed_maximum = 0.2F;
 
 const float SHIP_warning_time = 10.0F;

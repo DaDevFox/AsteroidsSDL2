@@ -7,6 +7,7 @@
 #define SETTING_MAX_POINT_COUNT 512
 
 extern const char* RESOURCE_ship_texture_path;
+extern const char* RESOURCE_pip_texture_path;
 extern const char* RESOURCE_laser_beam_texture_path;
 extern const char* RESOURCE_highlighter_beam_texture_path;
 
@@ -86,6 +87,11 @@ extern const float ASTEROID_split_minimum_velocity;
 extern const float PLAYER_controlspeed_maximum;
 extern const SDL_Color PLAYER_thrusting_outline_color;
 
+extern const int SHIP_initial_health;
+extern const float SHIP_health_damaged_showtime;
+extern const float SHIP_health_damaged_fadetime;
+extern const int SHIP_health_damaged_pulses;
+extern const float SHIP_health_damaged_pulsetime;
 extern const float SHIP_warning_time;
 extern const float SHIP_min_warning_focus_time;
 extern const float SHIP_speed_maximum;

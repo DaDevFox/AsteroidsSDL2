@@ -331,6 +331,40 @@ void RenderWindow::render(int src_x, int src_y, int src_w, int src_h, int dst_x,
 	}
 }
 
+void RenderWindow::render_alphamod(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, SDL_Texture* texture, const Uint8& alpha)
+{
+	SDL_Rect source{
+		src_x,
+		src_y,
+		src_w,
+		src_h
+	};
+
+	// adjusts source.w and source.h to actual values?
+	SDL_QueryTexture(texture, nullptr, nullptr, &source.w, &source.h);
+
+	int screen_dest_x_end;
+	int screen_dest_y_end;
+
+	SDL_Rect destination{
+		dst_x,
+		dst_y,
+		dst_w,
+		dst_h
+	};
+	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
+	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
+
+	if (flag1 || flag2 || on_screen(dst_x + dst_w, dst_y) || on_screen(dst_x, dst_y + dst_h))
+	{
+		destination.w = screen_dest_x_end - destination.x;
+		destination.h = screen_dest_y_end - destination.y;
+
+		SDL_SetTextureAlphaMod(texture, alpha);
+		SDL_RenderCopy(renderer, texture, &source, &destination);
+	}
+}
+
 void RenderWindow::render(const SDL_Rect* destination, SDL_Texture* texture)
 {
 	int screen_dst_x;
@@ -361,7 +395,9 @@ void RenderWindow::render(const SDL_Rect* source, const SDL_Rect* destination, S
 	SDL_RenderCopy(renderer, texture, source, destination);
 }
 
-
+/// <summary>
+/// FLAG: uses SCREEN not WORLD coordinates
+/// </summary>
 void RenderWindow::render_centered(int x, int y, int w, int h, SDL_Texture* texture)
 {
 	SDL_Rect destination{

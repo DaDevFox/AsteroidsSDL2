@@ -87,6 +87,7 @@ public:
 	void render(const SDL_Rect* source, const SDL_Rect* destination, SDL_Texture* texture);
 	void render(int x, int y, int w, int h, SDL_Texture* texture);
 	void render(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, SDL_Texture* texture);
+	void render_alphamod(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, SDL_Texture* texture, const Uint8& alpha);
 	void render_centered(int x, int y, int w, int h, SDL_Texture* texture);
 	void render_centered(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, SDL_Texture* texture);
 	void render_rotate(int x, int y, int w, int h, double angle, SDL_Texture* texture);
