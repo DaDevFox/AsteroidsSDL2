@@ -214,6 +214,17 @@ void update_target_position(int i)
 {
 	Entity* ship = (Entity*)entities + i;
 
+	// charging behavior
+	if (ship_attack_timers[i] >= SHIP_attack_cooldown_time + SHIP_attack_time)
+	{
+		Entity* target = (Entity*)entities + ship_targets[i];
+		target_positions[i] = {
+			(int)(target->x + target->velocity_x * (SHIP_attack_targetting_time + SHIP_attack_time)),
+			(int)(target->y + target->velocity_x * (SHIP_attack_targetting_time + SHIP_attack_time))
+		};
+		return;
+	}
+
 	float x_accumulate = 0.0F;
 	float y_accumulate = 0.0F;
 	for (int id : *shadowing_targets[i])
@@ -404,7 +415,7 @@ void ship_check_states(int i)
 		float desired_vel_y = other->desired_velocity_y;
 
 		const float warn_crit_vel_general = 0.05F;
-		const float warn_crit_vel_player = 0.01F;
+		const float warn_crit_vel_player = 0.001F;
 
 		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
 			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
@@ -441,7 +452,7 @@ void ship_tick_attack(int i)
 		ship->desired_velocity_x = -diff_x * recoil_percentage;
 		ship->desired_velocity_y = -diff_y * recoil_percentage;
 	}
-	// charging up
+	// charging to target
 	else
 	{
 		// rotate towards target; stay in place
