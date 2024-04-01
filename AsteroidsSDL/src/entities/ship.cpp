@@ -37,6 +37,13 @@ float* ship_attack_timers;
 int* ship_healths;
 float* ship_health_damaged_timers;
 
+int get_health(Entity* ship)
+{
+	if (ship->id >= GAME_ship_count)
+		return -1;
+	return ship_healths[ship->id];
+}
+
 void ships_init()
 {
 	ship_targets = new int[GAME_ship_count];

@@ -5,6 +5,8 @@
 #define WIDTH 680
 #define HEIGHT 400
 
+extern int PLAYER_initial_outline_point_count;
+extern const int GAME_min_outline_point_count;
 extern const int PLAYER_asteroid_id;
 extern const int PLAYER_entity_id;
 

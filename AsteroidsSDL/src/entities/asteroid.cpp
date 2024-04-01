@@ -806,6 +806,9 @@ void Asteroid::create_outline(Uint32* buffer)
 
 
 #endif
+
+	if (id == PLAYER_entity_id)
+		PLAYER_initial_outline_point_count = outline_point_count;
 }
 
 void Asteroid::cleanup()

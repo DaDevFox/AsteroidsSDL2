@@ -1,4 +1,5 @@
 #include "../main.h"
+#include "../entities/Entity.h"
 
 void debug_update(SDL_Keycode sym);
 void debug_update(SDL_Keycode sym)
@@ -30,6 +31,39 @@ void debug_update(SDL_Keycode sym)
 	}
 	else
 		CAMERA_focused_asteroid = PLAYER_asteroid_id;
+}
+
+void render_player_ui_update(RenderWindow* window);
+void render_player_ui_update(RenderWindow* window)
+{
+	int sidebar_width = 200;
+	int sidebar_height = -1;
+	int titletext_height = 20;
+
+	int healthbar_height = 40;
+	int healthbar_padding = 0;
+
+	SDL_Color sidebar_bg_color = { 80, 80, 80, 255 };
+	SDL_Color healthbar_bg_color = { 100, 100, 100, 255 };
+	SDL_Color healthbar_color = { 0, 255, 0, 255 };
+
+	Entity* player = (Entity*)entities + PLAYER_entity_id;
+	float health_normalized = (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
+
+	if (health_normalized <= 0.3F)
+		healthbar_color = { 255, 255, 0, 255 };
+	if (health_normalized <= 0.1F)
+		healthbar_color = { 255, 0, 0, 255 };
+
+	// sidebar
+	window->render_rect(WINDOW_width - sidebar_width, 0, sidebar_width, sidebar_height == -1 ? WINDOW_height : sidebar_height, sidebar_bg_color);
+
+	// healthbar title
+	window->render_centered_screen(WINDOW_width - (sidebar_width >> 1), titletext_height >> 1, "Health", encode_sans_bold, healthbar_color);
+
+	// healthbar bg + fill
+	window->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, sidebar_width - 2 * healthbar_padding, healthbar_height, healthbar_bg_color);
+	window->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, (int)(health_normalized * (float)(sidebar_width - 2 * healthbar_padding)), healthbar_height, healthbar_color);
 }
 
 void render_debug_update(RenderWindow* window);
@@ -136,7 +170,7 @@ void UI::input_update(SDL_Event* running_event)
 void UI::render_update(RenderWindow* window)
 {
 	render_debug_update(window);
-
+	render_player_ui_update(window);
 }
 
 

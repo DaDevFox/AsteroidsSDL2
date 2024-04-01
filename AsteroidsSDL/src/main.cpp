@@ -16,6 +16,8 @@ const int PLAYER_entity_id = GAME_ship_count + PLAYER_asteroid_id;
 const int chunk_size = ASTEROID_maximum_radius;
 const int GAME_chunkwise_height = GAME_height / chunk_size;
 const int GAME_chunkwise_width = GAME_width / chunk_size;
+const int GAME_min_outline_point_count = 100;
+int PLAYER_initial_outline_point_count = 0;
 
 int WINDOW_height;
 int WINDOW_width;

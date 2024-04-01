@@ -18,6 +18,8 @@ void ships_render_update(RenderWindow* window);
 /// </summary>
 void ships_cleanup();
 
+int get_health(Entity* ship);
+
 void ship_damage(Entity* ship, int amount);
 
 void alert_ship_warning(Entity* ship, Entity* alertee);
