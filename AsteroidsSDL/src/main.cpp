@@ -30,7 +30,7 @@ SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 void* entities;
 
 const char* window_title = "Asteroids";
-RenderWindow window(window_title, WIDTH, HEIGHT);
+RenderWindow window(window_title, INITIAL_WIDTH, INITIAL_HEIGHT);
 
 bool game_running;
 

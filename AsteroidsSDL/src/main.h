@@ -2,8 +2,8 @@
 #include "window/RenderWindow.h"
 #include "settings.h"
 
-#define WIDTH 680
-#define HEIGHT 400
+#define INITIAL_WIDTH 680
+#define INITIAL_HEIGHT 400
 
 extern int PLAYER_initial_outline_point_count;
 extern const int GAME_min_outline_point_count;
