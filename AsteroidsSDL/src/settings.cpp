@@ -104,9 +104,9 @@ const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 255, 255 };
 const int SHIP_initial_health = 3;
 
 const float SHIP_health_damaged_showtime = 2.0F;
-const float SHIP_health_damaged_fadetime = 0.0F;
-const int SHIP_health_damaged_pulses = 3;
-const float SHIP_health_damaged_pulsetime = 1.0F;
+const float SHIP_health_damaged_fadetime = 0.5F;
+const int SHIP_health_damaged_pulses = 2;
+const float SHIP_health_damaged_pulsetime = 0.25F;
 
 const float SHIP_speed_maximum = 0.2F;
 

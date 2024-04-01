@@ -564,14 +564,14 @@ void render_health(RenderWindow* window, Entity* ship)
 	if (ship_health_damaged_timers[id] <= 0.0F)
 		return;
 
-	float pip_height = 5.0F;
-	float pip_width = 5.0F;
+	float pip_height = 3.0F;
+	float pip_width = 3.0F;
 	float padding_per_pip = 1.0F;
 	float opacity = 0.0F;
 
 	// pulses at start; solid opacity in middle; fade out at end
 	if (ship_health_damaged_timers[id] <= SHIP_health_damaged_fadetime)
-		opacity = 1.0F - ship_health_damaged_timers[id] / SHIP_health_damaged_fadetime;
+		opacity = ship_health_damaged_timers[id] / SHIP_health_damaged_fadetime;
 	else if (ship_health_damaged_timers[id] <= SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime)
 		opacity = 1.0F;
 	else
@@ -584,7 +584,9 @@ void render_health(RenderWindow* window, Entity* ship)
 	float x = ship->x - (pip_width + 2 * padding_per_pip) * SHIP_initial_health;
 	for (int i = 0; i < SHIP_initial_health; i++)
 	{
-		window->render_alphamod(0, 0, 64, 64, (int)(x + padding_per_pip), (int)(ship->y - (ship->h >> 1) - pip_height), pip_width, pip_height, pip_texture, (Uint8)(opacity * 255.0F));
+		int alpha = (Uint8)(opacity * 255.0F * (i >= ship_healths[ship->id] ? 0.6F : 1.0F));
+
+		window->render_alphamod(0, 0, 64, 64, (int)(x + padding_per_pip), (int)(ship->y - (ship->h >> 1) - pip_height), pip_width, pip_height, pip_texture, alpha);
 		x += pip_width + 2 * padding_per_pip;
 	}
 }
@@ -732,8 +734,11 @@ void alert_ship_warning(Entity* ship, Entity* alertee)
 
 void ship_damage(Entity* ship, int amount)
 {
-	ship_healths[ship->id] -= amount;
-	ship_health_damaged_timers[ship->id] = SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime + SHIP_health_damaged_pulsetime;
+	if (ship_health_damaged_timers[ship->id] <= 0.0F) // hacky invincibility timer
+	{
+		ship_healths[ship->id] -= amount;
+		ship_health_damaged_timers[ship->id] = SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime + SHIP_health_damaged_pulsetime;
+	}
 }
 
 Entity* check_overlap(float x, float y, int ignore_id)
