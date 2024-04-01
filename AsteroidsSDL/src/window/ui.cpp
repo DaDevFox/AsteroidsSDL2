@@ -1,51 +1,39 @@
 #include "../main.h"
-#include <stdio.h>
 
-void UI::input_update(SDL_Event* running_event)
+void debug_update(SDL_Keycode sym);
+void debug_update(SDL_Keycode sym)
 {
-	if (running_event->type == SDL_KEYDOWN)
+	if (DEBUG_master)
 	{
-		SDL_Keycode sym = running_event->key.keysym.sym;
-#pragma region debug input
+		if (sym == KEY_DEBUG_mode)
+			DEBUG_mode = !DEBUG_mode;
 
-		if (DEBUG_master)
-		{
-			if (sym == KEY_DEBUG_mode)
-				DEBUG_mode = !DEBUG_mode;
+		if (sym == KEY_DEBUG_focused_asteroid_cancel)
+			CAMERA_focused_asteroid = -1;
+		if (sym == KEY_DEBUG_focused_asteroid_increment)
+			CAMERA_focused_asteroid = ++CAMERA_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : CAMERA_focused_asteroid;
+		if (sym == KEY_DEBUG_focused_asteroid_decrement)
+			CAMERA_focused_asteroid = --CAMERA_focused_asteroid < 0 ? -1 : CAMERA_focused_asteroid;
 
-			if (sym == KEY_DEBUG_focused_asteroid_cancel)
-				CAMERA_focused_asteroid = -1;
-			if (sym == KEY_DEBUG_focused_asteroid_increment)
-				CAMERA_focused_asteroid = ++CAMERA_focused_asteroid >= GAME_asteroid_count ? GAME_asteroid_count - 1 : CAMERA_focused_asteroid;
-			if (sym == KEY_DEBUG_focused_asteroid_decrement)
-				CAMERA_focused_asteroid = --CAMERA_focused_asteroid < 0 ? -1 : CAMERA_focused_asteroid;
-
-			if (sym == KEY_DEBUG_chunk_gridlines)
-				DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
-			if (sym == KEY_DEBUG_ship_targets)
-				DEBUG_ship_targets = !DEBUG_ship_targets;
-			if (sym == KEY_DEBUG_display_chunk_numbers)
-				DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
-			if (sym == KEY_DEBUG_display_entity_outlines)
-				DEBUG_display_entity_outlines = !DEBUG_display_entity_outlines;
-			if (sym == KEY_DEBUG_ships_fire_at_will)
-				DEBUG_ships_fire_at_will = !DEBUG_ships_fire_at_will;
-			if (sym == KEY_DEBUG_wireframe_mode)
-				DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
-		}
-		else
-			CAMERA_focused_asteroid = PLAYER_asteroid_id;
-
-#pragma endregion
-
-		if (sym == KEY_pause)
-		{
-			time_scaling = time_scaling > 0.0F ? 0.0F : 1.0F;
-		}
+		if (sym == KEY_DEBUG_chunk_gridlines)
+			DEBUG_chunk_gridlines = !DEBUG_chunk_gridlines;
+		if (sym == KEY_DEBUG_ship_targets)
+			DEBUG_ship_targets = !DEBUG_ship_targets;
+		if (sym == KEY_DEBUG_display_chunk_numbers)
+			DEBUG_display_chunk_numbers = !DEBUG_chunk_gridlines;
+		if (sym == KEY_DEBUG_display_entity_outlines)
+			DEBUG_display_entity_outlines = !DEBUG_display_entity_outlines;
+		if (sym == KEY_DEBUG_ships_fire_at_will)
+			DEBUG_ships_fire_at_will = !DEBUG_ships_fire_at_will;
+		if (sym == KEY_DEBUG_wireframe_mode)
+			DEBUG_wireframe_mode = !DEBUG_wireframe_mode;
 	}
+	else
+		CAMERA_focused_asteroid = PLAYER_asteroid_id;
 }
 
-void UI::render_update(RenderWindow* window)
+void render_debug_update(RenderWindow* window);
+void render_debug_update(RenderWindow* window)
 {
 	int curr_y = 0;
 	int curr_x = 0;
@@ -128,6 +116,27 @@ void UI::render_update(RenderWindow* window)
 		sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
 		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
 	}
+}
+
+void UI::input_update(SDL_Event* running_event)
+{
+	if (running_event->type == SDL_KEYDOWN)
+	{
+		SDL_Keycode sym = running_event->key.keysym.sym;
+
+		debug_update(sym);
+
+		if (sym == KEY_pause)
+		{
+			time_scaling = time_scaling > 0.0F ? 0.0F : 1.0F;
+		}
+	}
+}
+
+void UI::render_update(RenderWindow* window)
+{
+	render_debug_update(window);
+
 }
 
 
