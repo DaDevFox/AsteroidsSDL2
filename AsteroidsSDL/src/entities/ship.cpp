@@ -12,12 +12,7 @@ SDL_Texture* pip_texture;
 SDL_Texture* laser_beam_texture;
 SDL_Texture* highlighter_beam_texture;
 
-// TODO: warning and shadowing override
-//			warn if high speed or player
-//			while warning; shadow center of mass + avg vel * attack time
-// TODO: warning halo
-// TODO: accumulated warning attack system
-// TODO: attack halo
+// TODO: attack timeout using warntimer > attacktimer
 
 
 void render_fovs(RenderWindow* window);
@@ -266,6 +261,14 @@ void ships_update(float delta_time)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
+		if (ship_healths[i] <= 0)
+		{
+			// only run physical update; no behavior for dead ship
+			ship->update();
+			i++;
+			continue;
+		}
+
 		//if (DEBUG_mode && DEBUG_ships_fire_at_will)
 		ship_check_states(i);
 
@@ -354,15 +357,15 @@ void ship_check_states(int i)
 
 			float vel_x = other->velocity_x;
 			float vel_y = other->velocity_y;
-			float desired_vel_x = other->desired_velocity_x;
-			float desired_vel_y = other->desired_velocity_y;
+			float desired_vel_x = other->desired_velocity_x - vel_x;
+			float desired_vel_y = other->desired_velocity_y - vel_y;
 
 			const float attack_crit_vel_general = 0.06F;
-			const float attack_crit_vel_player = 0.01F;
+			const float attack_crit_vel_player = 0.06F;
 
 			if (DEBUG_mode && DEBUG_ships_fire_at_will ||
 				vel_x * vel_x + vel_y * vel_y >= attack_crit_vel_general * attack_crit_vel_general
-				|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= attack_crit_vel_player * attack_crit_vel_player)
+				|| id == PLAYER_entity_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= attack_crit_vel_player * attack_crit_vel_player)
 			{
 				ship_warn_timers[i] = SHIP_warning_time;
 				ship_targets[ship->id] = id;
@@ -415,10 +418,10 @@ void ship_check_states(int i)
 		float desired_vel_y = other->desired_velocity_y;
 
 		const float warn_crit_vel_general = 0.05F;
-		const float warn_crit_vel_player = 0.001F;
+		const float warn_crit_vel_player = 0.01F;
 
 		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
-			|| id == PLAYER_asteroid_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
+			|| id == PLAYER_entity_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
 		{
 			set_ship_shadowing_chunk(i, other->collision_chunk);
 			ship_warn_timers[i] += SHIP_warning_time;
@@ -636,6 +639,16 @@ void ships_render_update(RenderWindow* window)
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
+		if (ship_healths[i] <= 0)
+		{
+			// TODO: render_rotate_alphamod
+			// only run physical update; no behavior for dead ship
+			ship->render(window);
+			render_health(window, ship);
+			i++;
+			continue;
+		}
+
 		if (ship_attack_timers[i] > 0.0F)
 		{
 			// what the ship is trying to hit

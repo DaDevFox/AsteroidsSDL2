@@ -81,7 +81,7 @@ bool DEBUG_entity_rotations = false;
 
 int GAME_asteroid_count = 30;
 const int GAME_asteroid_pool_size = 100;
-const int GAME_ship_count = 2;
+const int GAME_ship_count = 5;
 
 
 const Uint32 GAME_asteroid_color_raw = 0xFFFFFFFF;
