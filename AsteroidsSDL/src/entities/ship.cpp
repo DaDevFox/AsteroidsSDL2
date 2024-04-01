@@ -420,6 +420,9 @@ void ship_tick_attack(int i)
 	Entity* ship = (Entity*)entities + i;
 	Entity* target = ((Entity*)entities) + ship_targets[i];
 
+	float diff_x = target->x - ship->x;
+	float diff_y = target->y - ship->y;
+
 	// cooling down
 	if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
 	{
@@ -432,8 +435,6 @@ void ship_tick_attack(int i)
 	else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
 	{
 		// slight recoil
-		float diff_x = target->x - ship->x;
-		float diff_y = target->y - ship->y;
 		float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
 		ship->desired_rotation = atan2(diff_y, diff_x);
 
@@ -444,7 +445,16 @@ void ship_tick_attack(int i)
 	else
 	{
 		// rotate towards target; stay in place
-		ship->desired_rotation = atan2(target->y - ship->y, target->x - ship->x);
+		float attack_theta = atan2(target->y - ship->y, target->x - ship->x);
+		float vel_theta = atan2(ship->velocity_y, ship->velocity_x);
+
+		float signed_dist_normalized = diff_x * diff_x + diff_y * diff_y - SHIP_max_attack_range * SHIP_max_attack_range;
+		if (signed_dist_normalized > 0.0F)
+			signed_dist_normalized = 1.0F / (1.0F + signed_dist_normalized);
+		else
+			signed_dist_normalized = 1.0F;
+
+		ship->desired_rotation = attack_theta * signed_dist_normalized + vel_theta * (1.0F - signed_dist_normalized);
 
 		/*ship->velocity_x = 0.0F;
 		ship->velocity_y = 0.0F;
@@ -452,23 +462,28 @@ void ship_tick_attack(int i)
 		ship->desired_velocity_y = ship->velocity_y;*/
 	}
 
+	bool in_range = diff_x * diff_x + diff_y * diff_y <= SHIP_max_attack_range * SHIP_max_attack_range;
 
-	float old_attack_timer = ship_attack_timers[i];
-
-	ship_attack_timers[i] -= (delta_time / 1000.0F);
-
-	if (old_attack_timer > SHIP_attack_cooldown_time &&
-		ship_attack_timers[i] < SHIP_attack_cooldown_time)
+	// only tick down if in range while chasing (while attacking tick regardless)
+	if (in_range || ship_attack_timers[i] <= SHIP_attack_cooldown_time + SHIP_attack_time)
 	{
-		// who the raycast hit affects (could be diff from target)
-		SDL_Point hit;
-		Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+		float old_attack_timer = ship_attack_timers[i];
 
-		if (effected == NULL)
-			return;
+		ship_attack_timers[i] -= (delta_time / 1000.0F);
 
-		SDL_Log("hit something; splitting; %i", effected->id);
-		((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
+		if (old_attack_timer > SHIP_attack_cooldown_time &&
+			ship_attack_timers[i] < SHIP_attack_cooldown_time)
+		{
+			// who the raycast hit affects (could be diff from target)
+			SDL_Point hit;
+			Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+
+			if (effected == NULL)
+				return;
+
+			SDL_Log("hit something; splitting; %i", effected->id);
+			((Asteroid*)effected)->split(hit.x, hit.y, 10.0F);
+		}
 	}
 }
 
