@@ -22,6 +22,7 @@ extern float SETTING_camera_zoom_max;
 extern float SETTING_camera_zoom_min;
 
 extern const int SETTING_default_entity_drag;
+extern bool SETTING_all_targetting_indicators;
 
 extern bool UI_FPSHUD_enabled;
 

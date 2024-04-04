@@ -317,12 +317,12 @@ bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point poi
 }
 
 
-Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity)
+Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity, bool specify_endpoint, float specified_theta)
 {
 	SDL_Point start;
 	SDL_Point end;
 
-	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end);
+	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end, specify_endpoint, specified_theta);
 	std::vector<SDL_Point> outline_bridge;
 
 	split_bridge_outline(this, start, end, &outline_bridge);
@@ -345,7 +345,7 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	return created;
 }
 
-Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end)
+Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end, bool specify_theta, float specified_theta)
 {
 	int collision_pixel_x = (int)collision_x - (screen_x - (w >> 1));
 	int collision_pixel_y = (int)collision_y - (screen_y - (h >> 1));
@@ -360,16 +360,31 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 		return nullptr;
 
 	Asteroid* created = append_asteroid_to_pool();
-
 	int split_endpoint = 0;
-	while (split_endpoint < outline_point_count
-		&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
-			|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
-		split_endpoint++;
+	if (!specify_theta)
+	{
+		while (split_endpoint < outline_point_count
+			&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
+				|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
+			split_endpoint++;
 
-	if (split_endpoint == outline_point_count)
-		while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
-			split_endpoint = rand() % outline_point_count;
+		if (split_endpoint == outline_point_count)
+			while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
+				split_endpoint = rand() % outline_point_count;
+	}
+	else
+	{
+		// find point first matching theta in spray arc range
+		float spray_arc = 0.05F;
+		while (split_endpoint < outline_point_count
+			&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
+				|| SDL_abs(atan2f(outline[split_endpoint].y - collision_pixel_y, outline[split_endpoint].x - collision_pixel_x) - specified_theta) > spray_arc))
+			split_endpoint++;
+
+		if (split_endpoint == outline_point_count)
+			while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
+				split_endpoint = rand() % outline_point_count;
+	}
 
 	SDL_Log("split command: (%i, %i) to (%i, %i)", collision_pixel_x, collision_pixel_y, outline[split_endpoint].x, outline[split_endpoint].y);
 
@@ -1041,7 +1056,7 @@ void Asteroid::on_collision(Entity* other, int collision_x, int collision_y)
 	{
 		float crit_vel = 0.02F;
 		alert_ship_warning(other, this);
-		if (velocity_x * velocity_x + velocity_y * velocity_y >= crit_vel * crit_vel)
+		if (id == PLAYER_entity_id && velocity_x * velocity_x + velocity_y * velocity_y >= crit_vel * crit_vel)
 		{
 			ship_damage(other, 1);
 		}

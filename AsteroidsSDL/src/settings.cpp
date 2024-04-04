@@ -19,7 +19,8 @@ int SETTING_secondary_mouse_button = SDL_BUTTON_RIGHT;
 float SETTING_camera_zoom_max = 2.0F;
 float SETTING_camera_zoom_min = 0.2F;
 
-bool SETTING_thrust_animation;
+bool SETTING_thrust_animation = true;
+bool SETTING_all_targetting_indicators = false;
 
 const int SETTING_default_entity_drag = 0.0001F;
 
@@ -97,7 +98,7 @@ const float ASTEROID_startspeed_maximum = 0.02F;
 
 const float ASTEROID_split_minimum_velocity = 0.020F;
 
-const float PLAYER_controlspeed_maximum = 0.05F;
+const float PLAYER_controlspeed_maximum = 0.1F;
 const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 255, 255 };
 
 // Ships
