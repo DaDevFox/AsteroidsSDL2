@@ -452,79 +452,7 @@ void ship_check_states(int i)
 			notice_timers[i]->at(id) = 0.0F;
 			return;
 		}
-
-
-		/*const float warn_crit_vel_general = 0.05F;
-		const float warn_crit_vel_player = 0.005F;
-
-		if (vel_x * vel_x + vel_y * vel_y >= warn_crit_vel_general * warn_crit_vel_general
-			|| id == PLAYER_entity_id && desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= warn_crit_vel_player * warn_crit_vel_player)
-		{
-			set_ship_shadowing_chunk(i, other->collision_chunk);
-			ship_warn_timers[i] += SHIP_warning_time;
-		}*/
 	}
-
-
-
-
-	//// check currently warned ships for attack-worthy movements
-	//if (ship_warn_timers[i] > 0.0F)
-	//{
-	//	for (int id : *shadowing_targets[i])
-	//	{
-	//		Entity* other = ((Entity*)entities) + id;
-
-	//		float vel_x = other->velocity_x;
-	//		float vel_y = other->velocity_y;
-	//		float desired_vel_x = other->desired_velocity_x - vel_x;
-	//		float desired_vel_y = other->desired_velocity_y - vel_y;
-
-
-	//	}
-	//}
-
-	// and return if in focus mode (no changes in attention)
-
-	// otherwise check in visible range for new groups to warn (or move on if none available)
-	/*float x = ship->x;
-	float y = ship->y;
-
-	int check_radius = 2;
-
-	int floor_y = (int)y / chunk_size - awareness_radius;
-	int ceil_y = (int)y / chunk_size + awareness_radius;
-	int left_x = (int)x / chunk_size - awareness_radius;
-	int right_x = (int)x / chunk_size + awareness_radius;*/
-	/*for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
-	{
-		for (int curr_x = SDL_max(left_x, 0); curr_x < SDL_min(right_x, GAME_chunkwise_width); curr_x++)
-		{
-			int chunk = curr_x + (GAME_width / chunk_size) * curr_y;
-			if (collision_check_grid[chunk] == nullptr)
-				continue;
-			std::set<int> curr_set = *(collision_check_grid[chunk]);
-			to_check.insert(curr_set.begin(), curr_set.end());
-		}
-	}*/
-
-	/*for (int id : to_check)
-	{
-		if (id == ship->id)
-			continue;
-
-		if ((*shadowing_targets[ship->id]).find(id) != (*shadowing_targets[ship->id]).end())
-			continue;
-
-		Entity* other = ((Entity*)entities) + id;
-
-		float vel_x = other->velocity_x;
-		float vel_y = other->velocity_y;
-		float desired_vel_x = other->desired_velocity_x;
-		float desired_vel_y = other->desired_velocity_y;
-
-
-	}*/
 }
 
 void ship_tick_attack(int i)
@@ -547,7 +475,7 @@ void ship_tick_attack(int i)
 	else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
 	{
 		// slight recoil
-		float recoil_percentage = 0.00001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
+		float recoil_percentage = 0.0001F * (float)(rand() % 11); // maximum recoil of 0.01% of distance 
 		ship->desired_rotation = atan2(diff_y, diff_x);
 
 		ship->desired_velocity_x = -diff_x * recoil_percentage;
@@ -567,11 +495,6 @@ void ship_tick_attack(int i)
 			signed_dist_normalized = 1.0F;
 
 		ship->desired_rotation = attack_theta * signed_dist_normalized + vel_theta * (1.0F - signed_dist_normalized);
-
-		/*ship->velocity_x = 0.0F;
-		ship->velocity_y = 0.0F;
-		ship->desired_velocity_x = ship->velocity_x;
-		ship->desired_velocity_y = ship->velocity_y;*/
 	}
 
 	bool in_range = diff_x * diff_x + diff_y * diff_y <= SHIP_max_attack_range * SHIP_max_attack_range;
