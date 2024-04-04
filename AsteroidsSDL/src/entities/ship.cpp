@@ -13,9 +13,6 @@ SDL_Texture* pip_texture;
 SDL_Texture* laser_beam_texture;
 SDL_Texture* highlighter_beam_texture;
 
-// TODO: attack timeout using warntimer > attacktimer
-// TODO: warning timer per-asteroid system
-// TODO: warning timer ui
 
 void render_fovs(RenderWindow* window);
 void render_notice_bars(RenderWindow* window);
