@@ -44,7 +44,7 @@ void render_player_ui_update(RenderWindow* window)
 	const float change_fadein_time = 0.5F;
 	const float change_fadeaway_time = 2.0F;
 
-	const float min_health_fade = 0.2F;
+	const float min_health_fade = 0.1F;
 
 	static float change_timer = 0.0F;
 
@@ -59,7 +59,7 @@ void render_player_ui_update(RenderWindow* window)
 
 	int healthbar_height = 40;
 	int healthbar_padding = 0;
-	float fake_opacity = min_health_fade;
+	float opacity = min_health_fade;
 
 	SDL_Color sidebar_bg_color = { 80, 80, 80, 255 };
 	SDL_Color healthbar_bg_color = { 100, 100, 100, 255 };
@@ -77,11 +77,11 @@ void render_player_ui_update(RenderWindow* window)
 
 	if (change_timer >= change_timer_max - change_fadein_time)
 	{
-		fake_opacity = min_health_fade +
+		opacity = min_health_fade +
 			(1.0F - (change_timer - (change_timer_max - change_fadein_time)) / change_fadein_time) * (1.0F - min_health_fade);
 	}
 	else if (change_timer >= 0.0F)
-		fake_opacity = 1.0F;
+		opacity = 1.0F;
 
 	if (change_timer <= change_roll_time)
 	{
@@ -95,7 +95,7 @@ void render_player_ui_update(RenderWindow* window)
 
 		if (change_timer >= -change_fadeaway_time)
 		{
-			fake_opacity = 1.0F + (change_timer / change_fadeaway_time) * (1.0F - min_health_fade);
+			opacity = 1.0F + (change_timer / change_fadeaway_time) * (1.0F - min_health_fade);
 		}
 	}
 
@@ -109,8 +109,8 @@ void render_player_ui_update(RenderWindow* window)
 		if (theta <= 2 * PI * health_progress)
 			color = healthbar_color;
 
-		//color = { (unsigned char)((float)color.r * fake_opacity), (unsigned char)((float)color.g * fake_opacity), (unsigned char)((float)color.b * fake_opacity), 255 };
-		window->render_rect_alphamod(player->x - (player->w >> 1) + player->center_x + player_radius * cosf(theta), player->y - (player->h >> 1) + player->center_y + player_radius * sinf(theta), 1.0F, 1.0F, color, (int)(fake_opacity * 255.0F));
+		//color = { (unsigned char)((float)color.r * opacity), (unsigned char)((float)color.g * opacity), (unsigned char)((float)color.b * opacity), 255 };
+		window->render_rect_alphamod(player->x - (player->w >> 1) + player->center_x + player_radius * cosf(theta), player->y - (player->h >> 1) + player->center_y + player_radius * sinf(theta), 1.0F, 1.0F, color, (int)(opacity * 255.0F));
 	}
 
 

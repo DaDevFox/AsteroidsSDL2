@@ -655,96 +655,165 @@ void render_notice_bars(RenderWindow* window)
 {
 	std::map<int, float> accumulated;
 
-	for (std::map<int, float>* ptr : notice_timers)
+	if (SETTING_all_targetting_indicators)
 	{
-		for (auto iter = ptr->begin(); iter != ptr->end(); iter++)
+		for (std::map<int, float>* ptr : notice_timers)
 		{
-			if (accumulated.find((*iter).first) != accumulated.end())
+			for (auto iter = ptr->begin(); iter != ptr->end(); iter++)
 			{
-				if ((*iter).second > accumulated[((*iter).first)])
-					accumulated[((*iter).first)] = (*iter).second;
+				if (accumulated.find((*iter).first) != accumulated.end())
+				{
+					if ((*iter).second > accumulated[((*iter).first)])
+						accumulated[((*iter).first)] = (*iter).second;
+					continue;
+				}
+
+				accumulated.insert(*iter);
+			}
+		}
+
+		SDL_Color color_bg = { 100, 100, 100, 60 };
+
+		SDL_Color color_good = { 255, 255, 255, 255 };
+		SDL_Color color_warned = { 255, 255, 0, 255 };
+		SDL_Color color_attacking = { 255, 0, 0, 255 };
+
+		for (std::pair<int, float> pair : accumulated)
+		{
+			if (pair.second <= 0.0F)
 				continue;
-			}
 
-			accumulated.insert(*iter);
-		}
-	}
+			if (!SETTING_all_targetting_indicators && pair.first != PLAYER_entity_id)
+				continue;
 
-	SDL_Color color_bg = { 100, 100, 100, 60 };
+			// render notices
+			Entity* entity = ((Entity*)entities + pair.first);
+			SDL_Color color;
+			float progress;
 
-	SDL_Color color_good = { 255, 255, 255, 255 };
-	SDL_Color color_warned = { 255, 255, 0, 255 };
-	SDL_Color color_attacking = { 255, 0, 0, 255 };
-
-	for (std::pair<int, float> pair : accumulated)
-	{
-		if (pair.second <= 0.0F)
-			continue;
-
-		if (!SETTING_all_targetting_indicators && pair.first != PLAYER_entity_id)
-			continue;
-
-		// render notices
-		Entity* entity = ((Entity*)entities + pair.first);
-		SDL_Color color;
-		float progress;
-
-		bool* warning_ship = new bool[GAME_ship_count];
-		bool warned = false;
-		for (int i = 0; i < GAME_ship_count; i++)
-		{
-			// search for living, warning ships
-			if (shadowing_targets[i]->find(pair.first) != shadowing_targets[i]->end() && ship_warn_timers[i] >= 0.0F && ship_healths[i] > 0)
-			{
-				warning_ship[i] = true;
-				warned = true;
-			}
-			else
-				warning_ship[i] = false;
-		}
-		if (warned)
-		{
-			progress = SDL_min(pair.second / notice_for_auto_attack, 1.0F);
-			color = SDL_Color{ (unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
-			(unsigned char)((float)color_warned.g * (1.0F - progress) + (float)color_attacking.g * progress),
-			(unsigned char)((float)color_warned.b * (1.0F - progress) + (float)color_attacking.b * progress),
-			255 };
-
-
+			bool* warning_ship = new bool[GAME_ship_count];
+			bool warned = false;
 			for (int i = 0; i < GAME_ship_count; i++)
 			{
-				if (ship_attack_timers[i] >= SHIP_attack_cooldown_time && ship_healths[i] > 0)
-					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, { 255, 0, 0, 255 });
-				else if (warning_ship[i])
-					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
+				// search for living, warning ships
+				if (shadowing_targets[i]->find(pair.first) != shadowing_targets[i]->end() && ship_warn_timers[i] >= 0.0F && ship_healths[i] > 0)
+				{
+					warning_ship[i] = true;
+					warned = true;
+				}
+				else
+					warning_ship[i] = false;
 			}
+			if (warned)
+			{
+				progress = SDL_min(pair.second / notice_for_auto_attack, 1.0F);
+				color = SDL_Color{ (unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
+				(unsigned char)((float)color_warned.g * (1.0F - progress) + (float)color_attacking.g * progress),
+				(unsigned char)((float)color_warned.b * (1.0F - progress) + (float)color_attacking.b * progress),
+				255 };
+
+
+				for (int i = 0; i < GAME_ship_count; i++)
+				{
+					if (ship_attack_timers[i] >= SHIP_attack_cooldown_time && ship_healths[i] > 0)
+						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, { 255, 0, 0, 255 });
+					else if (warning_ship[i])
+						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
+				}
+			}
+			else
+			{
+				progress = SDL_min(pair.second / notice_for_auto_warn, 1.0F);
+				color = SDL_Color{ (unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
+				(unsigned char)((float)color_good.g * (1.0F - progress) + (float)color_warned.g * progress),
+				(unsigned char)((float)color_good.b * (1.0F - progress) + (float)color_warned.b * progress),
+				255 };
+			}
+
+			delete[] warning_ship;
+
+			int bar_screen_width = 30;
+			int bar_screen_height = 3;
+			float world_x_offset = 0.0F, world_y_offset = ((float)entity->outline_point_count / (2 * PI)) - 0.3F; // rough radius approxomation
+			int screen_origin_x, screen_origin_y;
+
+			window->camera.world_to_screen(entity->x + world_x_offset, entity->y - (entity->h >> 1) + world_y_offset, &screen_origin_x, &screen_origin_y);
+
+
+
+			window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), bar_screen_width, bar_screen_height, color_bg);
+			window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), (int)(progress * (float)bar_screen_width), bar_screen_height, color);
 		}
-		else
+	}
+	else
+	{
+		SDL_Color color_bg = { 100, 100, 100, 60 };
+
+		SDL_Color color_good = { 255, 255, 255, 255 };
+		SDL_Color color_warned = { 255, 255, 0, 255 };
+		SDL_Color color_attacking = { 255, 0, 0, 255 };
+
+		int ship_id = 0;
+		for (std::map<int, float>* ptr : notice_timers)
 		{
-			progress = SDL_min(pair.second / notice_for_auto_warn, 1.0F);
-			color = SDL_Color{ (unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
-			(unsigned char)((float)color_good.g * (1.0F - progress) + (float)color_warned.g * progress),
-			(unsigned char)((float)color_good.b * (1.0F - progress) + (float)color_warned.b * progress),
-			255 };
+			for (auto iter = ptr->begin(); iter != ptr->end(); iter++)
+			{
+				std::pair<int, float> pair = *iter;
+
+				if (pair.second <= 0.0F)
+					continue;
+
+				if (pair.first != PLAYER_entity_id)
+					continue;
+
+				// render notice
+				Entity* player = ((Entity*)entities + PLAYER_entity_id);
+				Entity* ship = ((Entity*)entities + ship_id);
+				SDL_Color color;
+				float progress;
+
+				bool warned = false;
+				// check if living, warning ship focuses player
+				if (shadowing_targets[ship_id]->find(PLAYER_entity_id) != shadowing_targets[ship_id]->end() && ship_warn_timers[ship_id] > 0.0F && ship_healths[ship_id] > 0)
+					warned = true;
+
+				if (warned)
+				{
+					progress = SDL_min(pair.second / notice_for_auto_attack, 1.0F);
+					color = SDL_Color{ (unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
+					(unsigned char)((float)color_warned.g * (1.0F - progress) + (float)color_attacking.g * progress),
+					(unsigned char)((float)color_warned.b * (1.0F - progress) + (float)color_attacking.b * progress),
+					255 };
+
+
+					if (ship_attack_timers[ship_id] >= SHIP_attack_cooldown_time && ship_healths[ship_id] > 0)
+						render_dotted_line(window, ship, player, 0.0F, { 255, 0, 0, 255 });
+					else
+						render_dotted_line(window, ship, player, 10.0F + (float)(player->outline_point_count / (2.0F * PI)), { 255, 255, 0, 255 });
+
+				}
+				else
+				{
+					progress = SDL_min(pair.second / notice_for_auto_warn, 1.0F);
+					color = SDL_Color{ (unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
+					(unsigned char)((float)color_good.g * (1.0F - progress) + (float)color_warned.g * progress),
+					(unsigned char)((float)color_good.b * (1.0F - progress) + (float)color_warned.b * progress),
+					255 };
+				}
+
+				int bar_screen_width = 30;
+				int bar_screen_height = 5;
+				float world_x_offset = 0.0F;
+				float world_y_offset = 5.0F; // rough radius approxomation
+				int screen_origin_x, screen_origin_y;
+
+				window->camera.world_to_screen(ship->x + world_x_offset, ship->y + (ship->h >> 1) + world_y_offset, &screen_origin_x, &screen_origin_y);
+
+				window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), bar_screen_width, bar_screen_height, color_bg);
+				window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), (int)(progress * (float)bar_screen_width), bar_screen_height, color);
+			}
+			ship_id++;
 		}
-
-		delete[] warning_ship;
-
-		int bar_screen_width = 30;
-		int bar_screen_height = 3;
-		float world_x_offset = 0.0F, world_y_offset = ((float)entity->outline_point_count / (2 * PI)) - 0.3F; // rough radius approxomation
-		int screen_origin_x, screen_origin_y;
-
-		window->camera.world_to_screen(entity->x + world_x_offset, entity->y - (entity->h >> 1) + world_y_offset, &screen_origin_x, &screen_origin_y);
-
-
-
-		window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), bar_screen_width, bar_screen_height, color_bg);
-		window->render_rect(screen_origin_x - (bar_screen_width >> 1), screen_origin_y - (bar_screen_height >> 1), (int)(progress * (float)bar_screen_width), bar_screen_height, color);
-
-		//char arr[32] = "";
-		//sprintf_s(arr, "%5.3f", pair.second);
-		//window->render_centered_world(entity->x, entity->y - 100, arr, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 }
 
@@ -921,10 +990,13 @@ void ships_render_update(RenderWindow* window)
 
 
 		}
-		else if (ship_warn_timers[i] > 0.0F)
+		else if (ship_warn_timers[i] > 0.0F && ship_healths[i] > 0)
 		{
 			for (int id : *shadowing_targets[i])
 			{
+				if (notice_timers[i]->find(id) == notice_timers[i]->end() || notice_timers[i]->at(id) <= 0.0F)
+					continue;
+
 				Entity* other = (Entity*)entities + id;
 				if (other->id != PLAYER_entity_id)
 					render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
