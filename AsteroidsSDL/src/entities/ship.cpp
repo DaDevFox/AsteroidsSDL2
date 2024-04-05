@@ -713,7 +713,7 @@ void render_notice_bars(RenderWindow* window)
 
 			for (int i = 0; i < GAME_ship_count; i++)
 			{
-				if (ship_attack_timers[i] > 0.0F && ship_healths[i] > 0)
+				if (ship_attack_timers[i] >= SHIP_attack_cooldown_time && ship_healths[i] > 0)
 					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, { 255, 0, 0, 255 });
 				else if (warning_ship[i])
 					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
