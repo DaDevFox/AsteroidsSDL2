@@ -20,7 +20,9 @@ bool run_ship_avoidance(Entity* ship, float multiplier, float* vel_x, float* vel
 void generate_ship_outline(Entity* ship);
 void search_for_targets();
 Entity* check_overlap(float x, float y, int ignore_id);
+
 void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, const SDL_Color& color);
+void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius = -1.0F, const SDL_Color& color = { 255, 255, 255, 255 });
 
 void ship_check_states(int i);
 
@@ -428,9 +430,6 @@ void ship_check_states(int i)
 		else if (vel_x * vel_x + vel_y * vel_y >= crit_vel_notice * crit_vel_notice)
 			notice_timers[i]->at(id) = SDL_min(notice_timers[i]->at(id) + (delta_time / 1000.0F) * vel_to_notice_scaling, notice_for_auto_attack);
 
-		if ((*shadowing_targets[ship->id]).find(id) != (*shadowing_targets[ship->id]).end())
-			continue;
-
 
 		if (notice_timers[i]->at(id) >= notice_for_auto_warn && ship_warn_timers[i] <= 0.0F)
 		{
@@ -440,11 +439,15 @@ void ship_check_states(int i)
 			continue;
 		}
 
+
+		if ((*shadowing_targets[ship->id]).find(id) == (*shadowing_targets[ship->id]).end())
+			continue;
+
 		// check pursued attack targets if in range
 		const float attack_crit_vel_general = 0.1F;
 		const float attack_crit_vel_player = 0.05F;
 
-		if (ship_warn_timers[i] > 0.0F && notice_timers[i]->at(id) >= notice_for_auto_attack || (DEBUG_mode && DEBUG_ships_fire_at_will))
+		if (notice_timers[i]->at(id) + 2.0F >= notice_for_auto_attack || (DEBUG_mode && DEBUG_ships_fire_at_will))
 		{
 			ship_warn_timers[i] = SHIP_warning_time;
 			ship_targets[ship->id] = id;
@@ -460,8 +463,8 @@ void ship_tick_attack(int i)
 	Entity* ship = (Entity*)entities + i;
 	Entity* target = ((Entity*)entities) + ship_targets[i];
 
-	float diff_x = target->x - ship->x;
-	float diff_y = target->y - ship->y;
+	float diff_x = target->x - (target->w >> 1) + target->center_x - ship->x;
+	float diff_y = target->y - (target->h >> 1) + target->center_y - ship->y;
 
 	// cooling down
 	if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
@@ -485,7 +488,7 @@ void ship_tick_attack(int i)
 	else
 	{
 		// rotate towards target; stay in place
-		float attack_theta = atan2(target->y - ship->y, target->x - ship->x);
+		float attack_theta = atan2(target->y - (target->h >> 1) + target->center_y - ship->y, target->x - (target->w >> 1) + target->center_x - ship->x);
 		float vel_theta = atan2(ship->velocity_y, ship->velocity_x);
 
 		float signed_dist_normalized = diff_x * diff_x + diff_y * diff_y - SHIP_max_attack_range * SHIP_max_attack_range;
@@ -513,7 +516,7 @@ void ship_tick_attack(int i)
 			SDL_Point hit;
 			Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
 
-			if (effected == NULL)
+			if (effected == NULL || effected->id < GAME_ship_count)
 				return;
 
 			SDL_Log("hit something; splitting; %i", effected->id);
@@ -728,7 +731,7 @@ void render_notice_bars(RenderWindow* window)
 		delete[] warning_ship;
 
 		int bar_screen_width = 30;
-		int bar_screen_height = 5;
+		int bar_screen_height = 3;
 		float world_x_offset = 0.0F, world_y_offset = ((float)entity->outline_point_count / (2 * PI)) - 0.3F; // rough radius approxomation
 		int screen_origin_x, screen_origin_y;
 
@@ -745,10 +748,56 @@ void render_notice_bars(RenderWindow* window)
 	}
 }
 
+
+void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius, const SDL_Color& color)
+{
+	if (radius == -1.0F)
+		radius = asteroid->outline_point_count / (2 * PI);
+
+	int line_ammo = 5;
+	int line_rest = -10;
+
+	int curr_line = line_rest;
+
+	float resolution = 0.1F;
+	int origin_x = asteroid->x - (asteroid->w >> 1) + asteroid->center_x, origin_y = asteroid->y - (asteroid->h >> 1) + asteroid->center_y;
+	int x, y;
+	int x_prev = 0, y_prev = 0;
+	for (float theta = 0; theta <= 2 * PI; theta += resolution)
+	{
+		x = (int)(cosf(theta) * radius) + origin_x;
+		y = (int)(sinf(theta) * radius) + origin_y;
+
+		if (curr_line > 0)
+			window->render_rect((float)x, (float)y, 1.0F, 1.0F, color);
+
+		/*if (x_prev == x && y_prev == y)
+			continue;*/
+
+		if (curr_line < 0)
+		{
+			curr_line++;
+
+			if (curr_line == 0)
+				curr_line = line_ammo;
+		}
+		else if (curr_line > 0)
+		{
+			curr_line--;
+
+			if (curr_line == 0)
+				curr_line = line_rest;
+		}
+
+		x_prev = x;
+		y_prev = y;
+	}
+}
+
 void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, const SDL_Color& color)
 {
-	float diff_y = asteroid->y - ship->y;
-	float diff_x = asteroid->x - ship->x;
+	float diff_y = asteroid->y - (asteroid->h >> 1) + asteroid->center_y - ship->y;
+	float diff_x = asteroid->x - (asteroid->w >> 1) + asteroid->center_x - ship->x;
 	float dist = sqrtf(diff_y * diff_y + diff_x * diff_x);
 
 	float theta = atan2(diff_y, diff_x);
@@ -876,7 +925,10 @@ void ships_render_update(RenderWindow* window)
 			for (int id : *shadowing_targets[i])
 			{
 				Entity* other = (Entity*)entities + id;
-				render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
+				if (other->id != PLAYER_entity_id)
+					render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
+				else
+					render_dotted_circle(window, other, 10.0F + (float)other->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
 			}
 		}
 		//else

@@ -50,6 +50,8 @@ public:
 	void render_rect_outline(float world_x, float world_y, float world_w, float world_h, const SDL_Color& color);
 	void render_rect(float world_x, float world_y, float world_w, float world_h, SDL_Color color);
 	void render_rect(int screen_x, int screen_y, int screen_w, int screen_h, SDL_Color color);
+	void render_rect_alphamod(float world_x, float world_y, float world_w, float world_h, SDL_Color color, Uint8 alpha);
+
 
 	/// <summary>
 	/// Changes the current RenderDrawColor and draws a pixel at the given x and y pixel coordinate

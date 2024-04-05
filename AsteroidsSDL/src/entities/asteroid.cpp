@@ -252,7 +252,8 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 		for (int i = 0; i < asteroid->outline_point_count; i++)
 			start = start + asteroid->outline[i];
 		start = start / asteroid->outline_point_count;
-
+		asteroid->center_x = start.x;
+		asteroid->center_y = start.y;
 
 		// FLOOD FILL TO ADD INTERIOR POINTS
 		std::set<SDL_Point> open_set;

@@ -36,34 +36,95 @@ void debug_update(SDL_Keycode sym)
 void render_player_ui_update(RenderWindow* window);
 void render_player_ui_update(RenderWindow* window)
 {
+	Entity* player = (Entity*)entities + PLAYER_entity_id;
+	float player_radius = player->outline_point_count / (2 * PI) + 0.2F;
+
+	const float change_timer_max = 3.0F;
+	const float change_roll_time = 0.5F;
+	const float change_fadein_time = 0.5F;
+	const float change_fadeaway_time = 2.0F;
+
+	const float min_health_fade = 0.2F;
+
+	static float change_timer = 0.0F;
+
+	static float recent_health_progress = 1.0F;
+	static float health_progress_previous = 1.0F;
+	static float recent_health_progress_max = 1.0F;
+	float health_progress = 1.0F;
+
 	int sidebar_width = 200;
 	int sidebar_height = -1;
 	int titletext_height = 20;
 
 	int healthbar_height = 40;
 	int healthbar_padding = 0;
+	float fake_opacity = min_health_fade;
 
 	SDL_Color sidebar_bg_color = { 80, 80, 80, 255 };
 	SDL_Color healthbar_bg_color = { 100, 100, 100, 255 };
 	SDL_Color healthbar_color = { 0, 255, 0, 255 };
+	SDL_Color recent_healthbar_color = { 255, 255, 255, 255 };
 
-	Entity* player = (Entity*)entities + PLAYER_entity_id;
-	float health_normalized = (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
+	float clamp = 0.01F;
+	health_progress = (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
+	if (SDL_fabsf(health_progress_previous - health_progress) >= clamp)
+	{
+		change_timer = change_timer_max;
+		recent_health_progress_max = SDL_max(health_progress_previous, recent_health_progress_max);
+		health_progress_previous = health_progress;
+	}
 
-	if (health_normalized <= 0.3F)
-		healthbar_color = { 255, 255, 0, 255 };
-	if (health_normalized <= 0.1F)
-		healthbar_color = { 255, 0, 0, 255 };
+	if (change_timer >= change_timer_max - change_fadein_time)
+	{
+		fake_opacity = min_health_fade +
+			(1.0F - (change_timer - (change_timer_max - change_fadein_time)) / change_fadein_time) * (1.0F - min_health_fade);
+	}
+	else if (change_timer >= 0.0F)
+		fake_opacity = 1.0F;
+
+	if (change_timer <= change_roll_time)
+	{
+		float normalized_progress = change_timer / change_roll_time;
+		recent_health_progress = health_progress + 2.0F * (1.0F - (1.0F / (1.0F + normalized_progress))) * (recent_health_progress_max - health_progress);
+	}
+	if (change_timer <= 0.0F)
+	{
+		recent_health_progress = health_progress;
+		recent_health_progress_max = health_progress;
+
+		if (change_timer >= -change_fadeaway_time)
+		{
+			fake_opacity = 1.0F + (change_timer / change_fadeaway_time) * (1.0F - min_health_fade);
+		}
+	}
+
+
+
+	for (float theta = 0.0F; theta < 2 * PI; theta += 0.025F)
+	{
+		SDL_Color color = healthbar_bg_color;
+		if (theta <= 2 * PI * recent_health_progress)
+			color = recent_healthbar_color;
+		if (theta <= 2 * PI * health_progress)
+			color = healthbar_color;
+
+		//color = { (unsigned char)((float)color.r * fake_opacity), (unsigned char)((float)color.g * fake_opacity), (unsigned char)((float)color.b * fake_opacity), 255 };
+		window->render_rect_alphamod(player->x - (player->w >> 1) + player->center_x + player_radius * cosf(theta), player->y - (player->h >> 1) + player->center_y + player_radius * sinf(theta), 1.0F, 1.0F, color, (int)(fake_opacity * 255.0F));
+
+	}
+
 
 	// sidebar
-	window->render_rect(WINDOW_width - sidebar_width, 0, sidebar_width, sidebar_height == -1 ? WINDOW_height : sidebar_height, sidebar_bg_color);
+	//window->render_rect(WINDOW_width - sidebar_width, 0, sidebar_width, sidebar_height == -1 ? WINDOW_height : sidebar_height, sidebar_bg_color);
 
 	// healthbar title
-	window->render_centered_screen(WINDOW_width - (sidebar_width >> 1), titletext_height >> 1, "Health", encode_sans_bold, healthbar_color);
+	//window->render_centered_screen(WINDOW_width - (sidebar_width >> 1), titletext_height >> 1, "Health", encode_sans_bold, healthbar_color);
 
-	// healthbar bg + fill
-	window->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, sidebar_width - 2 * healthbar_padding, healthbar_height, healthbar_bg_color);
-	window->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, (int)(health_normalized * (float)(sidebar_width - 2 * healthbar_padding)), healthbar_height, healthbar_color);
+	//// healthbar bg + fill
+	//wi/*ndow->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, sidebar_width - 2 * healthbar_padding, healthbar_height, healthbar_bg_color);
+	//wi*/ndow->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, (int)(health_normalized * (float)(sidebar_width - 2 * healthbar_padding)), healthbar_height, healthbar_color);
+	change_timer -= unscaled_delta_time / 1000.0F;
 }
 
 void render_debug_update(RenderWindow* window);
