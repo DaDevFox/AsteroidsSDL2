@@ -2,6 +2,14 @@
 #include "../entities/Entity.h"
 #include "../entities/ship.h"
 
+const SDL_Color health_low = { 255, 0, 0, 255 };
+const float health_gradient_reach = 0.5F;
+
+const float health_flashing_cutoff = 0.5F;
+const float health_flashing_amplitude = 0.4F;
+const int health_flash_times = 4;
+const float health_flash_duration = 4;
+
 void debug_update(SDL_Keycode sym);
 void debug_update(SDL_Keycode sym)
 {
@@ -100,7 +108,20 @@ void render_player_ui_update(RenderWindow* window)
 		}
 	}
 
+	if (change_timer >= change_timer_max - health_flash_duration && health_progress <= health_flashing_cutoff)
+	{
+		float sin_normalized = sinf(2 * PI * ((change_timer_max - change_timer) / (health_flash_duration / health_flash_times))) * 0.5F + 0.5F;
+		opacity *= (1.0F - health_flashing_amplitude) + (health_flashing_amplitude * sin_normalized);
+	}
 
+	if (health_progress <= health_gradient_reach)
+	{
+		float value_normalized = (health_progress / health_gradient_reach);
+		healthbar_color = SDL_Color{ (unsigned char)(healthbar_color.r * value_normalized + (1.0F - value_normalized) * health_low.r),
+		(unsigned char)(healthbar_color.g * value_normalized + (1.0F - value_normalized) * health_low.g),
+		(unsigned char)(healthbar_color.b * value_normalized + (1.0F - value_normalized) * health_low.b),
+		255 };
+	}
 
 	for (float theta = 0.0F; theta < 2 * PI; theta += 0.025F)
 	{
