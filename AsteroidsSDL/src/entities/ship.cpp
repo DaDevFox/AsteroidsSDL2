@@ -760,7 +760,7 @@ void render_notice_bars(RenderWindow* window)
 			{
 				std::pair<int, float> pair = *iter;
 
-				if (pair.second <= 0.0F)
+				if (pair.second <= 0.0F && shadowing_targets[ship_id]->find(PLAYER_entity_id) == shadowing_targets[ship_id]->end())
 					continue;
 
 				if (pair.first != PLAYER_entity_id)
@@ -994,8 +994,8 @@ void ships_render_update(RenderWindow* window)
 		{
 			for (int id : *shadowing_targets[i])
 			{
-				if (notice_timers[i]->find(id) == notice_timers[i]->end() || notice_timers[i]->at(id) <= 0.0F)
-					continue;
+				//if (notice_timers[i]->find(id) == notice_timers[i]->end() || notice_timers[i]->at(id) <= 0.0F)
+				//	continue;
 
 				Entity* other = (Entity*)entities + id;
 				if (other->id != PLAYER_entity_id)
