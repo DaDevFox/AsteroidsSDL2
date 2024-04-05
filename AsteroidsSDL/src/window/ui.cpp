@@ -170,6 +170,7 @@ void render_game_ui_update(RenderWindow* window)
 	{
 		GAME_game_over = game_over;
 		INPUT_enabled = false;
+		time_scaling = 0.0F;
 
 		game_end_timer = max_end_timer;
 	}
