@@ -17,6 +17,10 @@ const int chunk_size = ASTEROID_maximum_radius;
 const int GAME_chunkwise_height = GAME_height / chunk_size;
 const int GAME_chunkwise_width = GAME_width / chunk_size;
 const int GAME_min_outline_point_count = 100;
+
+bool GAME_game_over = false;
+bool INPUT_enabled = true;
+
 int PLAYER_initial_outline_point_count = 0;
 
 int WINDOW_height;
@@ -160,7 +164,6 @@ void update()
 
 void game_loop()
 {
-	//printf("%i", ((Entity*)entities)[32].outline_point_count);
 	while (SDL_PollEvent(&running_event))
 	{
 		if (running_event.type == SDL_QUIT)
@@ -200,4 +203,10 @@ int main()
 	game_cleanup();
 
 	return 0;
+}
+
+float player_health()
+{
+	Entity* player = (Entity*)entities + PLAYER_entity_id;
+	return (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
 }

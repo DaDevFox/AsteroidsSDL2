@@ -8,6 +8,8 @@
 #include <time.h>
 #include "thrust_renderer.h"
 
+// TODO: for square: bridge creep (refill each time) while outline point count is >= MAX - original outline_point_ocunt
+
 SDL_Texture* ship_texture;
 SDL_Texture* pip_texture;
 SDL_Texture* laser_beam_texture;

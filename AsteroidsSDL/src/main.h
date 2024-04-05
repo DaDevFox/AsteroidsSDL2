@@ -10,6 +10,9 @@ extern const int GAME_min_outline_point_count;
 extern const int PLAYER_asteroid_id;
 extern const int PLAYER_entity_id;
 
+extern bool GAME_game_over;
+extern bool INPUT_enabled;
+
 extern int GAME_width;
 extern int GAME_height;
 extern SDL_Rect GAME_window_rect;
@@ -31,3 +34,5 @@ extern float delta_time;
 extern float time_scaling;
 
 extern bool game_running;
+
+float player_health();

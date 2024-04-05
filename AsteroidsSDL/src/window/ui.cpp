@@ -1,5 +1,6 @@
 #include "../main.h"
 #include "../entities/Entity.h"
+#include "../entities/ship.h"
 
 void debug_update(SDL_Keycode sym);
 void debug_update(SDL_Keycode sym)
@@ -67,7 +68,7 @@ void render_player_ui_update(RenderWindow* window)
 	SDL_Color recent_healthbar_color = { 255, 255, 255, 255 };
 
 	float clamp = 0.01F;
-	health_progress = (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
+	health_progress = player_health();
 	if (SDL_fabsf(health_progress_previous - health_progress) >= clamp)
 	{
 		change_timer = change_timer_max;
@@ -124,6 +125,73 @@ void render_player_ui_update(RenderWindow* window)
 	//wi/*ndow->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, sidebar_width - 2 * healthbar_padding, healthbar_height, healthbar_bg_color);
 	//wi*/ndow->render_rect(WINDOW_width - sidebar_width + healthbar_padding, titletext_height, (int)(health_normalized * (float)(sidebar_width - 2 * healthbar_padding)), healthbar_height, healthbar_color);
 	change_timer -= unscaled_delta_time / 1000.0F;
+}
+void render_game_ui_update(RenderWindow* window);
+void render_game_ui_update(RenderWindow* window)
+{
+	bool player_victor = false;
+	bool game_over = true;
+	for (int i = 0; i < GAME_ship_count; i++)
+		if (get_health((Entity*)entities + i) > 0)
+			game_over = false;
+
+	if (game_over)
+		player_victor = true;
+	else if (player_health() <= 0.0F)
+		game_over = true;
+
+	if (!game_over)
+		return;
+
+	static float game_end_timer = 0.0F;
+	const float max_end_timer = 2.0F;
+
+	const float end_screen_fadein_time = 2.0F;
+
+	const float end_screen_title_fadein_time = 2.0F;
+	const float end_screen_title_fadein_delay = 0.0F;
+
+	const float end_screen_subtitle_fadein_time = 2.0F;
+	const float end_screen_subtitle_fadein_delay = 0.0F;
+
+	const float end_screen_body_fadein_time = 2.0F;
+	const float end_screen_body_fadein_delay = 0.0F;
+
+
+	const SDL_Color text_color_subtitle = { 255, 255, 255, 255 };
+	const SDL_Color text_color_body = { 230, 230, 230, 255 };
+	const SDL_Color text_color_title_victory = { 0, 255, 0, 255 };
+	const SDL_Color text_color_title_loss = { 255, 0, 0, 255 };
+
+	const char* title = player_victor ? "VICTORY" : "DEFEAT";
+	const char* subtitle = "";
+
+	if (game_over != GAME_game_over)
+	{
+		GAME_game_over = game_over;
+		INPUT_enabled = false;
+
+		game_end_timer = max_end_timer;
+	}
+
+	if (max_end_timer - game_end_timer <= end_screen_body_fadein_time)
+	{
+		float progress = 1.0F - end_screen_body_fadein_time / (max_end_timer - game_end_timer);
+		window->render_rect_alphamod(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 }, (int)(progress * 255.0F));
+	}
+	else
+		window->render_rect(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 });
+
+	int title_offset = 150;
+	if ((max_end_timer - end_screen_title_fadein_delay) - game_end_timer >= 0.0F && (max_end_timer - end_screen_title_fadein_delay) - game_end_timer <= end_screen_title_fadein_time)
+	{
+		float progress = ((max_end_timer - end_screen_title_fadein_delay) - game_end_timer) / end_screen_title_fadein_time;
+		window->render_centered_screen(WINDOW_width / 2, title_offset, title, encode_sans_bold, player_victor ? text_color_title_victory : text_color_title_loss);
+	}
+	else if (game_end_timer <= max_end_timer - end_screen_title_fadein_delay)
+		window->render_centered_screen(WINDOW_width / 2, title_offset, title, encode_sans_bold, player_victor ? text_color_title_victory : text_color_title_loss);
+	if (game_end_timer > 0.0F)
+		game_end_timer -= unscaled_delta_time / 1000.0F;
 }
 
 void render_debug_update(RenderWindow* window);
@@ -220,7 +288,7 @@ void UI::input_update(SDL_Event* running_event)
 
 		debug_update(sym);
 
-		if (sym == KEY_pause)
+		if (sym == KEY_pause && INPUT_enabled)
 		{
 			time_scaling = time_scaling > 0.0F ? 0.0F : 1.0F;
 		}
@@ -231,6 +299,7 @@ void UI::render_update(RenderWindow* window)
 {
 	render_debug_update(window);
 	render_player_ui_update(window);
+	render_game_ui_update(window);
 }
 
 

@@ -223,6 +223,23 @@ void RenderWindow::render_rect_alphamod(float world_x, float world_y, float worl
 	}
 }
 
+void RenderWindow::render_rect_alphamod(int screen_x, int screen_y, int screen_w, int screen_h, SDL_Color color, Uint8 alpha)
+{
+	SDL_Rect rect{
+		screen_x,
+		screen_y,
+		screen_w,
+		screen_h
+	};
+
+	// BROKNE
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+	SDL_RenderFillRect(renderer, &rect);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+
 void RenderWindow::render_point(float x, float y, SDL_Color color)
 {
 	int screen_x;
