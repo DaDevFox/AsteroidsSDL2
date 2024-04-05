@@ -111,7 +111,6 @@ void render_player_ui_update(RenderWindow* window)
 
 		//color = { (unsigned char)((float)color.r * fake_opacity), (unsigned char)((float)color.g * fake_opacity), (unsigned char)((float)color.b * fake_opacity), 255 };
 		window->render_rect_alphamod(player->x - (player->w >> 1) + player->center_x + player_radius * cosf(theta), player->y - (player->h >> 1) + player->center_y + player_radius * sinf(theta), 1.0F, 1.0F, color, (int)(fake_opacity * 255.0F));
-
 	}
 
 

@@ -21,7 +21,7 @@ void generate_ship_outline(Entity* ship);
 void search_for_targets();
 Entity* check_overlap(float x, float y, int ignore_id);
 
-void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, const SDL_Color& color);
+void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, float signed_end = 0.0F, const SDL_Color& color = { 255, 255, 255, 255 });
 void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius = -1.0F, const SDL_Color& color = { 255, 255, 255, 255 });
 
 void ship_check_states(int i);
@@ -714,9 +714,9 @@ void render_notice_bars(RenderWindow* window)
 			for (int i = 0; i < GAME_ship_count; i++)
 			{
 				if (ship_attack_timers[i] > 0.0F && ship_healths[i] > 0)
-					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], { 255, 0, 0, 255 });
+					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, { 255, 0, 0, 255 });
 				else if (warning_ship[i])
-					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, { 255, 255, 0, 255 });
+					render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
 			}
 		}
 		else
@@ -759,8 +759,10 @@ void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius, 
 
 	int curr_line = line_rest;
 
-	float resolution = 0.1F;
-	int origin_x = asteroid->x - (asteroid->w >> 1) + asteroid->center_x, origin_y = asteroid->y - (asteroid->h >> 1) + asteroid->center_y;
+	float resolution = 0.03F;
+	int origin_x = asteroid->x - (asteroid->w >> 1) + asteroid->center_x;
+	int origin_y = asteroid->y - (asteroid->h >> 1) + asteroid->center_y;
+
 	int x, y;
 	int x_prev = 0, y_prev = 0;
 	for (float theta = 0; theta <= 2 * PI; theta += resolution)
@@ -794,16 +796,15 @@ void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius, 
 	}
 }
 
-void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, const SDL_Color& color)
+void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, float signed_end, const SDL_Color& color)
 {
 	float diff_y = asteroid->y - (asteroid->h >> 1) + asteroid->center_y - ship->y;
 	float diff_x = asteroid->x - (asteroid->w >> 1) + asteroid->center_x - ship->x;
-	float dist = sqrtf(diff_y * diff_y + diff_x * diff_x);
+	float dist = sqrtf(diff_y * diff_y + diff_x * diff_x) - signed_end;
 
 	float theta = atan2(diff_y, diff_x);
 
 	SDL_Point hit;
-	//raycast(ship->x, ship->y, atan2(diff_y, diff_x), sqrtf(dist), ship->id, &hit);
 
 	int line_ammo = 5;
 	int line_rest = -10;
