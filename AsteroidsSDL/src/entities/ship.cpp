@@ -433,7 +433,7 @@ void ship_check_states(int i)
 			notice_timers[i]->at(id) = SDL_min(notice_timers[i]->at(id) + (delta_time / 1000.0F) * vel_to_notice_scaling, notice_for_auto_attack);
 
 
-		if (notice_timers[i]->at(id) >= notice_for_auto_warn && ship_warn_timers[i] <= 0.0F)
+		if (notice_timers[i]->at(id) >= notice_for_auto_warn && (*shadowing_targets[ship->id]).find(id) == (*shadowing_targets[ship->id]).end())
 		{
 			set_ship_shadowing_chunk(i, other->collision_chunk);
 			ship_warn_timers[i] = SHIP_warning_time;
