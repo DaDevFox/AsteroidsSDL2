@@ -139,6 +139,16 @@ void Entity::init()
 
 }
 
+void Entity::on_collision(Entity* other, int collision_x, int collision_y)
+{
+	if (other->id == PLAYER_entity_id) // other is asteroid
+	{
+		float crit_vel = 0.02F;
+		if (velocity_x * velocity_x + velocity_y * velocity_y >= crit_vel * crit_vel)
+			ship_damage(this, 1);
+	}
+}
+
 void Entity::move()
 {
 	velocity_x = velocity_x + (desired_velocity_x - velocity_x) * delta_time * movement_windup_speed;

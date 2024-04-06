@@ -46,7 +46,7 @@ const SDL_KeyCode KEY_pause = SDLK_p;
 bool UI_FPSHUD_enabled = DEBUG_master;
 
 
-const bool DEBUG_master = false;
+const bool DEBUG_master = true;
 
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_mode = SDLK_u;

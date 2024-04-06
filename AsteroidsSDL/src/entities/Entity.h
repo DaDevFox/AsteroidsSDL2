@@ -78,7 +78,7 @@ public:
 	bool in_bounds(float world_x, float world_y) const;
 	bool in_bounds(Entity other);
 
-	virtual void on_collision(Entity* other, int collision_x, int collision_y) {}
+	virtual void on_collision(Entity* other, int collision_x, int collision_y);
 private:
 	void move();
 	void update_collision_chunk();
