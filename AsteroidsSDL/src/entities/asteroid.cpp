@@ -866,7 +866,7 @@ void asteroids_init()
 	}
 }
 
-static bool clicking = true;
+static bool clicking = false;
 
 void player_input_update(SDL_Event* running_event)
 {

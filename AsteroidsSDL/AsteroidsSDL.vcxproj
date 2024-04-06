@@ -79,6 +79,12 @@
     <IncludePath>D:\SDL\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\SDL\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\SDL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\SDL\lib\x64;$(LibraryPath)</LibraryPath>
+    <PublicIncludeDirectories>
+    </PublicIncludeDirectories>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -135,6 +141,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>"D:\SDL\lib\x64\SDL2.lib"; "D:\SDL\lib\x64\SDL2_image.lib";  "D:\SDL\lib\x64\SDL2_ttf.lib"; $(CoreLibraryDependencies);%(AdditionalDependencies); </AdditionalDependencies>
+      <AssemblyLinkResource>
+      </AssemblyLinkResource>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
