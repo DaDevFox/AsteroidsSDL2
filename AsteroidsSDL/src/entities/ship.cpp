@@ -953,8 +953,8 @@ void ships_render_update(RenderWindow* window)
 			SDL_Point hit;
 			Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
 
-			float diff_x = (effected != NULL ? effected->x : target->x) - ship->x;
-			float diff_y = (effected != NULL ? effected->y : target->y) - ship->y;
+			float diff_x = (effected != NULL ? effected->x - (effected->w >> 1) + effected->center_x : target->x - (target->w >> 1) + target->center_x) - ship->x;
+			float diff_y = (effected != NULL ? effected->y - (effected->h >> 1) + effected->center_y : target->y - (target->h >> 1) + target->center_y) - ship->y;
 
 			int beam_width = base_beam_width;
 			float height = SDL_min(sqrtf(diff_x * diff_x + diff_y * diff_y), SHIP_max_attack_range);
