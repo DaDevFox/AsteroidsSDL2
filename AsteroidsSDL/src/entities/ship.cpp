@@ -471,10 +471,10 @@ void ship_tick_attack(int i)
 	// cooling down
 	if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
 	{
-		/*ship->velocity_x = 0.0F;
+		ship->velocity_x = 0.0F;
 		ship->velocity_y = 0.0F;
 		ship->desired_velocity_x = ship->velocity_x;
-		ship->desired_velocity_y = ship->velocity_y;*/
+		ship->desired_velocity_y = ship->velocity_y;
 	}
 	// currently attacking (animate projectile)
 	else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
@@ -931,6 +931,14 @@ void ships_render_update(RenderWindow* window)
 	float variance_percentage = 0.6F;
 	int blips = 2;
 
+	float ship_opacity = 1.0F;
+	const float ship_cooldown_fade_variance = 0.4F;
+	const int ship_cooldown_fade_blips = 4;
+
+	const float ship_dead_opacity = 0.3F;
+	const float ship_damaged_fade_variance = 0.6F;
+	const int ship_damaged_squarewave_nodes = 6;
+
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
@@ -962,6 +970,7 @@ void ships_render_update(RenderWindow* window)
 			// cooling down
 			if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
 			{
+				ship_opacity = (1.0F - ship_cooldown_fade_variance) + (ship_cooldown_fade_variance * (0.5F * sinf(2.0F * PI * (ship_attack_timers[i] / (SHIP_attack_cooldown_time / (float)blips))) + 0.5F));
 			}
 			// currently attacking (animate projectile)
 			else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
@@ -1032,7 +1041,10 @@ void ships_render_update(RenderWindow* window)
 		}
 
 
-		ship->render(window);
+		if (ship_opacity >= 1.0F)
+			ship->render(window);
+		else
+			window->render_rotate_alphamod(0, 0, 0, 0, ship->screen_x - (ship->w >> 1), ship->screen_y - (ship->h >> 1), ship->w, ship->h, ship->rotation, ship_texture, (Uint8)(ship_opacity * 255.0F));
 		render_health(window, ship);
 		i++;
 	}

@@ -487,6 +487,46 @@ void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int
 	}
 }
 
+
+void RenderWindow::render_rotate_alphamod(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Texture* texture, Uint8 alpha)
+{
+	SDL_Rect source{
+		src_x,
+		src_y,
+		src_w,
+		src_h
+	};
+
+	// adjusts source.w and source.h to actual values?
+	SDL_QueryTexture(texture, nullptr, nullptr, &source.w, &source.h);
+
+	SDL_Rect destination{
+		dst_x,
+		dst_y,
+		dst_w,
+		dst_h
+	};
+
+	int screen_dest_x_end = dst_x;
+	int screen_dest_y_end = dst_y;
+
+	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
+	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
+	if (flag1 || flag2)
+	{
+		destination.w = screen_dest_x_end - destination.x;
+		destination.h = screen_dest_y_end - destination.y;
+
+		SDL_Point center = {
+			destination.w >> 1,
+			destination.h >> 1
+		};
+
+		SDL_SetTextureAlphaMod(texture, alpha);
+		SDL_RenderCopyEx(renderer, texture, &source, &destination, 180.0 * (angle / PI), &center, SDL_FLIP_NONE);
+	}
+}
+
 void RenderWindow::render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, int dst_pivot_x, int dst_pivot_y, double angle, SDL_Texture* texture)
 {
 	SDL_Rect source{

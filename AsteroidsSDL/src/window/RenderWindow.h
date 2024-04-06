@@ -108,6 +108,7 @@ public:
 	/// <param name="angle"></param>
 	/// <param name="texture"></param>
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Texture* texture);
+	void render_rotate_alphamod(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Texture* texture, Uint8 alpha);
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, int dst_pivot_x, int dst_pivot_y, double angle, SDL_Texture* texture);
 	void render_rotate(int x, int y, int w, int h, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Texture* texture);
 	void render_rotate(int src_x, int src_y, int src_w, int src_h, int dst_x, int dst_y, int dst_w, int dst_h, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Texture* texture);
