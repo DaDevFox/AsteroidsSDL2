@@ -53,7 +53,7 @@ void render_player_ui_update(RenderWindow* window)
 	const float change_fadein_time = 0.5F;
 	const float change_fadeaway_time = 2.0F;
 
-	const float min_health_fade = 0.1F;
+	const float min_health_fade = 0.2F;
 
 	static float change_timer = 0.0F;
 
@@ -152,25 +152,38 @@ void render_game_ui_update(RenderWindow* window)
 {
 	bool player_victor = false;
 	bool game_over = true;
-	for (int i = 0; i < GAME_ship_count; i++)
-		if (get_health((Entity*)entities + i) > 0)
-			game_over = false;
-
-	if (game_over)
-		player_victor = true;
-	else if (player_health() <= 0.0F)
-		game_over = true;
-
-	if (!game_over)
-		return;
 
 	static float game_end_timer = 0.0F;
 	const float max_end_timer = 2.0F;
 
+	if (!GAME_game_over)
+	{
+		for (int i = 0; i < GAME_ship_count; i++)
+			if (get_health((Entity*)entities + i) > 0)
+				game_over = false;
+
+		if (game_over)
+			player_victor = true;
+		else if (player_health() <= 0.0F)
+			game_over = true;
+
+		if (game_over)
+		{
+			GAME_game_over = game_over;
+			INPUT_enabled = false;
+			time_scaling = 0.0F;
+
+			game_end_timer = max_end_timer;
+		}
+		else
+			return;
+	}
+
+
 	const float end_screen_fadein_time = 2.0F;
 
 	const float end_screen_title_fadein_time = 2.0F;
-	const float end_screen_title_fadein_delay = 0.0F;
+	const float end_screen_title_fadein_delay = 0.1F;
 
 	const float end_screen_subtitle_fadein_time = 2.0F;
 	const float end_screen_subtitle_fadein_delay = 0.0F;
@@ -187,22 +200,9 @@ void render_game_ui_update(RenderWindow* window)
 	const char* title = player_victor ? "VICTORY" : "DEFEAT";
 	const char* subtitle = "";
 
-	if (game_over != GAME_game_over)
-	{
-		GAME_game_over = game_over;
-		INPUT_enabled = false;
-		time_scaling = 0.0F;
 
-		game_end_timer = max_end_timer;
-	}
+	window->render_rect(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 });
 
-	if (max_end_timer - game_end_timer <= end_screen_body_fadein_time)
-	{
-		float progress = 1.0F - end_screen_body_fadein_time / (max_end_timer - game_end_timer);
-		window->render_rect_alphamod(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 }, (int)(progress * 255.0F));
-	}
-	else
-		window->render_rect(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 });
 
 	int title_offset = 150;
 	if ((max_end_timer - end_screen_title_fadein_delay) - game_end_timer >= 0.0F && (max_end_timer - end_screen_title_fadein_delay) - game_end_timer <= end_screen_title_fadein_time)
@@ -213,7 +213,7 @@ void render_game_ui_update(RenderWindow* window)
 	else if (game_end_timer <= max_end_timer - end_screen_title_fadein_delay)
 		window->render_centered_screen(WINDOW_width / 2, title_offset, title, encode_sans_bold, player_victor ? text_color_title_victory : text_color_title_loss);
 	if (game_end_timer > 0.0F)
-		game_end_timer -= unscaled_delta_time / 1000.0F;
+		game_end_timer -= abs(unscaled_delta_time) / 1000.0F;
 }
 
 void render_debug_update(RenderWindow* window);
