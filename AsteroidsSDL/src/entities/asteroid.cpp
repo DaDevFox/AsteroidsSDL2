@@ -157,13 +157,20 @@ void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost
 		reach = SDL_max(SDL_min(reach, max_reach_initial), 0);
 
 		int curr_reach = reach + (reach_initial - reach) * (theta / (2.0F * PI));
+		int prev_x = w, prev_y = h;
 		for (int i = 0; i < curr_reach; i++)
 		{
 			int offset_x = cosf(theta) * i;
 			int offset_y = sinf(theta) * i;
 
+			if (prev_x == offset_x && prev_y == offset_y)
+				continue;
+
 			*(buffer + pixel_to_index(center_x + offset_x, center_y + offset_y, w)) = GAME_asteroid_color_raw;
-			pixel_count++;
+			(*pixel_count)++;
+
+			prev_x = offset_x;
+			prev_y = offset_y;
 		}
 
 		bridge_current += theta;
@@ -185,6 +192,9 @@ void Asteroid::generate()
 
 	point_count = pixels;
 	mass = ASTEROID_minimum_mass + mass_per_pixel * pixels;
+
+	if (id == PLAYER_entity_id)
+		PLAYER_initial_outline_point_count = point_count;
 
 	create_outline(buffer);
 
@@ -299,6 +309,7 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 		iterator++;
 	}
 
+	asteroid->point_count = added.size();
 	SDL_UnlockSurface(temp_surface); // allow external read/writes when finished writing
 
 	asteroid->texture = window.create_texture_from_surface(temp_surface);
@@ -711,7 +722,7 @@ void Asteroid::create_outline(Uint32* buffer)
 		for (int i = 0; i < outline.size(); i++)
 			this->outline[i] = outline.at(i);
 		outline_point_count = outline.size();
-	}
+}
 	else
 		SDL_Log("ERROR: outline buffer overflow for asteroid.\n");
 
@@ -819,9 +830,6 @@ void Asteroid::create_outline(Uint32* buffer)
 
 
 #endif
-
-	if (id == PLAYER_entity_id)
-		PLAYER_initial_outline_point_count = outline_point_count;
 }
 
 void Asteroid::cleanup()

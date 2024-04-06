@@ -46,7 +46,7 @@ const SDL_KeyCode KEY_pause = SDLK_p;
 bool UI_FPSHUD_enabled = DEBUG_master;
 
 
-const bool DEBUG_master = false;
+const bool DEBUG_master = true;
 
 // DEBUG
 const SDL_KeyCode KEY_DEBUG_mode = SDLK_u;
@@ -112,7 +112,7 @@ const float SHIP_health_damaged_pulsetime = 0.25F;
 const float SHIP_speed_maximum = 0.2F;
 
 const float SHIP_warning_time = 10.0F;
-const float SHIP_min_warning_focus_time = 2.0F; // min amount of time to dedicate to a new warning target (attention can't be stolen for __ seconds)
+const float SHIP_min_warning_focus_time = 0.0F; // min amount of time to dedicate to a new warning target (attention can't be stolen for __ seconds)
 
 const float SHIP_attack_cooldown_time = 3.0F;
 const float SHIP_attack_targetting_time = 0.5F;

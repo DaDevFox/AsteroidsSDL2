@@ -208,5 +208,5 @@ int main()
 float player_health()
 {
 	Entity* player = (Entity*)entities + PLAYER_entity_id;
-	return (float)(player->outline_point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
+	return (float)(player->point_count - GAME_min_outline_point_count) / (float)(PLAYER_initial_outline_point_count - GAME_min_outline_point_count);
 }
