@@ -306,9 +306,6 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 	SDL_FreeSurface(temp_surface);
 }
 
-// TODO: remove debug flag
-int splitflag = 0;
-
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point)
 {
 	for (SDL_Point* current = outline; current < outline + outline_point_count; current++)
