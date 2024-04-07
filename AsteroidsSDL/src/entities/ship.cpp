@@ -931,25 +931,34 @@ void ships_render_update(RenderWindow* window)
 	float variance_percentage = 0.6F;
 	int blips = 2;
 
-	float ship_opacity = 1.0F;
+	float ship_opacity;
 	const float ship_cooldown_fade_variance = 0.4F;
 	const int ship_cooldown_fade_blips = 4;
 
 	const float ship_dead_opacity = 0.3F;
-	const float ship_damaged_fade_variance = 0.6F;
+	const float ship_damaged_fade_min = 0.4F;
+	const float ship_damaged_fade_max = 0.8F;
 	const int ship_damaged_squarewave_nodes = 6;
 
 	int i = 0;
 	for (Entity* ship = (Entity*)entities; ship < (Entity*)entities + GAME_ship_count; ship++)
 	{
+		ship_opacity = 1.0F;
 		if (ship_healths[i] <= 0)
 		{
 			// TODO: render_rotate_alphamod
 			// only run physical update; no behavior for dead ship
-			ship->render(window);
+			window->render_rotate_alphamod(0, 0, 0, 0, ship->screen_x - (ship->w >> 1), ship->screen_y - (ship->h >> 1), ship->w, ship->h, ship->rotation, ship_texture, (Uint8)(ship_dead_opacity * 255.0F));
 			render_health(window, ship);
 			i++;
 			continue;
+		}
+
+		if (ship_health_damaged_timers[i] >= 0.0F)
+		{
+			float max_time = SHIP_health_damaged_showtime + SHIP_health_damaged_fadetime + SHIP_health_damaged_pulsetime;
+			int stepped = (int)(ship_damaged_squarewave_nodes * ship_health_damaged_timers[i] / max_time); // int-cast/truncate to create steps
+			ship_opacity = ship_damaged_fade_min + (ship_damaged_fade_max - ship_damaged_fade_min) * (stepped % 2 == 0 ? 1.0F : 0.0F);
 		}
 
 		if (ship_attack_timers[i] > 0.0F)
@@ -989,13 +998,8 @@ void ships_render_update(RenderWindow* window)
 			// charging up
 			else
 			{
-				//window->render_rotate(0, 0, 0, 0, ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width, 0, beam_width >> 1, ship->rotation, highlighter_beam_texture);
 				render_thrust(window, target, { 255, 0, 0, 255 }, 3, 4, 26.0F, true);
 			}
-
-			/*char buffer[16] = "";
-			sprintf_s(buffer, "%.4f", ship_attack_timers[i]);
-			window->render_centered_world(ship->x, ship->y, buffer, encode_sans_medium, { 255, 255, 255, 255 });*/
 
 			// decerements time in ships_update() func already (above is mirror functionality for render stage)
 
@@ -1005,9 +1009,6 @@ void ships_render_update(RenderWindow* window)
 		{
 			for (int id : *shadowing_targets[i])
 			{
-				//if (notice_timers[i]->find(id) == notice_timers[i]->end() || notice_timers[i]->at(id) <= 0.0F)
-				//	continue;
-
 				Entity* other = (Entity*)entities + id;
 				if (other->id != PLAYER_entity_id)
 					render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
@@ -1015,8 +1016,6 @@ void ships_render_update(RenderWindow* window)
 					render_dotted_circle(window, other, 10.0F + (float)other->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
 			}
 		}
-		//else
-			//render_thrust(window, ship, { 0, 255, 255, 255 });
 
 		if (DEBUG_mode && DEBUG_ship_targets)
 		{

@@ -524,6 +524,7 @@ void RenderWindow::render_rotate_alphamod(int src_x, int src_y, int src_w, int s
 
 		SDL_SetTextureAlphaMod(texture, alpha);
 		SDL_RenderCopyEx(renderer, texture, &source, &destination, 180.0 * (angle / PI), &center, SDL_FLIP_NONE);
+		SDL_SetTextureAlphaMod(texture, 255);
 	}
 }
 
