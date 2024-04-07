@@ -31,6 +31,8 @@ void render_thrust(RenderWindow* window, Entity* entity, const SDL_Color& color,
 		for (int i = 0; i < GAME_ship_count + GAME_asteroid_pool_size; i++)
 		{
 			all_thrust_columns.push_back(new int[thrust_numColumns]);
+			for (int j = 0; j < thrust_numColumns; j++)
+				all_thrust_columns[i][j] = 0;
 			thrusts_elapsed.push_back(0.0F);
 		}
 	}
