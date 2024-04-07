@@ -242,7 +242,7 @@ SDL_Point operator/(SDL_Point a, int b)
 
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point);
 
-void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
+bool Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 {
 	SDL_DestroyTexture(asteroid->texture);
 	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
@@ -300,6 +300,15 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 		}
 	}
 
+	const int max_size = asteroid->w * asteroid->h;
+	if (added.size() >= max_size - asteroid->point_count)  //approxomation for square 'overfill' scenario
+	{
+		SDL_UnlockSurface(temp_surface); // cleanup before returning
+		SDL_FreeSurface(temp_surface);
+
+		return false;
+	}
+
 	// WRITE ALL ADDED 
 	auto iterator = added.begin();
 	while (iterator != added.end())
@@ -315,6 +324,8 @@ void Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 	asteroid->texture = window.create_texture_from_surface(temp_surface);
 
 	SDL_FreeSurface(temp_surface);
+
+	return true;
 }
 
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point)
@@ -334,13 +345,39 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end, specify_endpoint, specified_theta);
 	std::vector<SDL_Point> outline_bridge;
 
-	split_bridge_outline(this, start, end, &outline_bridge);
-	split_bridge_outline(created, start, end, &outline_bridge);
+	int retries = 0;
+	do
+	{
+		if (retries > 0)
+		{
+			if ((start.x < end.x ? start.x : end.x) <= 0 || (start.y < end.y ? start.y : end.y) <= 0 ||
+				(end.x > start.x ? end.x : start.x) >= w || (end.y > start.y ? end.y : start.y) >= w)
+				break;
 
-	fill_pixels_from_outline(this);
-	fill_pixels_from_outline(created);
+			// outline_bridge has been initialized; undo its changes, increase size and retry
+			remove_bridge_outline(this, start, end, &outline_bridge);
+			remove_bridge_outline(created, start, end, &outline_bridge);
 
-	SDL_Log("created asteroid: %i; added %zu", created->outline_point_count, outline_bridge.size());
+			if (retries % 2 == 0)
+			{
+				(start.x < end.x ? start.x : end.x)--;
+				(start.y < end.y ? start.y : end.y)--;
+			}
+			else
+			{
+				(end.x > start.x ? end.x : start.x)++;
+				(end.y > start.y ? end.y : start.y)++;
+			}
+		}
+
+		split_bridge_outline(this, start, end, &outline_bridge);
+		split_bridge_outline(created, start, end, &outline_bridge);
+		retries++;
+	}
+	while (!fill_pixels_from_outline(this) || !fill_pixels_from_outline(created));
+
+
+	SDL_Log("created asteroid: %i; added %zu points, retrying %i times due to buffer infill overflows", created->outline_point_count, outline_bridge.size(), retries);
 
 	created->x = x + 1;
 	created->y = y + 1;
@@ -372,10 +409,46 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	int split_endpoint = 0;
 	if (!specify_theta)
 	{
-		while (split_endpoint < outline_point_count
-			&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
-				|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
-			split_endpoint++;
+		while (true)
+		{
+			while (split_endpoint < outline_point_count
+				&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
+					|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
+				split_endpoint++;
+
+			// raycast; check for interceding points (skip if there are; non(perfectly)convex shape selected)
+			int count = 0;
+			int last_x = -1, last_y = -1;
+			int x = collision_pixel_x, y = collision_pixel_y;
+			int x_prev = w, y_prev = h;
+			float theta = atan2f(outline[split_endpoint].y - collision_pixel_y, outline[split_endpoint].x - collision_pixel_x);
+			for (float dist = 0.0F; dist < 1.41F * (float)w; dist += 0.5F)
+			{
+				x = (int)(cosf(theta) * dist) + collision_pixel_x;
+				y = (int)(sinf(theta) * dist) + collision_pixel_y;
+
+				if (x_prev == x && y_prev == y || x <= 0 || y <= 0 || x > w || y > h)
+					continue;
+
+				if (outline_contains(outline, outline_point_count, { x, y }))
+				{
+					count++;
+					last_x = x;
+					last_y = y;
+				}
+
+				x_prev = x;
+				y_prev = y;
+			}
+
+			if (last_x != outline[split_endpoint].x || last_y != outline[split_endpoint].y || count > 2)
+			{
+				split_endpoint++;
+				continue;
+			}
+
+			break;
+		}
 
 		if (split_endpoint == outline_point_count)
 			while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
@@ -485,8 +558,8 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 			distance = SDL_sqrtf((float)distance);
 			float theta = atan2f((next_y - curr_y), (next_x - curr_x));
 
-			int x_prev = -1;
-			int y_prev = -1;
+			int x_prev = asteroid->w; // unreachable start point chosen (so none culled for first iteration)
+			int y_prev = asteroid->h;
 			int x, y;
 
 			float resolution = 0.5F;
@@ -501,7 +574,7 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 				outline_additions->push_back({ x, y });
 
-				if (!(x_prev == -1 || y_prev == -1) && x_prev != x && y_prev != y) // if it's self perfect diagonal
+				if (x_prev == x || y_prev == y) // if it's a perfect diagonal
 					outline_additions->push_back({ x,  y_prev }); // add corner point (could also be x_prev, y)
 
 				x_prev = x;
@@ -524,6 +597,11 @@ void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, 
 
 
 	asteroid->outline_point_count += outline_additions->size();
+}
+
+void Asteroid::remove_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions)
+{
+	asteroid->outline_point_count -= outline_additions->size();
 }
 
 Asteroid* append_asteroid_to_pool()
@@ -722,7 +800,7 @@ void Asteroid::create_outline(Uint32* buffer)
 		for (int i = 0; i < outline.size(); i++)
 			this->outline[i] = outline.at(i);
 		outline_point_count = outline.size();
-}
+	}
 	else
 		SDL_Log("ERROR: outline buffer overflow for asteroid.\n");
 
