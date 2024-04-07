@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#define RELEASE
 
 #define PI 3.14159265358979323F
 

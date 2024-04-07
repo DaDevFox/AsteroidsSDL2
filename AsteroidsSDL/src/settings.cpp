@@ -55,8 +55,11 @@ bool DEBUG_mode = false;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_increment = SDLK_b;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_decrement = SDLK_c;
 const SDL_KeyCode KEY_DEBUG_focused_asteroid_cancel = SDLK_z;
+#ifdef RELEASE
+int CAMERA_focused_asteroid = 0;
+#else
 int CAMERA_focused_asteroid = -1;
-
+#endif
 
 const SDL_KeyCode KEY_DEBUG_wireframe_mode = SDLK_q;
 bool DEBUG_wireframe_mode = false;

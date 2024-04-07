@@ -1,5 +1,3 @@
-#define RELEASE
-
 #include "RenderWindow.h"
 #include "../main.h"
 #include <iostream>

@@ -307,6 +307,8 @@ void UI::input_update(SDL_Event* running_event)
 	if (running_event->type == SDL_KEYDOWN)
 	{
 		SDL_Keycode sym = running_event->key.keysym.sym;
+		if (running_event->type == SDL_WINDOWEVENT_FOCUS_LOST && time_scaling > 0.0F)
+			time_scaling = 0.0F;
 
 		debug_update(sym);
 
