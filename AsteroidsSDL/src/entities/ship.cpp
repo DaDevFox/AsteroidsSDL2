@@ -643,12 +643,12 @@ void render_health(RenderWindow* window, Entity* ship)
 		opacity = sinf(theta) * 0.5F + 0.5F;
 	}
 
-	float x = ship->x - (pip_width + 2 * padding_per_pip) * SHIP_initial_health;
+	float x = ship->x + (ship->w >> 1) - (pip_width + 2 * padding_per_pip) * SHIP_initial_health;
 	for (int i = 0; i < SHIP_initial_health; i++)
 	{
 		int alpha = (Uint8)(opacity * 255.0F * (i >= ship_healths[ship->id] ? 0.6F : 1.0F));
 
-		window->render_alphamod(0, 0, 64, 64, (int)(x + padding_per_pip), (int)(ship->y - (ship->h >> 1) - pip_height), pip_width, pip_height, pip_texture, alpha);
+		window->render_alphamod(0, 0, 64, 64, (int)(x + padding_per_pip), (int)(ship->y - (ship->h) - pip_height), pip_width, pip_height, pip_texture, alpha);
 		x += pip_width + 2 * padding_per_pip;
 	}
 }
@@ -932,8 +932,8 @@ void ships_render_update(RenderWindow* window)
 	int blips = 2;
 
 	float ship_opacity;
-	const float ship_cooldown_fade_variance = 0.4F;
-	const int ship_cooldown_fade_blips = 4;
+	const float ship_cooldown_fade_variance = 0.2F;
+	const int ship_cooldown_fade_blips = 10;
 
 	const float ship_dead_opacity = 0.3F;
 	const float ship_damaged_fade_min = 0.4F;
