@@ -150,7 +150,7 @@ void render_player_ui_update(RenderWindow* window)
 void render_game_ui_update(RenderWindow* window);
 void render_game_ui_update(RenderWindow* window)
 {
-	bool player_victor = false;
+	static bool player_victor = false;
 	bool game_over = true;
 
 	static float game_end_timer = 0.0F;
