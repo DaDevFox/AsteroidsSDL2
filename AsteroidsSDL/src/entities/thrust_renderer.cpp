@@ -14,6 +14,9 @@ std::random_device rand_device;
 
 void render_thrust(RenderWindow* window, Entity* entity, const SDL_Color& color, int min_height, int max_height, float random_tick, bool central)
 {
+	if (entity->outline_point_count == 0)
+		return;
+
 	int thrust_min_height = 0;
 	int thrust_max_height = 0;
 	float thrust_random_tick = 0.0F;
