@@ -42,7 +42,7 @@
     <ClCompile Include="src\window\ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\entities\thrust_renderer.cpp">
+    <ClCompile Include="src\entities\env\thrust_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,7 +76,7 @@
     <ClInclude Include="src\entities\ship.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\entities\thrust_renderer.h">
+    <ClInclude Include="src\entities\env\thrust_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,7 +6,7 @@
 #include <set>
 #include <map>
 #include <time.h>
-#include "thrust_renderer.h"
+#include "env/thrust_renderer.h"
 
 // TODO: for square: bridge creep (refill each time) while point count is >= MAX - original point_ocunt
 

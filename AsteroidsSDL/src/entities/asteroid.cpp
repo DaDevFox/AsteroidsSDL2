@@ -3,7 +3,7 @@
 #include "../main.h"
 #include "asteroid.h"
 #include "ship.h"
-#include "thrust_renderer.h"
+#include "env/thrust_renderer.h"
 
 #include <queue>
 #include <set>
