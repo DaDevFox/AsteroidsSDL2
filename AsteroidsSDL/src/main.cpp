@@ -27,6 +27,10 @@ SDL_AudioSpec blip_warn_wavSpec;
 Uint32 blip_warn_wavLength;
 Uint8* blip_warn_wavBuffer;
 
+SDL_AudioSpec blip_attack_wavSpec;
+Uint32 blip_attack_wavLength;
+Uint8* blip_attack_wavBuffer;
+
 SDL_AudioSpec laser_shoot_wavSpec;
 Uint32 laser_shoot_wavLength;
 Uint8* laser_shoot_wavBuffer;
@@ -108,6 +112,7 @@ bool game_init()
 		return false;
 	}
 
+	SDL_LoadWAV("blip_attack.wav", &blip_attack_wavSpec, &blip_attack_wavBuffer, &blip_attack_wavLength);
 
 	SDL_LoadWAV("blip_warn.wav", &blip_warn_wavSpec, &blip_warn_wavBuffer, &blip_warn_wavLength);
 

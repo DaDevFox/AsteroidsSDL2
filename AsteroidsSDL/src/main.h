@@ -31,6 +31,10 @@ extern SDL_AudioSpec blip_warn_wavSpec;
 extern Uint32 blip_warn_wavLength;
 extern Uint8* blip_warn_wavBuffer;
 
+extern SDL_AudioSpec blip_attack_wavSpec;
+extern Uint32 blip_attack_wavLength;
+extern Uint8* blip_attack_wavBuffer;
+
 extern SDL_AudioSpec laser_shoot_wavSpec;
 extern Uint32 laser_shoot_wavLength;
 extern Uint8* laser_shoot_wavBuffer;

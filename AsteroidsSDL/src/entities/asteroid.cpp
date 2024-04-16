@@ -416,11 +416,6 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 					|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
 				split_endpoint++;
 
-			if (split_endpoint > outline_point_count)
-			{
-				split_endpoint = 0;
-				continue;
-			}
 			// raycast; check for interceding points (skip if there are; non(perfectly)convex shape selected)
 			int count = 0;
 			int last_x = -1, last_y = -1;

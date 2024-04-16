@@ -164,6 +164,7 @@ void set_ship_shadowing_chunk(int shipID, int chunk)
 	int left_x = chunk % GAME_chunkwise_width - check_radius;
 	int right_x = chunk % GAME_chunkwise_width + check_radius;
 
+	bool no_player_flag = shadowing_targets[shipID]->find(PLAYER_entity_id) == (shadowing_targets[shipID]->end());
 	shadowing_targets[shipID]->clear();
 
 	for (int curr_y = SDL_max(floor_y, 0); curr_y < SDL_min(ceil_y, GAME_chunkwise_height); curr_y++)
@@ -176,8 +177,18 @@ void set_ship_shadowing_chunk(int shipID, int chunk)
 
 			std::set<int>* curr_set = (collision_check_grid[curr_chunk]);
 			for (int id : *curr_set)
-				if (id >= GAME_ship_count) // if it's not a ship
+			{
+				if (id >= GAME_ship_count)
+				{ // if it's not a ship
 					shadowing_targets[shipID]->insert(id);
+
+					if (no_player_flag && id == PLAYER_entity_id)
+					{
+						int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
+						SDL_PauseAudioDevice(AUDIO_device_id, 0);
+					}
+				}
+			}
 		}
 	}
 }
@@ -457,6 +468,13 @@ void ship_check_states(int i)
 
 		if (notice_timers[i]->at(id) + 2.0F >= notice_for_auto_attack || (DEBUG_mode && DEBUG_ships_fire_at_will))
 		{
+			if (id == PLAYER_entity_id)
+			{
+				int success = SDL_QueueAudio(AUDIO_device_id, blip_attack_wavBuffer, blip_attack_wavLength);
+				success |= SDL_QueueAudio(AUDIO_device_id, blip_attack_wavBuffer, blip_attack_wavLength);
+				SDL_PauseAudioDevice(AUDIO_device_id, 0);
+			}
+
 			ship_warn_timers[i] = SHIP_warning_time;
 			ship_targets[ship->id] = id;
 			ship_attack_timers[ship->id] = SHIP_attack_time + SHIP_attack_targetting_time + SHIP_attack_cooldown_time;
@@ -1092,12 +1110,6 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 
 void alert_ship_warning(Entity* ship, Entity* alertee)
 {
-	if (shadowing_targets[ship->id]->find(PLAYER_entity_id) == (shadowing_targets[ship->id]->end()) && alertee->id == PLAYER_entity_id)
-	{
-		int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
-		SDL_PauseAudioDevice(AUDIO_device_id, 0);
-	}
-
 	set_ship_shadowing_chunk(ship->id, alertee->collision_chunk);
 	//if (shadowing_targets[ship->id]->find(alertee->id) != shadowing_targets[ship->id]->end()) // if alertee is in shadowing targets
 	//	ship_warn_timers[ship->id] += SHIP_warning_time;
@@ -1111,6 +1123,9 @@ void ship_damage(Entity* ship, int amount)
 	{
 		ship_healths[ship->id] -= amount;
 		ship_health_damaged_timers[ship->id] = SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime + SHIP_health_damaged_pulsetime;
+
+		int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
+		SDL_PauseAudioDevice(AUDIO_device_id, 0);
 	}
 }
 

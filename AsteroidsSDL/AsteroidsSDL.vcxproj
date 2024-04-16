@@ -179,6 +179,9 @@
     <ClInclude Include="src\window\camera.h" />
     <ClInclude Include="src\window\RenderWindow.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\CMakeLists.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
