@@ -121,7 +121,7 @@ void Camera::update(float delta_time)
 	if (fabs(true_desired_y - y) > 0.1f)
 		y = y + (true_desired_y - y) * unscaled_delta_time * (1.0F - SETTING_camera_pan_smoothness);
 
-	if (fabs(desired_zoom - zoom) > 0.1f)
+	if (fabs(desired_zoom - zoom) > 0.01f)
 		zoom = zoom + (desired_zoom - zoom) * unscaled_delta_time * (1.0F - SETTING_camera_zoom_smoothness);
 
 	if (CAMERA_focused_asteroid != -1)

@@ -27,6 +27,18 @@ extern int WINDOW_height;
 extern TTF_Font* encode_sans_medium;
 extern TTF_Font* encode_sans_bold;
 
+extern SDL_AudioSpec blip_warn_wavSpec;
+extern Uint32 blip_warn_wavLength;
+extern Uint8* blip_warn_wavBuffer;
+
+extern SDL_AudioSpec laser_shoot_wavSpec;
+extern Uint32 laser_shoot_wavLength;
+extern Uint8* laser_shoot_wavBuffer;
+
+extern int AUDIO_device_id;
+
+
+
 extern void* entities;
 extern RenderWindow window;
 extern float unscaled_delta_time;

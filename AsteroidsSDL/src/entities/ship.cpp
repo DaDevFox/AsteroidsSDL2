@@ -435,6 +435,12 @@ void ship_check_states(int i)
 
 		if (notice_timers[i]->at(id) >= notice_for_auto_warn && (*shadowing_targets[ship->id]).find(id) == (*shadowing_targets[ship->id]).end())
 		{
+			/*if (id == PLAYER_entity_id)
+			{
+				int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
+				SDL_PauseAudioDevice(AUDIO_device_id, 0);
+			}*/
+
 			set_ship_shadowing_chunk(i, other->collision_chunk);
 			ship_warn_timers[i] = SHIP_warning_time;
 			notice_timers[i]->at(id) = 0.0F;
@@ -517,6 +523,10 @@ void ship_tick_attack(int i)
 			// who the raycast hit affects (could be diff from target)
 			SDL_Point hit;
 			Entity* effected = raycast(ship->x, ship->y, ship->rotation, SHIP_max_attack_range, ship->id, &hit);
+
+			// play shot audio clip
+			int success = SDL_QueueAudio(AUDIO_device_id, laser_shoot_wavBuffer, laser_shoot_wavLength);
+			SDL_PauseAudioDevice(AUDIO_device_id, 0);
 
 			if (effected == NULL || effected->id < GAME_ship_count)
 				return;
@@ -1082,6 +1092,12 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 
 void alert_ship_warning(Entity* ship, Entity* alertee)
 {
+	if (shadowing_targets[ship->id]->find(PLAYER_entity_id) == (shadowing_targets[ship->id]->end()) && alertee->id == PLAYER_entity_id)
+	{
+		int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
+		SDL_PauseAudioDevice(AUDIO_device_id, 0);
+	}
+
 	set_ship_shadowing_chunk(ship->id, alertee->collision_chunk);
 	//if (shadowing_targets[ship->id]->find(alertee->id) != shadowing_targets[ship->id]->end()) // if alertee is in shadowing targets
 	//	ship_warn_timers[ship->id] += SHIP_warning_time;

@@ -21,6 +21,16 @@ const int GAME_min_outline_point_count = 100;
 bool GAME_game_over = false;
 bool INPUT_enabled = true;
 
+int AUDIO_device_id = 0;
+
+SDL_AudioSpec blip_warn_wavSpec;
+Uint32 blip_warn_wavLength;
+Uint8* blip_warn_wavBuffer;
+
+SDL_AudioSpec laser_shoot_wavSpec;
+Uint32 laser_shoot_wavLength;
+Uint8* laser_shoot_wavBuffer;
+
 int PLAYER_initial_outline_point_count = 0;
 
 int WINDOW_height;
@@ -95,6 +105,17 @@ bool game_init()
 	if (encode_sans_bold == nullptr)
 	{
 		SDL_Log("Error loading encode sans bold font: %s\n", SDL_GetError());
+		return false;
+	}
+
+
+	SDL_LoadWAV("blip_warn.wav", &blip_warn_wavSpec, &blip_warn_wavBuffer, &blip_warn_wavLength);
+
+	SDL_LoadWAV("laser_shoot.wav", &laser_shoot_wavSpec, &laser_shoot_wavBuffer, &laser_shoot_wavLength);
+
+	if (!(AUDIO_device_id = SDL_OpenAudioDevice(NULL, 0, &blip_warn_wavSpec, NULL, 0)))
+	{
+		SDL_Log("Error opening audio dvice: %s\n", SDL_GetError());
 		return false;
 	}
 
