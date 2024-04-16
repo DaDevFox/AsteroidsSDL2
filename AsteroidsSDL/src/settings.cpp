@@ -10,6 +10,7 @@ const char* RESOURCE_highlighter_beam_texture_path = "./highlighter_beam.png";
 
 int SETTING_camera_pan_speed = 10;
 float SETTING_camera_pan_smoothness = 0.995F;
+float SETTING_camera_zoom_smoothness = 0.995F;
 
 bool SETTING_keyboard_player_movement = false;
 

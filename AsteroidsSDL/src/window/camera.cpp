@@ -7,10 +7,10 @@ const int edge_buffer = 512;
 
 void Camera::set_zoom(float new_zoom)
 {
-	zoom = SDL_min(SDL_max(new_zoom, SETTING_camera_zoom_min), SETTING_camera_zoom_max);
+	desired_zoom = SDL_min(SDL_max(new_zoom, SETTING_camera_zoom_min), SETTING_camera_zoom_max);
 
-	x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
-	y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
+	//x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
+	//y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
 }
 
 void Camera::teleport(float x, float y)
@@ -102,11 +102,11 @@ void Camera::input_update(SDL_Event* running_event)
 
 		if (sym == KEY_zoom_in || sym == KEY_zoom_in_alt)
 		{
-			set_zoom(zoom - 0.1f);
+			set_zoom(desired_zoom - 0.1f);
 		}
 		if (sym == KEY_zoom_out || sym == KEY_zoom_out_alt)
 		{
-			set_zoom(zoom + 0.1f);
+			set_zoom(desired_zoom + 0.1f);
 		}
 	}
 }
@@ -121,6 +121,9 @@ void Camera::update(float delta_time)
 	if (fabs(true_desired_y - y) > 0.1f)
 		y = y + (true_desired_y - y) * unscaled_delta_time * (1.0F - SETTING_camera_pan_smoothness);
 
+	if (fabs(desired_zoom - zoom) > 0.1f)
+		zoom = zoom + (desired_zoom - zoom) * unscaled_delta_time * (1.0F - SETTING_camera_zoom_smoothness);
+
 	if (CAMERA_focused_asteroid != -1)
 	{
 		Entity* entity = ((Entity*)entities) + GAME_ship_count + CAMERA_focused_asteroid;
@@ -131,8 +134,11 @@ void Camera::update(float delta_time)
 		desired_x = GAME_width - screen_to_world_x(WINDOW_width) + screen_to_world_x(WINDOW_width) / 2.0F + edge_buffer;
 	if (true_desired_x < -edge_buffer)
 		desired_x = screen_to_world_x(WINDOW_width) / 2.0F - edge_buffer;
+
 	/*if (true_desired_y + screen_to_world_y(WINDOW_height) > GAME_height)
 		desired_y = GAME_height - screen_to_world_y(WINDOW_height) + screen_to_world_y(WINDOW_height) / 2.0F;
 	if (true_desired_y < 0)
 		desired_y = screen_to_world_y(WINDOW_height) / 2.0F;*/
+
+
 }

@@ -14,6 +14,7 @@ extern const char* RESOURCE_highlighter_beam_texture_path;
 
 extern int SETTING_camera_pan_speed;
 extern float SETTING_camera_pan_smoothness;
+extern float SETTING_camera_zoom_smoothness;
 
 extern bool SETTING_keyboard_player_movement;
 extern int SETTING_primary_mouse_button;

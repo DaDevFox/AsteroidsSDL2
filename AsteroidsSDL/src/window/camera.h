@@ -1,7 +1,8 @@
 #pragma once
 #include <SDL.h>
 
-class Camera {
+class Camera
+{
 public:
 	float x;
 	float y;
@@ -9,6 +10,7 @@ public:
 	float desired_y;
 
 	float zoom;
+	float desired_zoom;
 
 	/// <summary>
 	/// Sets zoom and teleports to new zoomed location to avoid jarring movements
@@ -50,5 +52,6 @@ public:
 	int world_to_screen_y(float world_y);
 
 	Camera()
-		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F) {}
+		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F)
+	{}
 };

@@ -1,5 +1,6 @@
 #include "parallax_renderer.h"
 #include <chrono>
+#include <random>
 #include <set>
 #include "../../window/RenderWindow.h"
 
@@ -22,20 +23,23 @@ void ParallaxRenderer::init(const char** layer_image_paths)
 	if (layer_image_paths != nullptr)
 		return; // TODO: image reading
 
+	std::random_device rand_device;
+	std::uniform_int_distribution<int> x_dist(0, GAME_width);
+	std::uniform_int_distribution<int> y_dist(0, GAME_height);
+
+
 	layers = new SDL_Texture * [layer_count];
 	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 	SDL_LockSurface(temp_surface);
+	if (temp_surface == NULL)
+	{
+		SDL_Log("Error creating layer surface: %s\n", SDL_GetError());
+		return;
+	}
 
 	for (int i = 0; i < layer_count; i++)
 	{
-		srand(time(NULL));
-
-		if (temp_surface == NULL)
-		{
-			SDL_Log("Error creating layer surface: %s\n", SDL_GetError());
-			return;
-		}
-
+		SDL_FillRect(temp_surface, nullptr, 0);
 		Uint32* buffer = (Uint32*)temp_surface->pixels;
 
 		float points_multiple = 1.0F;
@@ -46,8 +50,8 @@ void ParallaxRenderer::init(const char** layer_image_paths)
 
 		for (int i = 0; i < amount; i++)
 		{
-			int x = rand() % GAME_width;
-			int y = rand() % GAME_height;
+			int x = x_dist(rand_device);
+			int y = y_dist(rand_device);
 
 			float size_multiple = 1.0F;
 			for (int j = 0; j < i; j++)
@@ -94,8 +98,8 @@ void ParallaxRenderer::init(const char** layer_image_paths)
 				}
 			}
 		}
-		layers[i] = window.create_texture_from_surface(temp_surface);
 
+		layers[i] = window.create_texture_from_surface(temp_surface);
 	}
 
 	SDL_UnlockSurface(temp_surface);
@@ -116,8 +120,8 @@ void ParallaxRenderer::render(RenderWindow* window)
 
 		window->set_cull(false);
 		window->render_alphamod(0, 0, 0, 0,
-			(window->camera.x / window->camera.zoom - (float)GAME_width * 0.5F) * parallax_layer_multiple,
-			(window->camera.y / window->camera.zoom - (float)GAME_height * 0.5F) * parallax_layer_multiple,
+			-(window->camera.x / window->camera.zoom - (float)GAME_width * 0.5F) * parallax_layer_multiple,
+			-(window->camera.y / window->camera.zoom - (float)GAME_height * 0.5F) * parallax_layer_multiple,
 			GAME_width, GAME_height, layers[i], (Uint8)((float)255.0F * layer_opacity));
 		window->set_cull(true);
 	}
