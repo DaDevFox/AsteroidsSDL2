@@ -52,6 +52,6 @@ public:
 	int world_to_screen_y(float world_y);
 
 	Camera()
-		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), zoom(1.0F)
+		: x(0.0F), y(0.0F), desired_x(0.0F), desired_y(0.0F), desired_zoom(1.0F), zoom(1.0F)
 	{}
 };
