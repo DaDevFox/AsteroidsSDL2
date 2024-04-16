@@ -82,7 +82,6 @@ bool game_init()
 
 	resize();
 
-	window.init();
 	window.camera.teleport(GAME_width / 2.0F, GAME_height / 2.0F);
 
 	encode_sans_medium = TTF_OpenFont("./EncodeSans-Medium.ttf", 18);
@@ -100,6 +99,7 @@ bool game_init()
 	}
 
 	entities_init();
+	window.init();
 
 	return true;
 }

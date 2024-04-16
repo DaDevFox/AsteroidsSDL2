@@ -92,7 +92,7 @@ RenderWindow::~RenderWindow()
 
 void RenderWindow::init()
 {
-
+	ui.init();
 }
 
 
@@ -117,6 +117,7 @@ void RenderWindow::get_info(int* width, int* height) const
 
 void RenderWindow::cleanup()
 {
+	ui.clean_up();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
@@ -398,7 +399,7 @@ void RenderWindow::render_alphamod(int src_x, int src_y, int src_w, int src_h, i
 	bool flag1 = world_to_screen(dst_x, dst_y, &destination.x, &destination.y);
 	bool flag2 = world_to_screen(dst_x + dst_w, dst_y + dst_h, &screen_dest_x_end, &screen_dest_y_end);
 
-	if (flag1 || flag2 || on_screen(dst_x + dst_w, dst_y) || on_screen(dst_x, dst_y + dst_h))
+	if (!cull || flag1 || flag2 || on_screen(dst_x + dst_w, dst_y) || on_screen(dst_x, dst_y + dst_h))
 	{
 		destination.w = screen_dest_x_end - destination.x;
 		destination.h = screen_dest_y_end - destination.y;
@@ -730,6 +731,12 @@ void RenderWindow::render_all_deferred()
 		it++;
 	}
 
+}
+
+void RenderWindow::set_cull(bool value)
+{
+	if (cull != value)
+		cull = value;
 }
 
 SDL_Texture* RenderWindow::create_texture_from_surface(SDL_Surface* surface)

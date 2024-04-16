@@ -1,7 +1,9 @@
 #include "../main.h"
 #include "../entities/Entity.h"
 #include "../entities/ship.h"
+#include "../entities/env/parallax_renderer.h"
 
+ParallaxRenderer parallax;
 const SDL_Color health_low = { 255, 0, 0, 255 };
 const float health_gradient_reach = 0.5F;
 
@@ -302,6 +304,11 @@ void render_debug_update(RenderWindow* window)
 	}
 }
 
+void UI::init()
+{
+	parallax.init();
+}
+
 void UI::input_update(SDL_Event* running_event)
 {
 	if (running_event->type == SDL_KEYDOWN)
@@ -321,6 +328,8 @@ void UI::input_update(SDL_Event* running_event)
 
 void UI::render_update(RenderWindow* window)
 {
+	parallax.render(window);
+
 	render_debug_update(window);
 	render_player_ui_update(window);
 	render_game_ui_update(window);
@@ -329,3 +338,8 @@ void UI::render_update(RenderWindow* window)
 
 void UI::update(float delta_time)
 {}
+
+void UI::clean_up()
+{
+	parallax.clean_up();
+}

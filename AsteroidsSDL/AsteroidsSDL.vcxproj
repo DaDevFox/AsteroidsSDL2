@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\entities\env\parallax_renderer.cpp" />
     <ClCompile Include="src\entities\ship.cpp" />
     <ClCompile Include="src\entities\env\thrust_renderer.cpp" />
     <ClCompile Include="src\math\polygon_math.cpp" />
@@ -167,6 +168,7 @@
     <Image Include="res\circle.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\entities\env\parallax_renderer.h" />
     <ClInclude Include="src\entities\EntityManager.h" />
     <ClInclude Include="src\entities\ship.h" />
     <ClInclude Include="src\entities\env\thrust_renderer.h" />

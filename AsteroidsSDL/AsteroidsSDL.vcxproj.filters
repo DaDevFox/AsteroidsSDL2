@@ -45,6 +45,9 @@
     <ClCompile Include="src\entities\env\thrust_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\entities\env\parallax_renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.png">
@@ -77,6 +80,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\entities\env\thrust_renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entities\env\parallax_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

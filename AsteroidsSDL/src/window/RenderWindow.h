@@ -10,9 +10,13 @@ class RenderWindow;
 class UI
 {
 public:
+	void init();
+
 	void input_update(SDL_Event* running_event);
 	void render_update(RenderWindow* window);
 	void update(float delta_time);
+
+	void clean_up();
 };
 
 
@@ -121,6 +125,8 @@ public:
 
 	void render_all_deferred();
 
+	void set_cull(bool value);
+
 	void draw();
 
 	SDL_Texture* create_texture_from_surface(SDL_Surface* surface);
@@ -132,6 +138,8 @@ protected:
 
 private:
 	std::vector<std::tuple<float, float, float, SDL_Color>> deferred_render_calls;
+
+	bool cull;
 
 	bool on_screen(float world_x, float world_y);
 	bool world_to_screen(float world_x, float world_y, int* screen_x, int* screen_y);
