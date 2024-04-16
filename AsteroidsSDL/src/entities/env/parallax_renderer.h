@@ -13,7 +13,7 @@ public:
 	float parallax_multiple = 0.1F;
 
 	int layergen_points_variance = 3;
-	int layergen_points = 20;
+	int layergen_points = 40;
 	float layergen_base_opacity = 1.0F;
 	int layergen_points_avg_size = 10;
 	float layergen_points_layer_exponent = 1.75F; // multiplied together [layer] times and then multiplied by layergen_points
