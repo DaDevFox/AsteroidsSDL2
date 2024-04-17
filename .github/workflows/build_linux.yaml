@@ -1,5 +1,6 @@
-name: Asteroids Linux Build
+name: "Asteroids Linux Build"
 on: workflow_dispatch
+
 jobs:
   build_linux:
     runs-on: ubuntu-latest
@@ -10,6 +11,7 @@ jobs:
           install-linux-dependencies: true
           version: 2-latest
           version-sdl-image: 2-latest
+
       - name: "linux setup + build"
         run: |
           cmake -s . -B build
