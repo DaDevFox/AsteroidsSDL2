@@ -11,6 +11,9 @@ jobs:
           sudo apt-get update -y -qq
           sudo apt-get install libsdl2-dev
           ls
+
+      - uses: actions/checkout@master
+
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
         with:
