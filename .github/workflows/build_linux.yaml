@@ -17,5 +17,5 @@ jobs:
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
         with:
-          source-dir: AsteroidsSDL/src
+          source-dir: AsteroidsSDL
           build-dir: out
