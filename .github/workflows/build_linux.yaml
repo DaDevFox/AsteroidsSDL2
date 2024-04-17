@@ -3,9 +3,6 @@ on: workflow_dispatch
 jobs:
   build_linux:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working_directory: ./scripts
     steps:
       - uses: libsdl-org/setup-sdl@main
         id: sdl
