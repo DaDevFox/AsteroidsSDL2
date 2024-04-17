@@ -361,5 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/AsteroidsSDL/CMakeLists.txt
-/AsteroidsSDL/src/CMakeLists.txt
