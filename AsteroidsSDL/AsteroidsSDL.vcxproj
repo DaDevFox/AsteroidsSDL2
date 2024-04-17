@@ -152,6 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cmake\FindSDL2.cmake" />
+    <ClCompile Include="cmake\FindSDL2_Image.cmake" />
     <ClCompile Include="src\entities\env\parallax_renderer.cpp" />
     <ClCompile Include="src\entities\ship.cpp" />
     <ClCompile Include="src\entities\env\thrust_renderer.cpp" />
@@ -180,7 +182,10 @@
     <ClInclude Include="src\window\RenderWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\CMakeLists.txt" />
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

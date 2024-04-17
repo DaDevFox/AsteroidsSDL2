@@ -48,6 +48,12 @@
     <ClCompile Include="src\entities\env\parallax_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cmake\FindSDL2.cmake">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmake\FindSDL2_Image.cmake">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.png">
@@ -87,6 +93,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\CMakeLists.txt" />
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
 </Project>

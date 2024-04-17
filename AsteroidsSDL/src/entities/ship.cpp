@@ -1124,7 +1124,7 @@ void ship_damage(Entity* ship, int amount)
 		ship_healths[ship->id] -= amount;
 		ship_health_damaged_timers[ship->id] = SHIP_health_damaged_fadetime + SHIP_health_damaged_showtime + SHIP_health_damaged_pulsetime;
 
-		int success = SDL_QueueAudio(AUDIO_device_id, blip_warn_wavBuffer, blip_warn_wavLength);
+		int success = SDL_QueueAudio(AUDIO_device_id, hit_damage_wavBuffer, hit_damage_wavLength);
 		SDL_PauseAudioDevice(AUDIO_device_id, 0);
 	}
 }

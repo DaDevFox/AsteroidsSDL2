@@ -35,6 +35,14 @@ SDL_AudioSpec laser_shoot_wavSpec;
 Uint32 laser_shoot_wavLength;
 Uint8* laser_shoot_wavBuffer;
 
+SDL_AudioSpec hit_damage_wavSpec;
+Uint32 hit_damage_wavLength;
+Uint8* hit_damage_wavBuffer;
+
+SDL_AudioSpec thrust_wavSpec;
+Uint32 thrust_wavLength;
+Uint8* thrust_wavBuffer;
+
 int PLAYER_initial_outline_point_count = 0;
 
 int WINDOW_height;
@@ -117,6 +125,10 @@ bool game_init()
 	SDL_LoadWAV("blip_warn.wav", &blip_warn_wavSpec, &blip_warn_wavBuffer, &blip_warn_wavLength);
 
 	SDL_LoadWAV("laser_shoot.wav", &laser_shoot_wavSpec, &laser_shoot_wavBuffer, &laser_shoot_wavLength);
+
+	SDL_LoadWAV("hit_damage.wav", &hit_damage_wavSpec, &hit_damage_wavBuffer, &hit_damage_wavLength);
+
+	SDL_LoadWAV("thrust.wav", &thrust_wavSpec, &thrust_wavBuffer, &thrust_wavLength);
 
 	if (!(AUDIO_device_id = SDL_OpenAudioDevice(NULL, 0, &blip_warn_wavSpec, NULL, 0)))
 	{
@@ -212,6 +224,15 @@ void game_cleanup()
 {
 
 	entities_cleanup();
+
+	SDL_CloseAudioDevice(AUDIO_device_id);
+	SDL_FreeWAV(blip_attack_wavBuffer);
+	SDL_FreeWAV(blip_warn_wavBuffer);
+	SDL_FreeWAV(laser_shoot_wavBuffer);
+	SDL_FreeWAV(thrust_wavBuffer);
+	SDL_FreeWAV(hit_damage_wavBuffer);
+
+
 	IMG_Quit();
 	SDL_Quit();
 }

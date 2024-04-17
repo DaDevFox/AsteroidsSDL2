@@ -35,9 +35,17 @@ extern SDL_AudioSpec blip_attack_wavSpec;
 extern Uint32 blip_attack_wavLength;
 extern Uint8* blip_attack_wavBuffer;
 
+extern SDL_AudioSpec hit_damage_wavSpec;
+extern Uint32 hit_damage_wavLength;
+extern Uint8* hit_damage_wavBuffer;
+
 extern SDL_AudioSpec laser_shoot_wavSpec;
 extern Uint32 laser_shoot_wavLength;
 extern Uint8* laser_shoot_wavBuffer;
+
+extern SDL_AudioSpec thrust_wavSpec;
+extern Uint32 thrust_wavLength;
+extern Uint8* thrust_wavBuffer;
 
 extern int AUDIO_device_id;
 

@@ -1053,12 +1053,22 @@ std::uniform_int_distribution<int> dist(thrust_min_height, thrust_max_height);*/
 
 void asteroids_render_update(RenderWindow* window)
 {
+	static float elapsed = 0.0F;
+	const float clip_length = 1.0F;
 	if (clicking)
 	{
 		// Select player asteroid
 		Asteroid* player = ((Asteroid*)entities + PLAYER_entity_id);
 
 		render_thrust(window, player, PLAYER_thrusting_outline_color);
+
+		/*elapsed += unscaled_delta_time / 1000.0F;
+		if (elapsed > clip_length)
+		{
+			elapsed = 0.0F;
+			int success = SDL_QueueAudio(AUDIO_device_id, thrust_wavBuffer, thrust_wavLength);
+			SDL_PauseAudioDevice(AUDIO_device_id, 0);
+		}*/
 	}
 
 	for (Asteroid* asteroid = (Asteroid*)entities + GAME_ship_count; asteroid < (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count; asteroid++)
