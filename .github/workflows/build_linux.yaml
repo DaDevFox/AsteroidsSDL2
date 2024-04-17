@@ -5,15 +5,12 @@ jobs:
   build_linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: BrettDong/setup-sdl2-frameworks@main
-        with:
-          sdl2: latest
-          sdl2-ttf: latest
-          sdl2-image: 2.6.3
-          sdl2-mixer: none
-          sdl2-net: none
-
-      - name: "linux setup + build"
+      - name: install_dependencies
+        run: |
+          sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+          sudo apt-get update -y -qq
+          sudo apt-get install libsdl2-dev
+      - name: Build
         run: |
           cmake -s . -B build
           cmake --build build --verbose
