@@ -12,4 +12,5 @@ jobs:
           version-sdl-image: 2-latest
       - name: "linux setup + build"
         run: |
-          make
+          cmake -s . -B build
+          cmake --build build --verbose
