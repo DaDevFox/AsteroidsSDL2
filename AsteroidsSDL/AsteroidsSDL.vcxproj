@@ -182,7 +182,7 @@
     <ClInclude Include="src\window\RenderWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="CMakeLists.txt" />
+    <Text Include="src\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

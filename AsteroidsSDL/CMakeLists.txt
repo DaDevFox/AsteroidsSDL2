@@ -1,9 +1,0 @@
-cmake_minimum_required(VERSION 3.7)
-
-project(AsteroidsSDL)
-
-find_package(SDL2 REQUIRED CONFIG)
-include_directories(${SDL2_INCLUDE_DIRS})
-
-add_executable(AsteroidsSDL main.cpp)
-target_link_libraries(AsteroidsSDL ${SDL2_LIBRARIES})
