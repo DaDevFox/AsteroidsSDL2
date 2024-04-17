@@ -11,4 +11,4 @@ target_include_directories(${PROJECT_NAME} ${SDL2_INCLUDE_DIR})
 target_link_libraries(
     ${PROJECT_NAME} PRIVATE
     SDL2::SDL2
-    SDL2::SDL2main
+    SDL2::SDL2main)
