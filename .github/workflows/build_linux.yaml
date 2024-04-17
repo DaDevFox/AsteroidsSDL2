@@ -12,5 +12,5 @@ jobs:
           sudo apt-get install libsdl2-dev
       - name: Build
         run: |
-          cmake -s . -B build
-          cmake --build build --verbose
+          cmake ..
+          make
