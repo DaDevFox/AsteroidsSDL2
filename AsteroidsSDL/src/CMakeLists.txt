@@ -7,9 +7,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 file(GLOB asteroids_SRC
      "*.h"
      "*.cpp"
-)
+     "math/*.h"
+     "math/*.cpp"
+     "entities/*.h"
+     "entities/*.cpp"
+     "window/*.h"
+     "window/*.cpp")
 
-add_executable(${PROJECT_NAME} ${asteroids_SRC
+add_executable(${PROJECT_NAME} ${asteroids_SRC})
 
 INCLUDE(FindPkgConfig)
 
