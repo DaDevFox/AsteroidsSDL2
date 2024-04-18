@@ -152,9 +152,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\cmake\FindSDL2.cmake" />
-    <ClCompile Include="src\cmake\FindSDL2_Image.cmake" />
-    <ClCompile Include="src\cmake\FindSDL2_TTF.cmake" />
     <ClCompile Include="src\entities\env\parallax_renderer.cpp" />
     <ClCompile Include="src\entities\ship.cpp" />
     <ClCompile Include="src\entities\env\thrust_renderer.cpp" />
