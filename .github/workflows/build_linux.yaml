@@ -17,8 +17,6 @@ jobs:
           sudo apt-get install libsdl2-ttf-dev
 
           echo "SDL_LOC=$(find /usr/lib -name SDL2)" >> $GITHUB_ENV
-          echo "SDL_LOC=$(find /usr/lib -name SDL2_TTF)" >> $GITHUB_ENV
-          echo "SDL_LOC=$(find /usr/lib -name SDL2_Image)" >> $GITHUB_ENV
 
       - uses: actions/checkout@master
 
