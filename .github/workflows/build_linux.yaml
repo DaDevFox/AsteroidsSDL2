@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           zip -r Linux.zip AsteroidsSDL/src 
+           zip -r Linux.zip AsteroidsSDL/src out
 
       - name: 'Get Previous tag'
         id: previoustag
