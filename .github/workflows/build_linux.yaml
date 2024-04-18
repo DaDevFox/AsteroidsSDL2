@@ -29,11 +29,11 @@ jobs:
           source-dir: AsteroidsSDL/src
           build-dir: out
 
-      - name: Zip result
+      - name: Zip Result
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-#          cp -v ${{env.SDL_LOC }} AsteroidsSDL/out
+           cp -v ${{env.SDL_LOC }} AsteroidsSDL/out
            zip AsteroidsLinux.zip AsteroidsSDL/out 
 
       # TODO: build output zip + release
