@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           zip AsteroidsLinux.zip AsteroidsSDL/out 
+           zip AsteroidsLinux.zip AsteroidsSDL/out/AsteroidsSDL 
 
       # TODO: build output zip + release
       - name: Release Output
@@ -36,7 +36,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: AsteroidsSDL/out/AsteroidsLinux.zip
+          file: AsteroidsLinux.zip
           asset_name: AsteroidsLinux
           tag: ${{ github.ref }}
           overwrite: true
