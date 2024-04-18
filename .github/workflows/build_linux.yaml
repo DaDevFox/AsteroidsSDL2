@@ -16,9 +16,9 @@ jobs:
           sudo apt-get install libsdl2-image-dev
           sudo apt-get install libsdl2-ttf-dev
 
-          echo "SDL_LOC=$(find /usr/lib -name SDL2)" >> $GITHUB_OUTPUT
-          echo "SDL_LOC=$(find /usr/lib -name SDL2_TTF)" >> $GITHUB_OUTPUT
-          echo "SDL_LOC=$(find /usr/lib -name SDL2_Image)" >> $GITHUB_OUTPUT
+          echo "SDL_LOC=$(find /usr/lib -name SDL2)" >> $GITHUB_ENV
+          echo "SDL_LOC=$(find /usr/lib -name SDL2_TTF)" >> $GITHUB_ENV
+          echo "SDL_LOC=$(find /usr/lib -name SDL2_Image)" >> $GITHUB_ENV
 
       - uses: actions/checkout@master
 
@@ -29,6 +29,8 @@ jobs:
           build-dir: out
 
       - name: Zip result
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}
         run: |
           cp -v ${{ steps.dependencies.outputs.SDL_LOC }} AsteroidsSDL/out
 
