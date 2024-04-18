@@ -48,10 +48,13 @@
     <ClCompile Include="src\entities\env\parallax_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cmake\FindSDL2.cmake">
+    <ClCompile Include="src\cmake\FindSDL2.cmake">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cmake\FindSDL2_Image.cmake">
+    <ClCompile Include="src\cmake\FindSDL2_Image.cmake">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cmake\FindSDL2_TTF.cmake">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
