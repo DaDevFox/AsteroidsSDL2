@@ -349,14 +349,14 @@ void Entity::render(RenderWindow* window)
 	if (DEBUG_mode && DEBUG_entity_rotations)
 	{
 		char str[20] = "";
-		sprintf_s(str, "%.4f", rotation);
+		snprintf(str, 20, "%.4f", rotation);
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
 	if (DEBUG_mode && DEBUG_chunk_gridlines)
 	{
 		char str[20] = "";
-		sprintf_s(str, "%i", collision_chunk);
+		snprintf(str, 20, "%i", collision_chunk);
 		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 
