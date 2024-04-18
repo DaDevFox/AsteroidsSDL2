@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           zip -r AsteroidsLinux.zip AsteroidsSDL/out/ 
+           zip -r AsteroidsLinux.zip . -i AsteroidsSDL/out/ 
 
       # TODO: build output zip + release
       - name: Release Output
