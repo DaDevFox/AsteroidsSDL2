@@ -19,8 +19,7 @@ jobs:
             - name: Find Libraries
               id: find_libraries
               run: |
-                echo "hello"
-      #          echo ::set-env name=SDL_LOC::$(find /usr/lib -name SDL2)
+                echo ::set-env name=SDL_LOC::$(find /usr/lib -name SDL2)
 
       - uses: actions/checkout@master
 
