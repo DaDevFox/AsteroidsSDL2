@@ -265,13 +265,13 @@ void render_debug_update(RenderWindow* window)
 				debug_mode_indicator_width, debug_bar_height,
 				debug_mode_indicator_color_on);
 
-			char output[16];
-			sprintf_s(output, "focused: %i", CAMERA_focused_asteroid);
+			//char output[16];
+			//sprintf_s(output, "focused: %i", CAMERA_focused_asteroid);
 
-			window->render_centered_screen(
-				debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
-				(float)debug_bar_height * 0.5F + debug_bar_offset,
-				output, encode_sans_medium, { 255, 255, 255, 255 });
+			//window->render_centered_screen(
+			//	debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
+			//	(float)debug_bar_height * 0.5F + debug_bar_offset,
+			//	output, encode_sans_medium, { 255, 255, 255, 255 });
 		}
 
 		if (DEBUG_chunk_gridlines)
@@ -299,7 +299,7 @@ void render_debug_update(RenderWindow* window)
 		// FPS HUD
 		char output[40];
 
-		sprintf_s(output, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
+		snprintf(output, 40, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
 		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
 	}
 }
