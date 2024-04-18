@@ -16,11 +16,6 @@ jobs:
           sudo apt-get install libsdl2-image-dev
           sudo apt-get install libsdl2-ttf-dev
 
-            - name: Find Libraries
-              id: find_libraries
-              run: |
-                echo ::set-env name=SDL_LOC::$(find /usr/lib -name SDL2)
-
       - uses: actions/checkout@master
 
       - name: Configure and Build Project
@@ -33,7 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           cp -v ${{env.SDL_LOC }} AsteroidsSDL/out
            zip AsteroidsLinux.zip AsteroidsSDL/out 
 
       # TODO: build output zip + release
