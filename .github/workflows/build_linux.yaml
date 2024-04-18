@@ -29,7 +29,6 @@ jobs:
         with:
           source-dir: AsteroidsSDL/src
           build-dir: out
-
       - name: Zip result
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
