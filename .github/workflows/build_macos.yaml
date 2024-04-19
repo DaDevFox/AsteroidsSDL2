@@ -25,7 +25,6 @@ jobs:
       - name: Install Dependencies
         id: dependencies
         run: |
-          brew install pkg-config
           brew install sdl2
           brew install sdl2_image
           brew install sdl2_ttf
