@@ -10,12 +10,12 @@ jobs:
           repo: 'libsdl-org/SDL'
           version: 'tags/release-2.30.2'
           file: 'SDL2-2.30.2.dmg'
-          target: sdl-downloaded/SDL2-2.30.2.dmg
+          target: SDL2-2.30.2.dmg
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: SDL Release Relocation 
         run: |
-          hdiutil attach /sdl-downloaded/SDL2-2.30.2.dmg
+          hdiutil attach SDL2-2.30.2.dmg
           sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
 
       - name: Checkout Repo
