@@ -14,8 +14,8 @@ jobs:
         restore-keys: ${{ runner.os }}-rubygems-
 
       - name: Install Homebrew Bundler RubyGems
-       if: steps.cache.outputs.cache-hit != 'true'
-       run: brew install-bundler-gems
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: brew install-bundler-gems
 
       # TODO: setup-sdl + sdl_ttf + sdl_mixer
       - name: Install Dependencies
