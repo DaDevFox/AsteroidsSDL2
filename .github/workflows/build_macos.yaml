@@ -30,6 +30,8 @@ jobs:
           brew install sdl2_ttf
 
       - uses: actions/checkout@v4
+        with:
+        ref: 'cd-testing'
 
       - name: configure and build project
         uses: threeal/cmake-action@main
