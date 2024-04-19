@@ -5,6 +5,7 @@ jobs:
   build_macos:
     runs-on: macos-latest
     steps:
+
       - uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: 'libsdl-org/SDL'
@@ -13,10 +14,33 @@ jobs:
           target: SDL2-2.30.2.dmg
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: SDL Release Relocation 
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'libsdl-org/SDL_image'
+          version: 'tags/release-2.8.2'
+          file: 'SDL2_image-2.8.2.dmg'
+          target: SDL2_image-2.8.2.dmg
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'libsdl-org/SDL_ttf'
+          version: 'tags/release-2.22.0'
+          file: 'SDL2_ttf-2.22.0.dmg'
+          target: SDL2_ttf-2.22.0.dmg
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: SDL Releases Relocation 
         run: |
           hdiutil attach SDL2-2.30.2.dmg
           sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
+          hdiutil unmount /Volumes/mountpoint
+          hdiutil attach SDL2_image-2.8.2.dmg
+          sudo cp -r /Volumes/SDL2/SDL2_image.framework /Library/Frameworks/
+          hdiutil unmount /Volumes/mountpoint
+          hdiutil attach SDL2_ttf-2.22.0.dmg
+          sudo cp -r /Volumes/SDL2/SDL2_ttf.framework /Library/Frameworks/
+          hdiutil unmount /Volumes/mountpoint
 
       - name: Checkout Repo
         uses: actions/checkout@v4
