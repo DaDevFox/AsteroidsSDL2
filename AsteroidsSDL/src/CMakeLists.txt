@@ -23,16 +23,11 @@ INCLUDE(FindPkgConfig)
 
 
 if(APPLE)
-    set(HOMEBREW_PREFIX "/usr/local/"
-        CACHE PATH "Path to Homebrew installation")
-
-        link_directories( /opt/local/lib )
-
-    set(CMAKE_PREFIX_PATH
-        "${HOMEBREW_PREFIX}")
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
 endif()
 
-PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+#PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 if(UNIX)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
