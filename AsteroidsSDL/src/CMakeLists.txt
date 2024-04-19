@@ -21,16 +21,7 @@ add_executable(${PROJECT_NAME} ${asteroids_SRC})
 INCLUDE(FindPkgConfig)
 
 if(APPLE)
-    set(HOMEBREW_PREFIX "/usr/local"
-        CACHE PATH "Path to Homebrew installation")
-        
-
-    set(CMAKE_PREFIX_PATH
-    "${HOMEBREW_PREFIX}")
-    set(CMAKE_FIND_FRAMEWORK NEVER)
-    set(CMAKE_FIND_APPBUNDLE NEVER)
-
-
+    PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/usr/local/Cellar/
 endif()
 
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
