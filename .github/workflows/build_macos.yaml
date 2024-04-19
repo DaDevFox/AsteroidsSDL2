@@ -29,9 +29,9 @@ jobs:
           brew install sdl2_image
           brew install sdl2_ttf
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@cd-testing
 
-      - name: Configure and Build Project
+      - name: configure and build project
         uses: threeal/cmake-action@main
         with:
           source-dir: AsteroidsSDL/src
