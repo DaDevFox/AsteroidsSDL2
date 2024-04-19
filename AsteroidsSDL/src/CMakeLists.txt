@@ -21,10 +21,10 @@ add_executable(${PROJECT_NAME} ${asteroids_SRC})
 INCLUDE(FindPkgConfig)
 
 if(APPLE)
-    set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /Library/Frameworks)
+    find_library(SDL2 SDL2)
+else()
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 endif()
-
-PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 if(UNIX)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
