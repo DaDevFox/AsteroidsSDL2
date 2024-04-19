@@ -5,29 +5,50 @@ jobs:
   build_macos:
     runs-on: macos-latest
     steps:
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+      - name: Manual SDL Release Download
+        uses: robinraju/release-downloader@v1.10
+        with: 
+          # The source repository path.
+          # Expected format {owner}/{repo}
+          # Default: ${{ github.repository }}
+          repository: "libsdl-org/SDL"
+          
+          # A flag to set the download target as latest release
+          # The default value is 'false'
+          latest: false
 
-      - name: Cache Homebrew Bundler RubyGems
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
-          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
-          restore-keys: ${{ runner.os }}-rubygems-
+          # A flag to download from prerelease. It should be combined with latest flag.
+          # The default value is 'false'
+          preRelease: false 
+          # The github tag. e.g: v1.0.1
+          # Download assets from a specific tag/version
+          tag: "release-2.30.2"
+          
+          # The name of the file to download.
+          # Use this field only to specify filenames other than tarball or zipball, if any.
+          # Supports wildcard pattern (eg: '*', '*.deb', '*.zip' etc..)
+          fileName: "SDL2-2.30.2.dmg"
+          
+          # Download the attached tarball (*.tar.gz)
+          tarBall: false 
+          # Download the attached zipball (*.zip)
+          zipBall: false
+          
+          # Relative path under $GITHUB_WORKSPACE to place the downloaded file(s)
+          # It will create the target directory automatically if not present
+          # eg: out-file-path: "my-downloads" => It will create directory $GITHUB_WORKSPACE/my-downloads
+          out-file-path: "sdl-downloaded"
 
-      - name: Install Homebrew Bundler RubyGems
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: brew install-bundler-gems
+          # Github access token to download files from private repositories
+          # https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+          # eg: token: ${{ secrets.MY_TOKEN }}
+          token: ${{secrets.token}} 
 
-      # TODO: setup-sdl + sdl_ttf + sdl_mixer
-      - name: Install Dependencies
-        id: dependencies
+
+      - name: SDL Release Relocation 
         run: |
-          brew install sdl2
-          brew install sdl2_image
-          brew install sdl2_ttf
+          hdiutil attach /sdl-downloaded/SDL2-2.30.2.dmg
+          sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
 
       - name: Checkout Repo
         uses: actions/checkout@v4
