@@ -29,7 +29,7 @@ jobs:
           brew install sdl2_image
           brew install sdl2_ttf
 
-      - uses: actions/checkout@cd-testing
+      - uses: actions/checkout@v4
 
       - name: configure and build project
         uses: threeal/cmake-action@main
