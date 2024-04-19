@@ -26,6 +26,8 @@ if(APPLE)
     set(HOMEBREW_PREFIX "/usr/local/"
         CACHE PATH "Path to Homebrew installation")
 
+        link_directories( /opt/local/lib )
+
     set(CMAKE_PREFIX_PATH
         "${HOMEBREW_PREFIX}")
 endif()
