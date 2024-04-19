@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_MODULE_PATH /cmake)
 project(AsteroidsSDL)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set (CMAKE_CXX_STANDARD 23)
 
 file(GLOB asteroids_SRC
@@ -20,19 +20,12 @@ add_executable(${PROJECT_NAME} ${asteroids_SRC})
 
 INCLUDE(FindPkgConfig)
 
-
-
 if(APPLE)
-    set(HOMEBREW_PREFIX "/usr/local/"
-        CACHE PATH "Path to Homebrew installation")
-
-        link_directories( /opt/local/lib )
-
-    set(CMAKE_PREFIX_PATH
-        "${HOMEBREW_PREFIX}")
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
 endif()
 
-PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+#PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 if(UNIX)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
