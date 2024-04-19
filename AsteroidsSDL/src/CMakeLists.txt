@@ -20,48 +20,48 @@ add_executable(${PROJECT_NAME} ${asteroids_SRC})
 
 INCLUDE(FindPkgConfig)
 
-if(APPLE)
-    find_package(SDL2 REQUIRED)
-    
-    find_path(SDL2_INCLUDE_DIR SDL.h
-      HINTS
-        ENV SDL2DIR
-        ${SDL2_DIR}
-        "/usr/local/Cellar/sdl2_image/2.30.2"
-      PATH_SUFFIXES SDL2
-                    # path suffixes to search inside ENV{SDL2DIR}
-                    include/SDL2 include)
+#if(APPLE)
+#   find_package(SDL2 REQUIRED)
+#   
+#   find_path(SDL2_INCLUDE_DIR SDL.h
+#     HINTS
+#       ENV SDL2DIR
+#       ${SDL2_DIR}
+#       "/usr/local/Cellar/sdl2_image/2.30.2"
+#     PATH_SUFFIXES SDL2
+#                   # path suffixes to search inside ENV{SDL2DIR}
+#                   include/SDL2 include)
+#
+#   find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
+#     HINTS
+#       ENV SDL2IMAGEDIR
+#       ENV SDL2DIR
+#       ${SDL2_DIR}
+#       "/usr/local/Cellar/sdl2_image/2.8.2_1"
+#     PATH_SUFFIXES SDL2
+#                   # path suffixes to search inside ENV{SDL2DIR}
+#                   include/SDL2 include)
+#
+#       
+#   find_path(SDL2_TTF_INCLUDE_DIR SDL_ttf.h
+#     HINTS
+#       ENV SDL2TTFDIR
+#       ENV SDL2DIR
+#       ${SDL2_DIR}
+#       "/usr/local/Cellar/sdl2_ttf/2.22.0"
+#     PATH_SUFFIXES SDL2
+#                   # path suffixes to search inside ENV{SDL2DIR}
+#                   include/SDL2 include)
+#endif()
 
-    find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
-      HINTS
-        ENV SDL2IMAGEDIR
-        ENV SDL2DIR
-        ${SDL2_DIR}
-        "/usr/local/Cellar/sdl2_image/2.8.2_1"
-      PATH_SUFFIXES SDL2
-                    # path suffixes to search inside ENV{SDL2DIR}
-                    include/SDL2 include)
-
-        
-    find_path(SDL2_TTF_INCLUDE_DIR SDL_ttf.h
-      HINTS
-        ENV SDL2TTFDIR
-        ENV SDL2DIR
-        ${SDL2_DIR}
-        "/usr/local/Cellar/sdl2_ttf/2.22.0"
-      PATH_SUFFIXES SDL2
-                    # path suffixes to search inside ENV{SDL2DIR}
-                    include/SDL2 include)
-endif()
-
-#PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 if(UNIX)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
     PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 elseif(APPLE)
-    #PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED sdl2_image>=2.0.0)
-    #PKG_SEARCH_MODULE(SDL2TTF REQUIRED sdl2_ttf>=2.0.0)
+    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED sdl2_image>=2.0.0)
+    PKG_SEARCH_MODULE(SDL2TTF REQUIRED sdl2_ttf>=2.0.0)
 endif()
 
 
