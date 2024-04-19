@@ -29,7 +29,8 @@ jobs:
           brew install sdl2_image
           brew install sdl2_ttf
 
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
         with:
           ref: cd-testing
 
