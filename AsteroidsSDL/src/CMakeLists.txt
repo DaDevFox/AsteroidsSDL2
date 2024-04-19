@@ -23,7 +23,7 @@ INCLUDE(FindPkgConfig)
 
 
 if(APPLE)
-    set(HOMEBREW_PREFIX "/usr/local"
+    set(HOMEBREW_PREFIX "/usr/local/Cellar"
         CACHE PATH "Path to Homebrew installation")
 
     set(CMAKE_PREFIX_PATH
