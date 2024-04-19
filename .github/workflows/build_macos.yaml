@@ -34,9 +34,9 @@ jobs:
         run: |
           hdiutil attach SDL2-2.30.2.dmg
           sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
-          hdiutil info
           hdiutil detach /dev/disk2s1
           hdiutil attach SDL2_image-2.8.2.dmg
+          hdiutil info
           sudo cp -r /Volumes/SDL2/SDL2_image.framework /Library/Frameworks/
           hdiutil detach /dev/disk2s1 
           hdiutil attach SDL2_ttf-2.22.0.dmg
