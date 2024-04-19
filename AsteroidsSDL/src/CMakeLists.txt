@@ -20,6 +20,10 @@ add_executable(${PROJECT_NAME} ${asteroids_SRC})
 
 INCLUDE(FindPkgConfig)
 
+if(APPLE)
+    PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/usr/local/Cellar/
+endif()
+
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
 if(UNIX)
