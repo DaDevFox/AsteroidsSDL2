@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(AsteroidsSDL)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 set (CMAKE_CXX_STANDARD 23)
 
 file(GLOB asteroids_SRC
@@ -22,7 +22,7 @@ if(APPLE)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
 
-    find_package(SDL2TTF REQUIRED)
+    find_package(SDL2_TTF REQUIRED)
     find_library(SDL2_LIBRARY NAME SDL2)
     add_executable(AsteroidsSDL asteroids_SRC)
     include_directories(AsteroidsSDL ${SDL2_INCLUDE_DIRS})
