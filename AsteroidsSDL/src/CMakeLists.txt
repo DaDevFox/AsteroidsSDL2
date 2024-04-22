@@ -23,9 +23,9 @@ if(APPLE)
 #    find_library(SDL2TTF sdl2_ttf)
 
     find_library(SDL2_LIBRARY NAME SDL2)
-    add_executable(MyProject main.cpp)
-    include_directories(MyProject ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(MyProject ${SDL2_LIBRARIES})
+    add_executable(AsteroidsSDL main.cpp)
+    include_directories(AsteroidsSDL ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(AsteroidsSDL ${SDL2_LIBRARIES})
 
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
