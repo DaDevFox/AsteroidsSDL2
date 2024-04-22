@@ -16,20 +16,26 @@ file(GLOB asteroids_SRC
      "window/*.h"
      "window/*.cpp")
 
-add_executable(${PROJECT_NAME} ${asteroids_SRC})
-
-INCLUDE(FindPkgConfig)
 
 if(APPLE)
 #    find_library(SDL2 SDL2)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
 
-    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
-    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
-    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
-    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
+    find_library(SDL2_LIBRARY NAME SDL2)
+    add_executable(MyProject main.cpp)
+    include_directories(MyProject ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(MyProject ${SDL2_LIBRARIES})
+
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
+#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 else()
+    add_executable(${PROJECT_NAME} ${asteroids_SRC})
+
+    INCLUDE(FindPkgConfig)
+
     PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
     PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
     PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
