@@ -24,7 +24,7 @@ if(APPLE)
 
     find_package(SDL2_TTF REQUIRED)
     find_library(SDL2_LIBRARY NAME SDL2)
-    add_executable(AsteroidsSDL asteroids_SRC)
+    add_executable(AsteroidsSDL ${asteroids_SRC})
     include_directories(AsteroidsSDL ${SDL2_INCLUDE_DIRS})
     include_directories(${SDL2TTF_INCLUDE_DIR})
     target_link_libraries(AsteroidsSDL ${SDL2_LIBRARIES})
