@@ -22,6 +22,10 @@ if(APPLE)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
 
+    export SDL_INCLUDE_DIR=/Library/Frameworks/SDL.framework/
+    export SDLIMAGE_LIBRARY=/Library/Frameworks/SDL_image.framework/
+    export SDLIMAGE_INCLUDE_DIR=/Library/Frameworks/SDL_image.framework/Headers
+
     find_package(SDL2 REQUIRED)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
