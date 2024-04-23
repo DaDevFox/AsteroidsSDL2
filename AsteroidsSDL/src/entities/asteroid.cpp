@@ -694,7 +694,7 @@ void Asteroid::create_outline(Uint32* buffer)
 	//		continue;
 	//	}
 
-	//	outline.push_back({ curr_x, curr_y });
+	//	outline.push_back({curr_x, curr_y });
 
 	//	if (curr_x - 1 > 0 &&
 	//		*(buffer + pixel_to_index(curr_x - 1, curr_y, w)) == GAME_asteroid_color_raw
@@ -716,7 +716,7 @@ void Asteroid::create_outline(Uint32* buffer)
 	//	if (curr_x + 1 < w &&
 	//		*(buffer + pixel_to_index(curr_x + 1, curr_y, w)) == GAME_asteroid_color_raw
 	//		&& visited.find(pixel_to_index(curr_x + 1, curr_y, w)) == visited.end())
-	//	{ 
+	//	{
 	//		open.push(pixel_to_index(curr_x + 1, curr_y, w));
 	//		continue;
 	//	}
@@ -1084,7 +1084,7 @@ void asteroids_render_update(RenderWindow* window)
 			int wx = i->x + ax;
 			int wy = i->y + ay;
 
-			window->render_point(wx, wy, { 0, 0, 255, 255 });
+			window->render_point(wx, wy, {0, 0, 255, 255 });
 		}*/
 
 

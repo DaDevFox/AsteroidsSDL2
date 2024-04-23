@@ -4,7 +4,7 @@
 #include "../entities/env/parallax_renderer.h"
 
 ParallaxRenderer parallax;
-const SDL_Color health_low = { 255, 0, 0, 255 };
+const SDL_Color health_low = {255, 0, 0, 255 };
 const float health_gradient_reach = 0.5F;
 
 const float health_flashing_cutoff = 0.5F;
@@ -72,10 +72,10 @@ void render_player_ui_update(RenderWindow* window)
 	int healthbar_padding = 0;
 	float opacity = min_health_fade;
 
-	SDL_Color sidebar_bg_color = { 80, 80, 80, 255 };
-	SDL_Color healthbar_bg_color = { 100, 100, 100, 255 };
-	SDL_Color healthbar_color = { 0, 255, 0, 255 };
-	SDL_Color recent_healthbar_color = { 255, 255, 255, 255 };
+	SDL_Color sidebar_bg_color = {80, 80, 80, 255 };
+	SDL_Color healthbar_bg_color = {100, 100, 100, 255 };
+	SDL_Color healthbar_color = {0, 255, 0, 255 };
+	SDL_Color recent_healthbar_color = {255, 255, 255, 255 };
 
 	float clamp = 0.01F;
 	health_progress = player_health();
@@ -119,7 +119,7 @@ void render_player_ui_update(RenderWindow* window)
 	if (health_progress <= health_gradient_reach)
 	{
 		float value_normalized = (health_progress / health_gradient_reach);
-		healthbar_color = SDL_Color{ (unsigned char)(healthbar_color.r * value_normalized + (1.0F - value_normalized) * health_low.r),
+		healthbar_color = SDL_Color{(unsigned char)(healthbar_color.r * value_normalized + (1.0F - value_normalized) * health_low.r),
 		(unsigned char)(healthbar_color.g * value_normalized + (1.0F - value_normalized) * health_low.g),
 		(unsigned char)(healthbar_color.b * value_normalized + (1.0F - value_normalized) * health_low.b),
 		255 };
@@ -133,7 +133,7 @@ void render_player_ui_update(RenderWindow* window)
 		if (theta <= 2 * PI * health_progress)
 			color = healthbar_color;
 
-		//color = { (unsigned char)((float)color.r * opacity), (unsigned char)((float)color.g * opacity), (unsigned char)((float)color.b * opacity), 255 };
+		//color = {(unsigned char)((float)color.r * opacity), (unsigned char)((float)color.g * opacity), (unsigned char)((float)color.b * opacity), 255 };
 		window->render_rect_alphamod(player->x - (player->w >> 1) + player->center_x + player_radius * cosf(theta), player->y - (player->h >> 1) + player->center_y + player_radius * sinf(theta), 1.0F, 1.0F, color, (int)(opacity * 255.0F));
 	}
 
@@ -194,16 +194,16 @@ void render_game_ui_update(RenderWindow* window)
 	const float end_screen_body_fadein_delay = 0.0F;
 
 
-	const SDL_Color text_color_subtitle = { 255, 255, 255, 255 };
-	const SDL_Color text_color_body = { 230, 230, 230, 255 };
-	const SDL_Color text_color_title_victory = { 0, 255, 0, 255 };
-	const SDL_Color text_color_title_loss = { 255, 0, 0, 255 };
+	const SDL_Color text_color_subtitle = {255, 255, 255, 255 };
+	const SDL_Color text_color_body = {230, 230, 230, 255 };
+	const SDL_Color text_color_title_victory = {0, 255, 0, 255 };
+	const SDL_Color text_color_title_loss = {255, 0, 0, 255 };
 
 	const char* title = player_victor ? "VICTORY" : "DEFEAT";
 	const char* subtitle = "";
 
 
-	window->render_rect(0, 0, WINDOW_width, WINDOW_height, { 0,0,0,255 });
+	window->render_rect(0, 0, WINDOW_width, WINDOW_height, {0,0,0,255 });
 
 
 	int title_offset = 150;
@@ -227,20 +227,20 @@ void render_debug_update(RenderWindow* window)
 	int debug_bar_offset = 30;
 	const char* debug_header_text = "debug menu";
 	int debug_bar_height = 50;
-	SDL_Color debug_bar_bg_color = { 150, 150, 150, 255 };
-	SDL_Color debug_bar_bg_accent_color = { 100, 100, 100, 255 };
-	SDL_Color debug_mode_indicator_color_on = { 0, 140, 0, 255 };
-	SDL_Color debug_mode_indicator_color_off = { 30, 30, 30, 255 };
+	SDL_Color debug_bar_bg_color = {150, 150, 150, 255 };
+	SDL_Color debug_bar_bg_accent_color = {100, 100, 100, 255 };
+	SDL_Color debug_mode_indicator_color_on = {0, 140, 0, 255 };
+	SDL_Color debug_mode_indicator_color_off = {30, 30, 30, 255 };
 	int debug_mode_indicator_width = 150;
 
 
 	if (DEBUG_mode)
 	{
-		bool modes[] = { DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will, DEBUG_ship_targets };
-		const char* text[] = { "wireframe", "grid", "outlines", "fire at will", "show ship targets" };
+		bool modes[] = {DEBUG_wireframe_mode, DEBUG_chunk_gridlines, DEBUG_display_entity_outlines, DEBUG_ships_fire_at_will, DEBUG_ship_targets };
+		const char* text[] = {"wireframe", "grid", "outlines", "fire at will", "show ship targets" };
 
 		window->render_rect(0, 0, WINDOW_width, debug_bar_offset, debug_bar_bg_accent_color);
-		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, { 255, 255, 255, 255 });
+		window->render_centered_screen((float)WINDOW_width * 0.5F, debug_bar_offset * 0.5F, debug_header_text, encode_sans_medium, {255, 255, 255, 255 });
 
 		// Debug Mode Indicators
 		for (int i = 0; i < sizeof(modes) / sizeof(bool); i++)
@@ -253,7 +253,7 @@ void render_debug_update(RenderWindow* window)
 			window->render_centered_screen(
 				(float)debug_mode_indicator_width * 0.5F + (float)(i * debug_mode_indicator_width),
 				(float)debug_bar_height * 0.5F + debug_bar_offset,
-				text[i], encode_sans_medium, { 255, 255, 255, 255 });
+				text[i], encode_sans_medium, {255, 255, 255, 255 });
 
 			curr_x += debug_mode_indicator_width;
 		}
@@ -271,16 +271,16 @@ void render_debug_update(RenderWindow* window)
 			//window->render_centered_screen(
 			//	debug_mode_indicator_width * 0.5F + (float)(curr_x * debug_mode_indicator_width),
 			//	(float)debug_bar_height * 0.5F + debug_bar_offset,
-			//	output, encode_sans_medium, { 255, 255, 255, 255 });
+			//	output, encode_sans_medium, {255, 255, 255, 255 });
 		}
 
 		if (DEBUG_chunk_gridlines)
 		{
 			for (int x = 0; x < GAME_width; x += chunk_size)
-				window->render_line(x, 0, x, GAME_height, { 200, 200, 200, 255 });
+				window->render_line(x, 0, x, GAME_height, {200, 200, 200, 255 });
 
 			for (int y = 0; y < GAME_height; y += chunk_size)
-				window->render_line(0, y, GAME_width, y, { 200, 200, 200, 255 });
+				window->render_line(0, y, GAME_width, y, {200, 200, 200, 255 });
 		}
 
 		curr_y += debug_bar_offset + debug_bar_height;
@@ -290,7 +290,7 @@ void render_debug_update(RenderWindow* window)
 	{
 		// FPS HUD
 		char output[40] = "PAUSED";
-		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_bold, { 255, 255, 255, 255 });
+		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_bold, {255, 255, 255, 255 });
 		curr_y += 20;
 	}
 
@@ -300,7 +300,7 @@ void render_debug_update(RenderWindow* window)
 		char output[40];
 
 		snprintf(output, 40, "%.1d fps; (%.1d, %.1d)", (int)((1000.0F / delta_time)), (int)window->camera.x, (int)window->camera.y);
-		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, { 255, 255, 255, 255 });
+		window->render_centered_screen(WINDOW_width / 2.0F, curr_y + 20, output, encode_sans_medium, {255, 255, 255, 255 });
 	}
 }
 

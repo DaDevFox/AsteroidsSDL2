@@ -51,7 +51,7 @@ int WINDOW_width;
 int GAME_height = 1024;
 int GAME_width = 1024;
 
-SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
+SDL_Rect GAME_window_rect = {0, 0, GAME_width, GAME_height };
 
 void* entities;
 
@@ -69,7 +69,7 @@ Uint32 current_tick;
 
 SDL_Event running_event;
 
-SDL_Color game_frame_color{ 120, 120, 120, 255 };
+SDL_Color game_frame_color{120, 120, 120, 255 };
 
 // resources
 TTF_Font* encode_sans_medium;

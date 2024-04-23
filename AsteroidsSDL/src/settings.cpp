@@ -103,7 +103,7 @@ const float ASTEROID_startspeed_maximum = 0.02F;
 const float ASTEROID_split_minimum_velocity = 0.020F;
 
 const float PLAYER_controlspeed_maximum = 0.1F;
-const SDL_Color PLAYER_thrusting_outline_color = { 0, 0, 255, 255 };
+const SDL_Color PLAYER_thrusting_outline_color = {0, 0, 255, 255 };
 
 // Ships
 const int SHIP_initial_health = 3;

@@ -190,7 +190,7 @@ void Entity::update_collision_chunk()
 		collision_chunk = curr_chunk;
 	}
 
-	window.render_rect((screen_x / chunk_size) * chunk_size, (screen_y / chunk_size) * chunk_size, chunk_size, chunk_size, { 100, 100, 100, 20 });
+	window.render_rect((screen_x / chunk_size) * chunk_size, (screen_y / chunk_size) * chunk_size, chunk_size, chunk_size, {100, 100, 100, 20 });
 }
 
 bool collision_between(Entity* a, Entity* b, SDL_Point* hit)
@@ -209,7 +209,7 @@ bool collision_between(Entity* a, Entity* b, SDL_Point* hit)
 	for (SDL_Point* i = a->outline; i < a->outline + a->outline_point_count; i++)
 	{
 		scratch.insert(hash(ax + i->x, ay + i->y));
-		window.render_point(ax + i->x, ay + i->y, { 0, 0, 255, 255 });
+		window.render_point(ax + i->x, ay + i->y, {0, 0, 255, 255 });
 	}
 
 	for (SDL_Point* i = b->outline; i < b->outline + b->outline_point_count; i++)
@@ -219,7 +219,7 @@ bool collision_between(Entity* a, Entity* b, SDL_Point* hit)
 		//	if(scratch[idx] == hashed)//TODO: sorting + binary search for vector
 		if (scratch.find(hashed) != scratch.end())
 		{
-			*hit = SDL_Point{ bx + i->x, by + i->y };
+			*hit = SDL_Point{bx + i->x, by + i->y };
 			return true;
 		}
 	}
@@ -338,26 +338,26 @@ void Entity::render(RenderWindow* window)
 {
 	if (DEBUG_mode && (DEBUG_display_entity_outlines || DEBUG_wireframe_mode))
 	{
-		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 100, 100, 100, 100 });
+		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, {100, 100, 100, 100 });
 		for (int i = 0; i < outline_point_count; i++)
-			window->render_rect((float)(screen_x - (w >> 1) + outline[i].x), (float)(screen_y - (h >> 1) + outline[i].y), 1.0F, 1.0F, { 0, 0, 255, 255 });
+			window->render_rect((float)(screen_x - (w >> 1) + outline[i].x), (float)(screen_y - (h >> 1) + outline[i].y), 1.0F, 1.0F, {0, 0, 255, 255 });
 	}
 
 	if (DEBUG_mode && DEBUG_wireframe_mode && id == GAME_ship_count + GAME_asteroid_count - 1)
-		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, { 255, 0, 0, 255 });
+		window->render_rect_outline(screen_x - (w >> 1), screen_y - (h >> 1), w, h, {255, 0, 0, 255 });
 
 	if (DEBUG_mode && DEBUG_entity_rotations)
 	{
 		char str[20] = "";
 		snprintf(str, 20, "%.4f", rotation);
-		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
+		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, {255, 255, 255, 255 });
 	}
 
 	if (DEBUG_mode && DEBUG_chunk_gridlines)
 	{
 		char str[20] = "";
 		snprintf(str, 20, "%i", collision_chunk);
-		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, { 255, 255, 255, 255 });
+		window->render_centered_world(x, y + 50.0F, str, encode_sans_medium, {255, 255, 255, 255 });
 	}
 
 	if ((DEBUG_mode && DEBUG_wireframe_mode))
