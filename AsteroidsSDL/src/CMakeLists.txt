@@ -23,6 +23,7 @@ if(APPLE)
 #    find_library(SDL2TTF sdl2_ttf)
 
     find_package(SDL2_TTF REQUIRED)
+    find_package(SDL2_Image REQUIRED)
     find_library(SDL2_LIBRARY NAME SDL2)
     add_executable(AsteroidsSDL ${asteroids_SRC})
     include_directories(AsteroidsSDL ${SDL2_INCLUDE_DIRS})
