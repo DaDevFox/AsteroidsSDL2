@@ -24,7 +24,7 @@ if(APPLE)
 
     set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
     
-    find_library(SDL2 REQUIRED SDL2)
+    find_library(SDL2 NAME SDL2)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
     add_executable(AsteroidsSDL ${asteroids_SRC})
