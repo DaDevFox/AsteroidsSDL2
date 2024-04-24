@@ -59,6 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
+           cp -r /AsteroidsSDL/res/* /out
            zip -r Linux.zip out
 
       - name: Upload Release Asset
@@ -127,6 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
+           cp -r /AsteroidsSDL/res/* /out
            zip -r OSX.zip out
 
       - name: Upload Release Asset
