@@ -20,14 +20,15 @@ jobs:
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
           version: ${{ steps.previoustag.outputs.tag }}
+          strict: false
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.previoustag.outputs.tag }}
-          release_name: v${{ steps.previoustag.outputs.tag }}
+          tag_name: ${{ steps.semvers.outputs.patch }}
+          release_name: v${{ steps.semvers.outputs.v_patch}}
           draft: false
           prerelease: false
 
