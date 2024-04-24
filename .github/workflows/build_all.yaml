@@ -1,4 +1,4 @@
-name: "Asteroids MacOS Build"
+name: "Asteroids Cross-Platform Build"
 on: workflow_dispatch
 
 jobs:
