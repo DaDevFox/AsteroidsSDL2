@@ -8,6 +8,7 @@ jobs:
       tag: ${{ steps.previoustag.outputs.tag }}
       release_url: ${{steps.create_release.outputs.upload_url}}
     steps:
+      - uses: actions/checkout@master
       - name: 'Get Previous tag'
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
