@@ -70,6 +70,7 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./Linux.zip
           asset_name: Linux.zip
+          asset_content_type: application/zip
 
   build_macos:
     runs-on: macos-latest
