@@ -59,7 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           zip -r Linux.zip AsteroidsSDL/src out
+           zip -r Linux.zip out
 
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -127,7 +127,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           zip -r OSX.zip AsteroidsSDL/src out
+           zip -r OSX.zip out
 
       - name: Upload Release Asset
         id: upload-release-asset 
