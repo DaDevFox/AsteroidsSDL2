@@ -47,10 +47,7 @@ jobs:
           sudo apt-get install libsdl2-image-dev
           sudo apt-get install libsdl2-ttf-dev
 
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          ref: main
+      - uses: actions/checkout@master
 
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
@@ -116,10 +113,7 @@ jobs:
           sudo cp -r /Volumes/SDL2_ttf/SDL2_ttf.framework /Library/Frameworks/
           hdiutil detach /dev/disk2s1 
 
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          ref: main
+      - uses: actions/checkout@master
 
       - name: Configure and Build
         uses: threeal/cmake-action@main
