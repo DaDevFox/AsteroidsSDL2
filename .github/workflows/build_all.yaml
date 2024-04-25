@@ -114,15 +114,11 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: CMake Workflow
-        uses: alandefreitas/cpp-actions/cmake-workflow@master
+      - name: CMake Configure, Build, and Install
+        uses: threeal/cmake-action@main
         with:
           source-dir: AsteroidsSDL/src
           build-dir: out
-          package: true
-          package-name: Asteroids
-          package-vendor: FoxGames
-          package-generators: PACKAGEMAKER
 
       - name: Zip Result
         env:
