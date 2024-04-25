@@ -120,13 +120,13 @@ jobs:
           source-dir: AsteroidsSDL/src
           build-dir: out
 
+      #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
       - name: Zip Result
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
            cp -r AsteroidsSDL/res/* out
            ls
-           cp -r bin/* out
            zip -r OSX.zip out
 
       - name: Upload Release Asset
