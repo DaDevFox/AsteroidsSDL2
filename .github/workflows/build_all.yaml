@@ -115,11 +115,17 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: CMake Configure, Build, and Install
+      - name: CMake Configure and Build
         uses: threeal/cmake-action@main
         with:
           source-dir: AsteroidsSDL/src
           build-dir: out
+
+      - name: CMake Install
+        run:
+          cd out
+          cpack
+          cd ../
 
       #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
       - name: Zip Result
