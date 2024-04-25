@@ -36,7 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: create_release
     steps:
-      # TODO: setup-sdl + sdl_ttf + sdl_mixer
       - name: Install Dependencies
         id: dependencies
         run: |
