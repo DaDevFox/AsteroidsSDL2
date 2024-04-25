@@ -35,7 +35,7 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2_LIBRARIES})
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
-
+    
     install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
     include(CPack)
 
