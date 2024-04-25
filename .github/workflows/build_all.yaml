@@ -32,6 +32,7 @@ jobs:
           draft: false
           prerelease: false
 
+  # TODO: Appimage and flatpak
   build_linux:
     runs-on: ubuntu-latest
     needs: create_release
@@ -125,9 +126,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           tree
-           cp -r AsteroidsSDL/res/* out
-           zip -r OSX.zip out
+            ls -R
+            cp -r AsteroidsSDL/res/* out
+            zip -r OSX.zip out
 
       - name: Upload Release Asset
         id: upload-release-asset 
