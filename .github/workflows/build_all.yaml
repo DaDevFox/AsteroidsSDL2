@@ -124,7 +124,7 @@ jobs:
       - name: CMake Install
         run:
           cd out
-          cpack
+          make package
           cd ../
 
       #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
