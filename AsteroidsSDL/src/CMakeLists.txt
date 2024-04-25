@@ -55,7 +55,6 @@ if(APPLE)
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
 
-    
     include(CPack)
 
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2")

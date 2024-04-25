@@ -125,8 +125,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
+           tree
            cp -r AsteroidsSDL/res/* out
-           ls
            zip -r OSX.zip out
 
       - name: Upload Release Asset
