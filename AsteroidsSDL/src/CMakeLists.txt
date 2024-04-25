@@ -36,7 +36,20 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
+    install(TARGETS SDL2 ARCHIVE DESTINATION lib)
+    install(TARGETS SDL2IMAGE ARCHIVE DESTINATION lib)
+    install(TARGETS SDL2TTF ARCHIVE DESTINATION lib)
+    install(FILES SDL.h DESTINATION include)
+    install(FILES SDL_image.h DESTINATION include)
+    install(FILES SDL_ttf.h DESTINATION include)
+
     install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
+    
+    set(CPACK_PACKAGE_NAME "Asteroids")
+    set(CPACK_PACKAGE_VENDOR "Fox Games")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
+
+    
     include(CPack)
 
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
