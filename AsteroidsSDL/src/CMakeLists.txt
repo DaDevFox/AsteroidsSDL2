@@ -31,7 +31,8 @@ if(APPLE)
       "@executable_path/../../Frameworks")
 
     set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
-    
+    SET(CPACK_OUTPUT_FILE_PREFIX packages)
+
     find_package(SDL2)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
