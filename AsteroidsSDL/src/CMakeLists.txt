@@ -31,7 +31,7 @@ if(APPLE)
       "@executable_path/../../Frameworks")
 
     set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
-    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
     find_package(SDL2)
     find_package(SDL2IMAGE REQUIRED)
