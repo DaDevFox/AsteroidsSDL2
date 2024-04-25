@@ -27,6 +27,8 @@ if(APPLE)
     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
+    list(APPEND CMAKE_INSTALL_RPATH
+      "@executable_path/../../Frameworks")
 
     set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
     
@@ -42,9 +44,15 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
-    install(DIRECTORY ${SDL2_LIBRARIES} ARCHIVE DESTINATION lib)
-    install(DIRECTORY ${SDL2TTF_LIBRARIES} ARCHIVE DESTINATION lib)
-    install(DIRECTORY ${SDL2Image_LIBRARIES} ARCHIVE DESTINATION lib)
+    install(DIRECTORY ${SDL2_LIBRARIES} 
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+    install(DIRECTORY ${SDL2TTF_LIBRARIES} 
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+    install(DIRECTORY ${SDL2Image_LIBRARIES}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
     install(FILES SDL.h DESTINATION include)
     install(FILES SDL_image.h DESTINATION include)
     install(FILES SDL_ttf.h DESTINATION include)
