@@ -125,7 +125,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
            cp -r AsteroidsSDL/res/* out
-#          cp -r AsteroidsSDL/bin/* out
            cp -r bin/* out
            zip -r OSX.zip out
 
