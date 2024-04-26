@@ -48,10 +48,10 @@ if(APPLE)
     
     install(DIRECTORY ${SDL2MAIN_LIBRARY} 
         DESTINATION lib)
-    install(DIRECTORY ${SDL2TTF_LIBRARY} 
-        DESTINATION lib)
-    install(DIRECTORY ${SDL2Image_LIBRARY}
-        DESTINATION lib)
+    #install(DIRECTORY ${SDL2TTF_LIBRARY} 
+    #    DESTINATION lib)
+    #install(DIRECTORY ${SDL2Image_LIBRARY}
+    #    DESTINATION lib)
 #    install(FILES SDL.h DESTINATION include)
 #    install(FILES SDL_image.h DESTINATION include)
 #    install(FILES SDL_ttf.h DESTINATION include)
