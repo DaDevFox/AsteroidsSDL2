@@ -46,7 +46,7 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
-    install(DIRECTORY ${SDL2_LIBRARIES} 
+    install(DIRECTORY ${SDL2_LIBRARY} 
         DESTINATION lib)
     install(DIRECTORY ${SDL2TTF_LIBRARIES} 
         DESTINATION lib)
