@@ -22,7 +22,7 @@ if(APPLE)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
     
-    set(CPACK_GENERATOR DragNDrop)
+    set(CPACK_GENERATOR "productbuild;DragNDrop")
 
     SET(CMAKE_SKIP_BUILD_RPATH FALSE)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
