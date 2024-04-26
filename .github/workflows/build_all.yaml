@@ -123,7 +123,7 @@ jobs:
           build-dir: out
 
       - name: CMake Install
-        run:
+        run: |
           cd out
           cpack --config CPackSourceConfig.cmake 
           cpack --config CPackConfig.cmake 
