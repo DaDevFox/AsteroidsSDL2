@@ -47,14 +47,17 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
     install(DIRECTORY ${SDL2_LIBRARIES} 
+        TYPE SHARED_LIBRARY 
         DESTINATION lib)
     install(DIRECTORY ${SDL2TTF_LIBRARIES} 
+        TYPE SHARED_LIBRARY 
         DESTINATION lib)
     install(DIRECTORY ${SDL2Image_LIBRARIES}
+        TYPE SHARED_LIBRARY 
         DESTINATION lib)
-    install(FILES SDL.h DESTINATION include)
-    install(FILES SDL_image.h DESTINATION include)
-    install(FILES SDL_ttf.h DESTINATION include)
+#    install(FILES SDL.h DESTINATION include)
+#    install(FILES SDL_image.h DESTINATION include)
+#    install(FILES SDL_ttf.h DESTINATION include)
 
     install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
     
