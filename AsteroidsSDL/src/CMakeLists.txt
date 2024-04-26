@@ -29,10 +29,10 @@ if(APPLE)
     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
-    list(APPEND CMAKE_INSTALL_RPATH
-      "@executable_path/../../Frameworks")
+#    list(APPEND CMAKE_INSTALL_RPATH
+#      "@executable_path/../../Frameworks")
 
-    set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
+#    set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
     set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
     find_package(SDL2)
