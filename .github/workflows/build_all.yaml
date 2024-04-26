@@ -125,8 +125,8 @@ jobs:
       - name: CMake Install
         run:
           cd out
-          cpack --config CPackConfig.cmake 
           cpack --config CPackSourceConfig.cmake 
+          cpack --config CPackConfig.cmake 
           cd ../
 
       #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
