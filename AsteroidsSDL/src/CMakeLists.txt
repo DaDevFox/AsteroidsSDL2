@@ -22,7 +22,7 @@ if(APPLE)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
     
-    set(CPACK_GENERATOR "productbuild;DragNDrop")
+    set(CPACK_GENERATOR "NSIS;productbuild;DragNDrop")
 
     SET(CMAKE_SKIP_BUILD_RPATH FALSE)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
@@ -32,7 +32,6 @@ if(APPLE)
 #    list(APPEND CMAKE_INSTALL_RPATH
 #      "@executable_path/../../Frameworks")
 
-#    set(SDL2_INCLUDE_DIR, "/Library/Frameworks/SDL2.framework/")
     set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
     find_package(SDL2)
