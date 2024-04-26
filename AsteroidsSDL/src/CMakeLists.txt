@@ -22,6 +22,8 @@ if(APPLE)
 #    find_library(SDL2IMAGE SDL2_image)
 #    find_library(SDL2TTF sdl2_ttf)
     
+    set(CPACK_GENERATOR DragNDrop);
+
     SET(CMAKE_SKIP_BUILD_RPATH FALSE)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
     SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
