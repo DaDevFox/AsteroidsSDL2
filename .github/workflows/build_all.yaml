@@ -125,7 +125,7 @@ jobs:
       - name: CMake Install
         run:
           cd out
-          cpack
+          cpack -C "Release" -G "PACKAGEMAKER"
           cd ../
 
       #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
