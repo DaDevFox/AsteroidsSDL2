@@ -136,7 +136,7 @@ jobs:
         run: |
             ls -R
             cp -r AsteroidsSDL/res/* out
-            zip -r OSX.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/Headers/ruby
+            zip -r OSX.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/Headers/ruby -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_14.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Ruby.framework/Versions/2.6/Headers/ruby
 
       - name: Upload Release Asset
         id: upload-release-asset 
