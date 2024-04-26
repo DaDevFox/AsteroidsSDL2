@@ -60,6 +60,10 @@ if(APPLE)
     set(CPACK_PACKAGE_NAME "Asteroids")
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
+    set(CPACK_PACKAGE_VERSION_MAJOR 0)
+    set(CPACK_PACKAGE_VERSION_MINOR 2)
+    set(CPACK_PACKAGE_VERSION_PATCH 0)
+
 
     include(CPack)
 
