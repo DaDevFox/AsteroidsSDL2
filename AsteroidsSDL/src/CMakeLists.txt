@@ -44,9 +44,6 @@ endif()
 set(LIB_INSTALL_DIR lib)
 set(INCLUDE_INSTALL_DIR include)
 
-add_executable(${PROJECT_NAME} ${asteroids_SRC})
-find_package(SDL2)
-
 if(APPLE)
 #    find_library(SDL2 SDL2)
 #    find_library(SDL2IMAGE SDL2_image)
