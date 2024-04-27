@@ -87,7 +87,7 @@ if(APPLE)
 #    install(FILES SDL_image.h DESTINATION include)
 #    install(FILES SDL_ttf.h DESTINATION include)
 
-    install(FILES asteroids_RES DESTINATION bin)
+    install(FILES ${asteroids_RES} DESTINATION bin)
     install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
     
     set(CPACK_PACKAGE_NAME "Asteroids")
