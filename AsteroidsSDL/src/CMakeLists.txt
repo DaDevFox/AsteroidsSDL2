@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(AsteroidsSDL)
 
+option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 set (CMAKE_CXX_STANDARD 23)
 
@@ -16,6 +18,34 @@ file(GLOB asteroids_SRC
      "window/*.h"
      "window/*.cpp")
 
+# from https://github.com/VileLasagna/WarpDrive/blob/dEffectiveMotor/WarpDrive/CMakeLists.txt
+if(NOT EXTERNAL_ROOT)
+    set(EXTERNAL_ROOT "${CMAKE_CURRENT_DIR}/redist")
+endif(NOT EXTERNAL_ROOT)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(WDSYSTEM_ROOT "/usr/local")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(WDSYSTEM_ROOT "c:/Program Files/${PROJECT_NAME}")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+list(APPEND CMAKE_PREFIX_PATH ${WDSYSTEM_ROOT})
+
+if ( (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        OR ( (CMAKE_INSTALL_PREFIX STREQUAL EXTERNAL_ROOT) OR (CMAKE_INSTALL_PREFIX STREQUAL WDSYSTEM_ROOT) ) )
+
+    if(DEVELOPMENT_DEPLOY)
+        set(CMAKE_INSTALL_PREFIX "${EXTERNAL_ROOT}" CACHE PATH "Default install path" FORCE)
+    else(DEVELOPMENT_DEPLOY)
+        set(CMAKE_INSTALL_PREFIX "${WDSYSTEM_ROOT}" CACHE PATH "Default install path" FORCE)
+    endif(DEVELOPMENT_DEPLOY)
+
+endif()
+
+set(LIB_INSTALL_DIR lib)
+set(INCLUDE_INSTALL_DIR include)
+
+add_executable(${PROJECT_NAME} ${asteroids_SRC})
+find_package(SDL2)
 
 if(APPLE)
 #    find_library(SDL2 SDL2)
@@ -46,7 +76,7 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
-    install(DIRECTORY ${SDL2MAIN_LIBRARY} 
+    install(FILES ${SDL2_LIBRARY} 
         DESTINATION lib)
     #install(DIRECTORY ${SDL2TTF_LIBRARY} 
     #    DESTINATION lib)
