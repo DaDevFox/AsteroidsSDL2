@@ -18,6 +18,11 @@ file(GLOB asteroids_SRC
      "window/*.h"
      "window/*.cpp")
 
+file(GLOB asteroids_RES 
+    "res/*.png"
+    "res/*.wav"
+    "res/*.ttf")
+
 # from https://github.com/VileLasagna/WarpDrive/blob/dEffectiveMotor/WarpDrive/CMakeLists.txt
 if(NOT EXTERNAL_ROOT)
     set(EXTERNAL_ROOT "${CMAKE_CURRENT_DIR}/redist")
@@ -73,8 +78,7 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
-    install(FILES ${SDL2_LIBRARY} 
-        DESTINATION lib)
+    install(FILES ${SDL2_LIBRARY} DESTINATION lib)
     #install(DIRECTORY ${SDL2TTF_LIBRARY} 
     #    DESTINATION lib)
     #install(DIRECTORY ${SDL2Image_LIBRARY}
@@ -83,6 +87,7 @@ if(APPLE)
 #    install(FILES SDL_image.h DESTINATION include)
 #    install(FILES SDL_ttf.h DESTINATION include)
 
+    install(FILES asteroids_RES DESTINATION bin)
     install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
     
     set(CPACK_PACKAGE_NAME "Asteroids")
