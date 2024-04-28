@@ -88,7 +88,7 @@ if(APPLE)
     install(DIRECTORY ${SDL2Image_INCLUDE_DIR}
         DESTINATION include)
 
-    install(DIRECTORY ${SDL2_LIBRARIES} DESTINATION lib)
+    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
 
 #    install(FILES SDL.h DESTINATION include)
 #    install(FILES SDL_image.h DESTINATION include)
