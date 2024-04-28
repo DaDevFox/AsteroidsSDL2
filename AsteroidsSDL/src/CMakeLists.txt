@@ -23,6 +23,7 @@ file(GLOB asteroids_RES
     "res/*.wav"
     "res/*.ttf")
 
+#TODO: look at https://www.youtube.com/watch?v=6GkZnII8Jss
 # from https://github.com/VileLasagna/WarpDrive/blob/dEffectiveMotor/WarpDrive/CMakeLists.txt
 if(NOT EXTERNAL_ROOT)
     set(EXTERNAL_ROOT "${CMAKE_CURRENT_DIR}/redist")
@@ -63,6 +64,8 @@ if(APPLE)
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
 #    list(APPEND CMAKE_INSTALL_RPATH
 #      "@executable_path/../../Frameworks")
+
+    set(CMAKE_INSTALL_PREFIX "Library/Frameworks")
 
     set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
