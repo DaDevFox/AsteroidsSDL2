@@ -65,7 +65,7 @@ if(APPLE)
 #    list(APPEND CMAKE_INSTALL_RPATH
 #      "@executable_path/../../Frameworks")
 
-    set(CMAKE_INSTALL_PREFIX "Library/Frameworks")
+    set(CMAKE_PREFIX_PATH CMAKE_PREFIX_PATH "Library/Frameworks")
 
     set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
 
@@ -81,7 +81,7 @@ if(APPLE)
     target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
     target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
     
-    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
+    #install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
     #install(DIRECTORY ${SDL2TTF_LIBRARY} 
     #    DESTINATION lib)
     #install(DIRECTORY ${SDL2Image_LIBRARY}
