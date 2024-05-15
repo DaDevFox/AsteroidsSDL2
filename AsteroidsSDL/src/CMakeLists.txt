@@ -13,7 +13,6 @@ set(PROJECT_VERSION_MAJOR ${CMAKE_MATCH_1})
 set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
 set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
 
-#
 option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
 set(${CMAKE_BUILD_TYPE} "Debug")

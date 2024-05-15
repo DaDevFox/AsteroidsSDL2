@@ -100,6 +100,14 @@ FIND_FILE(SDL2_IMAGE_DLL SDL2_image.dll
 	PATH_SUFFIXES lib64 lib lib/x64
 	PATHS ${SDL2TTF_SEARCH_PATHS})
 
+if(APPLE)
+	FIND_FILE(SDL2_IMAGE_DYLIB libSDL2_image.dylib
+	HINTS
+	$ENV{SDL2IMAGEDIR}
+	PATH_SUFFIXES lib
+	PATHS ${SDL2IMAGE_SEARCH_PATHS})
+endif()
+
 IF(NOT SDL2IMAGE_BUILDING_LIBRARY)
 	IF(NOT ${SDL2IMAGE_INCLUDE_DIR} MATCHES ".framework")
 		# Non-OS X framework versions expect you to also dynamically link to

@@ -98,6 +98,14 @@ FIND_FILE(SDL2_TTF_DLL SDL2_ttf.dll
 	PATH_SUFFIXES lib64 lib lib/x64
 	PATHS ${SDL2TTF_SEARCH_PATHS})
 
+if(APPLE)
+	FIND_FILE(SDL2_TTF_DYLIB libSDL2_ttf.dylib
+	HINTS
+	$ENV{SDL2TTFDIR}
+	PATH_SUFFIXES lib
+	PATHS ${SDL2TTF_SEARCH_PATHS})
+endif()
+
 IF(NOT SDL2TTF_BUILDING_LIBRARY)
 	IF(NOT ${SDL2TTF_INCLUDE_DIR} MATCHES ".framework")
 		# Non-OS X framework versions expect you to also dynamically link to
