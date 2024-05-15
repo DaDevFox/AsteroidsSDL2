@@ -70,46 +70,36 @@ if(APPLE)
     
     set(CPACK_GENERATOR "DragNDrop;productbuild")
 
-    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
-    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
+#    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+#    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
+#    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
 #    list(APPEND CMAKE_INSTALL_RPATH
 #      "@executable_path/../../Frameworks")
 
-    set(CMAKE_INSTALL_PREFIX "Library/Frameworks/SDL2.framework")
+#    set(CMAKE_INSTALL_PREFIX "Library/Frameworks/SDL2.framework")
 
-    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/")
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
 
-    find_package(SDL2)
+    find_package(SDL2 REQUIRED)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
+
     add_executable(${ProjName} ${asteroids_SRC})
-    include_directories(${ProjName})
-    include_directories(${SDL2_INCLUDE_DIR})
-    include_directories(${SDL2TTF_INCLUDE_DIR})
-    include_directories(${SDL2IMAGE_INCLUDE_DIR})
-    target_link_libraries(${ProjName} ${SDL2_LIBRARIES})
-    target_link_libraries(${ProjName} ${SDL2TTF_LIBRARY})
-    target_link_libraries(${ProjName} ${SDL2IMAGE_LIBRARY})
     
-    install(DIRECTORY ${SDL2_INCLUDE_DIR} 
-        DESTINATION include)
-    install(DIRECTORY ${SDL2TTF_INCLUDE_DIR} 
-        DESTINATION include)
-    install(DIRECTORY ${SDL2Image_INCLUDE_DIR}
-        DESTINATION include)
-
-    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
-
-#    install(FILES SDL.h DESTINATION include)
-#    install(FILES SDL_image.h DESTINATION include)
-#    install(FILES SDL_ttf.h DESTINATION include)
-
+    include_directories(${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR})
+    target_link_libraries(${ProjName} ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} ${SDL2IMAGE_LIBRARY})
+    
+    # unsure if libraries themselves are also needed
+    install(FILES ${SDL2_DYLIB} DESTINATION bin)
+    install(FILES ${SDL2_IMAGE_DYLIB} DESTINATION bin)
+    install(FILES ${SDL2_TTF_DYLIB} DESTINATION bin)
     install(FILES ${asteroids_RES} DESTINATION bin)
-    install(TARGETS ${ProjName} RUNTIME DESTINATION bin)
     
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+    # CPack config
     set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
@@ -117,8 +107,21 @@ if(APPLE)
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
-
+    # Cpack invocation
     include(CPack)
+
+#    install(DIRECTORY ${SDL2_INCLUDE_DIR} 
+#        DESTINATION include)
+#    install(DIRECTORY ${SDL2TTF_INCLUDE_DIR} 
+#        DESTINATION include)
+#    install(DIRECTORY ${SDL2Image_INCLUDE_DIR}
+#        DESTINATION include)
+
+#    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
+
+#    install(FILES SDL.h DESTINATION include)
+#    install(FILES SDL_image.h DESTINATION include)
+#    install(FILES SDL_ttf.h DESTINATION include)
 
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
