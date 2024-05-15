@@ -107,6 +107,10 @@ jobs:
           hdiutil info
           hdiutil attach SDL2-2.30.2.dmg
           sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
+          cd /Volumes/SDL2/SDL2.framework
+          tree
+          cd ..../
+          hdiutil detach /dev/disk4s1
           hdiutil attach SDL2_image-2.8.2.dmg
           sudo cp -r /Volumes/SDL2_image/SDL2_image.framework /Library/Frameworks/
           hdiutil detach /dev/disk4s1 
