@@ -104,6 +104,7 @@ jobs:
       # TODO: remove debug cd, ls -r, cd
       - name: SDL Releases Relocation 
         run: |
+          brew install tree
           hdiutil info
           hdiutil attach SDL2-2.30.2.dmg
           sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
