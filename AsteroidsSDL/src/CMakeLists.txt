@@ -12,6 +12,7 @@ set(PROJECT_VERSION_MAJOR ${CMAKE_MATCH_1})
 set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
 set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
 
+#
 project(${ProjName})
 option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
@@ -137,30 +138,21 @@ else(APPLE)
     find_package(SDL2 REQUIRED)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
+
+    # link/set includes for executable
+    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+
+    # cp files into installler (installer will copy back out on install)
     install(FILES ${SDL2_DLL} DESTINATION bin)
     install(FILES ${SDL2_IMAGE_DLL} DESTINATION bin)
     install(FILES ${SDL2_TTF_DLL} DESTINATION bin)
-
-    # ALSO TEMP
-    #set(SDL2IMAGE_LIBRARIES "D:/SDL/lib/x86/SDL2_image.lib")
-    #set(SDL2TTF_LIBRARIES "D:/SDL/lib/x86/SDL2_ttf.lib")
-    
-    
     install(FILES ${asteroids_RES} DESTINATION bin)
-
-#    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-#    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
-#    PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
-
-    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
-    #TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES})
-
+    
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-    install(FILES ${SDL2_LIBRARIES} DESTINATION bin)
-    install(FILES ${SDL2IMAGE_LIBRARY} DESTINATION bin)
-    install(FILES ${SDL2TTF_LIBRARY} DESTINATION bin)
+    
 
+    # CPack config
     set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
@@ -168,6 +160,7 @@ else(APPLE)
     set(CPACK_PACKAGE_VERSION_MINOR 2)
     set(CPACK_PACKAGE_VERSION_PATCH 0)
 
+    # Cpack invocation
     include(CPack)
 endif()
 
