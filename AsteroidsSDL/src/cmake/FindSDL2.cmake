@@ -71,6 +71,17 @@
 # "SDL.h", not <SDL/SDL.h>.  This is done for portability reasons
 # because not all systems place things in SDL/ (see FreeBSD).
 
+SET(SDL2_SEARCH_PATHS
+	~/Library/Frameworks
+	/Library/Frameworks
+	/usr/local
+	/usr
+	/sw # Fink
+	/opt/local # DarwinPorts
+	/opt/csw # Blastwave
+	/opt
+)
+
 if(NOT SDL2_DIR)
   set(SDL2_DIR "" CACHE PATH "SDL2 directory")
 endif()
@@ -89,7 +100,7 @@ FIND_FILE(SDL2_DLL SDL2.dll
     ENV SDL2DIR
     ${SDL2_DIR}
 	PATH_SUFFIXES lib64 lib lib/x64
-	PATHS ${SDL2TTF_SEARCH_PATHS})
+	PATHS ${SDL2_SEARCH_PATHS})
 
 if(APPLE)
     FIND_FILE(SDL2_DYLIB libSDL2.dylib
@@ -97,7 +108,7 @@ if(APPLE)
     ENV SDL2DIR
     ${SDL2_DIR}
 	PATH_SUFFIXES lib64 lib SDL
-	PATHS ${SDL2TTF_SEARCH_PATHS})
+	PATHS ${SDL2_SEARCH_PATHS})
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
