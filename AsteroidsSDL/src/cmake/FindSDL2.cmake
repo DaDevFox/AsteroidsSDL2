@@ -84,6 +84,13 @@ find_path(SDL2_INCLUDE_DIR SDL.h
                 include/SDL2 include
 )
 
+FIND_FILE(SDL2_DLL SDL2.dll
+	HINTS
+    ENV SDL2DIR
+    ${SDL2_DIR}
+	PATH_SUFFIXES lib64 lib lib/x64
+	PATHS ${SDL2TTF_SEARCH_PATHS})
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(VC_LIB_PATH_SUFFIX lib/x64)
 else()

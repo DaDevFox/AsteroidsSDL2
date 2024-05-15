@@ -3,8 +3,9 @@ project(AsteroidsSDL)
 
 option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
+set(${CMAKE_BUILD_TYPE} "Debug")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
-set (CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 23)
 
 file(GLOB asteroids_SRC
      "*.h"
@@ -19,9 +20,9 @@ file(GLOB asteroids_SRC
      "window/*.cpp")
 
 file(GLOB asteroids_RES 
-    "res/*.png"
-    "res/*.wav"
-    "res/*.ttf")
+    "../res/*.png"
+    "../res/*.wav"
+    "../res/*.ttf")
 
 #TODO: look at https://www.youtube.com/watch?v=6GkZnII8Jss
 # from https://github.com/VileLasagna/WarpDrive/blob/dEffectiveMotor/WarpDrive/CMakeLists.txt
@@ -111,16 +112,50 @@ if(APPLE)
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
 #    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
-else()
+else(APPLE)
     add_executable(${PROJECT_NAME} ${asteroids_SRC})
+    
+    set(CPACK_GENERATOR "NSIS")
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
+    SET(CPACK_OUTPUT_FILE_PREFIX packages)
 
-    INCLUDE(FindPkgConfig)
+    # TEMP; FOR LOCAL DEV ONLY
+    set(CMAKE_PREFIX_PATH CMAKE_PREFIX_PATH "D:/SDL")
 
-    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
-    PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2IMAGE REQUIRED)
+    find_package(SDL2TTF REQUIRED)
+    install(FILES ${SDL2_DLL} DESTINATION bin)
+    install(FILES ${SDL2_IMAGE_DLL} DESTINATION bin)
+    install(FILES ${SDL2_TTF_DLL} DESTINATION bin)
 
-    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES})
+    # ALSO TEMP
+    #set(SDL2IMAGE_LIBRARIES "D:/SDL/lib/x86/SDL2_image.lib")
+    #set(SDL2TTF_LIBRARIES "D:/SDL/lib/x86/SDL2_ttf.lib")
+    
+    
+    install(FILES ${asteroids_RES} DESTINATION bin)
+
+#    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+#    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+#    PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
+
+    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+    #TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES})
+
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+    install(FILES ${SDL2_LIBRARIES} DESTINATION bin)
+    install(FILES ${SDL2IMAGE_LIBRARY} DESTINATION bin)
+    install(FILES ${SDL2TTF_LIBRARY} DESTINATION bin)
+
+    set(CPACK_PACKAGE_NAME "Asteroids")
+    set(CPACK_PACKAGE_VENDOR "Fox Games")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
+    set(CPACK_PACKAGE_VERSION_MAJOR 0)
+    set(CPACK_PACKAGE_VERSION_MINOR 2)
+    set(CPACK_PACKAGE_VERSION_PATCH 0)
+
+    include(CPack)
 endif()
 

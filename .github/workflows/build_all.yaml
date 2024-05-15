@@ -101,6 +101,7 @@ jobs:
           target: SDL2_ttf-2.22.0.dmg
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # TODO: remove debug cd, ls -r, cd
       - name: SDL Releases Relocation 
         run: |
           hdiutil info
