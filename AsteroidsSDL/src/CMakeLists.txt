@@ -3,6 +3,7 @@ file(STRINGS config.txt CONFIG)
 
 # set project name from config.txt
 list(POP_FRONT CONFIG ProjName)
+project(${ProjName})
 
 # set project version
 list(POP_FRONT CONFIG ProjVersion)
@@ -13,7 +14,6 @@ set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
 set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
 
 #
-project(${ProjName})
 option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
 set(${CMAKE_BUILD_TYPE} "Debug")
@@ -114,9 +114,9 @@ if(APPLE)
     set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
-    set(CPACK_PACKAGE_VERSION_MAJOR 0)
-    set(CPACK_PACKAGE_VERSION_MINOR 2)
-    set(CPACK_PACKAGE_VERSION_PATCH 0)
+    set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 
     include(CPack)
@@ -156,9 +156,9 @@ else(APPLE)
     set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
-    set(CPACK_PACKAGE_VERSION_MAJOR 0)
-    set(CPACK_PACKAGE_VERSION_MINOR 2)
-    set(CPACK_PACKAGE_VERSION_PATCH 0)
+    set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
     # Cpack invocation
     include(CPack)
