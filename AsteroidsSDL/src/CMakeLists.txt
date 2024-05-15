@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
-project(AsteroidsSDL)
+file(STRINGS config.txt CONFIG)
 
+# set project name from config.txt
+list(POP_FRONT CONFIG ProjName)
+
+# set project version
+list(POP_FRONT CONFIG ProjVersion)
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)"
+       ProjVersion_MATCH ${ProjVersion})
+set(PROJECT_VERSION_MAJOR ${CMAKE_MATCH_1})
+set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
+set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
+
+project(${ProjName})
 option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
 set(${CMAKE_BUILD_TYPE} "Debug")
@@ -73,14 +85,14 @@ if(APPLE)
     find_package(SDL2)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
-    add_executable(AsteroidsSDL ${asteroids_SRC})
-    include_directories(AsteroidsSDL)
+    add_executable(${ProjName} ${asteroids_SRC})
+    include_directories(${ProjName})
     include_directories(${SDL2_INCLUDE_DIR})
     include_directories(${SDL2TTF_INCLUDE_DIR})
     include_directories(${SDL2IMAGE_INCLUDE_DIR})
-    target_link_libraries(AsteroidsSDL ${SDL2_LIBRARIES})
-    target_link_libraries(AsteroidsSDL ${SDL2TTF_LIBRARY})
-    target_link_libraries(AsteroidsSDL ${SDL2IMAGE_LIBRARY})
+    target_link_libraries(${ProjName} ${SDL2_LIBRARIES})
+    target_link_libraries(${ProjName} ${SDL2TTF_LIBRARY})
+    target_link_libraries(${ProjName} ${SDL2IMAGE_LIBRARY})
     
     install(DIRECTORY ${SDL2_INCLUDE_DIR} 
         DESTINATION include)
@@ -96,11 +108,11 @@ if(APPLE)
 #    install(FILES SDL_ttf.h DESTINATION include)
 
     install(FILES ${asteroids_RES} DESTINATION bin)
-    install(TARGETS AsteroidsSDL RUNTIME DESTINATION bin)
+    install(TARGETS ${ProjName} RUNTIME DESTINATION bin)
     
-    set(CPACK_PACKAGE_NAME "Asteroids")
+    set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
     set(CPACK_PACKAGE_VERSION_MAJOR 0)
     set(CPACK_PACKAGE_VERSION_MINOR 2)
     set(CPACK_PACKAGE_VERSION_PATCH 0)
@@ -149,9 +161,9 @@ else(APPLE)
     install(FILES ${SDL2IMAGE_LIBRARY} DESTINATION bin)
     install(FILES ${SDL2TTF_LIBRARY} DESTINATION bin)
 
-    set(CPACK_PACKAGE_NAME "Asteroids")
+    set(CPACK_PACKAGE_NAME ${ProjName})
     set(CPACK_PACKAGE_VENDOR "Fox Games")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Asteroids")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
     set(CPACK_PACKAGE_VERSION_MAJOR 0)
     set(CPACK_PACKAGE_VERSION_MINOR 2)
     set(CPACK_PACKAGE_VERSION_PATCH 0)
