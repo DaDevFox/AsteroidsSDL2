@@ -91,6 +91,10 @@ if(APPLE)
     include_directories(${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR})
     target_link_libraries(${ProjName} ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} ${SDL2IMAGE_LIBRARY})
     
+    list(POP_FRONT ${SDL2_LIBRARIES} SDL2_DYLIB)
+    list(POP_FRONT ${SDL2IMAGE_LIBRARY} SDL2_IMAGE_DYLIB)
+    list(POP_FRONT ${SDL2TTF_LIBRARY} SDL2_TTF_DYLIB)
+
     # unsure if libraries themselves are also needed
     install(FILES ${SDL2_DYLIB} DESTINATION bin)
     install(FILES ${SDL2_IMAGE_DYLIB} DESTINATION bin)
