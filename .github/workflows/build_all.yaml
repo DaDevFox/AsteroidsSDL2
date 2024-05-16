@@ -13,6 +13,10 @@ jobs:
         id: versionnum
         run: |
           echo "version=$(cat AsteroidsSDL/src/config.txt | head -2 | tail -1)" >> $GITHUB_OUTPUT
+      
+      - name: Concatenate 'v'
+        id: versionvnum
+        run: |
           echo "v_version=$(printf "v%s" ${{ steps.versionnum.outputs.version }})" >> $GITHUB_OUTPUT
 
       - name: Create Release
@@ -22,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.versionnum.outputs.version }}
-          release_name: ${{ steps.versionnum.outputs.v_version}}
+          release_name: ${{ steps.versionvnum.outputs.v_version}}
           draft: false
           prerelease: false
 
