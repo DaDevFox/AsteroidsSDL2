@@ -9,26 +9,20 @@ jobs:
       release_url: ${{steps.create_release.outputs.upload_url}}
     steps:
       - uses: actions/checkout@master
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          prefix: 'v'
-          fallback: 0.1
-      - name: 'Get next minor version'
-        id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@v1"
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-          strict: false
+      - name: Get Version Number
+        id: versionnum
+        run: |
+          echo "version=${cat config.txt | head -2 | tail -1}" >> $GITHUB_OUTPUT
+          echo "v_version=${printf "v%s" (cat config.txt | head -2 | tail -1)}" >> $GITHUB_OUTPUT
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.semvers.outputs.patch }}
-          release_name: ${{ steps.semvers.outputs.v_patch}}
+          tag_name: ${{ steps.versionnum.outputs.version }}
+          release_name: ${{ steps.versionnum.outputs.v_version}}
           draft: false
           prerelease: false
 
