@@ -12,7 +12,7 @@ jobs:
       - name: Get Version Number
         id: versionnum
         run: |
-          echo "version=${cat config.txt | head -2 | tail -1}" >> $GITHUB_OUTPUT
+          echo "version=${cat AsteroidsSDL/src/config.txt | head -2 | tail -1}" >> $GITHUB_OUTPUT
           echo "v_version=${printf "v%s" (cat AsteroidsSDL/src/config.txt | head -2 | tail -1)}" >> $GITHUB_OUTPUT
 
       - name: Create Release
