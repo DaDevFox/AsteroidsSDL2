@@ -77,47 +77,12 @@ jobs:
     runs-on: macos-latest
     needs: create_release
     steps:
-      - uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: 'libsdl-org/SDL'
-          version: 'tags/release-2.30.2'
-          file: 'SDL2-2.30.2.dmg'
-          target: SDL2-2.30.2.dmg
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: 'libsdl-org/SDL_image'
-          version: 'tags/release-2.8.2'
-          file: 'SDL2_image-2.8.2.dmg'
-          target: SDL2_image-2.8.2.dmg
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: 'libsdl-org/SDL_ttf'
-          version: 'tags/release-2.22.0'
-          file: 'SDL2_ttf-2.22.0.dmg'
-          target: SDL2_ttf-2.22.0.dmg
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # TODO: remove debug cd, ls -r, cd
-      - name: SDL Releases Relocation 
+      - name: Install Dependencies
+        id: dependencies
         run: |
-          brew install tree
-          hdiutil info
-          hdiutil attach SDL2-2.30.2.dmg
-          sudo cp -r /Volumes/SDL2/SDL2.framework /Library/Frameworks/
-          cd /Volumes/
-          tree
-          cd ../
-          hdiutil detach /dev/disk4s1
-          hdiutil attach SDL2_image-2.8.2.dmg
-          sudo cp -r /Volumes/SDL2_image/SDL2_image.framework /Library/Frameworks/
-          hdiutil detach /dev/disk4s1 
-          hdiutil attach SDL2_ttf-2.22.0.dmg
-          sudo cp -r /Volumes/SDL2_ttf/SDL2_ttf.framework /Library/Frameworks/
-          hdiutil detach /dev/disk4s1 
+          brew install sdl2
+          brew install sdl2_image
+          brew install sdl2_ttf      
 
       - uses: actions/checkout@master
 
