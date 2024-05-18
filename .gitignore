@@ -3,6 +3,18 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Cmake local building data
+CMakeCache.txt
+*.vcxproj
+*.vcxproj.filters
+
+install_manifest.txt
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CPackProperties.cmake
+
+
 # User-specific files
 *.rsuser
 *.suo
