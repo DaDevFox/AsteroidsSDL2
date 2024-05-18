@@ -1,2 +1,2 @@
-AsteroidsSDL2
-0.4.1
+AsteroidsSDL
+0.4.2
