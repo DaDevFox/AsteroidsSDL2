@@ -59,10 +59,9 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          dir
-          cd AsteroidsSDL
-          dir
+          dir SLD*
           cd ../
+          dir SDL*
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
