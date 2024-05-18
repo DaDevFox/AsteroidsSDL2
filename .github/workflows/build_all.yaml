@@ -34,12 +34,11 @@ jobs:
     runs-on: windows-latest
     needs: create_release
     steps:
-      - uses: dsaltares/fetch-gh-release-asset@master
+      - uses: robinraju/release-downloader@v1.10
         with:
-          repo: 'libsdl-org/SDL'
-          version: 'tags/release-2.30.3'
-          file: 'SDL2-devel-2.30.3-VC.zip'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: 'libsdl-org/SDL'
+          tag: 'release-2.30.3'
+          fileName: 'SDL2-devel-2.30.3-VC.zip'
 
       - uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -63,7 +62,7 @@ jobs:
           cd ../
           dir
           mkdir SDL2
-          mkdir SDL2_ttft
+          mkdir SDL2_ttf
           mkdir SDL2_image
           powershell -command "Expand-Archive -Force './SDL2-devel-2.30.3-VC.zip' 'SDL2'"
           powershell -command "Expand-Archive -Force './SDL2_image-devel-2.8.2-VC.zip' 'SDL2_image'"
