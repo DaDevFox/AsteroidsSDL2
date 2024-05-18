@@ -30,6 +30,75 @@ jobs:
           draft: false
           prerelease: false
 
+  build_windows:
+    runs-on: windows-latest
+    needs: create_release
+    steps:
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'libsdl-org/SDL'
+          version: 'tags/release-2.30.3'
+          file: 'SDL2-devel-2.30.3-VC.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'libsdl-org/SDL_ttf'
+          version: 'tags/release-2.22.0'
+          file: 'SDL2_ttf-devel-2.22.0-VC.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: 'libsdl-org/SDL_image'
+          version: 'tags/release-2.8.2'
+          file: 'SDL2_image-devel-2.8.2-VC.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@master
+
+      - name: Unzip Dependencies
+        run: |
+          mkdir SDL2
+          mkdir SDL2_ttf
+          mkdir SDL2_image
+          powershell -command "Expand-Archive -Force './SDL2-devel-2.30.3-VC.zip' 'SDL2'"
+          powershell -command "Expand-Archive -Force './SDL2_image-devel-2.8.2-VC.zip' 'SDL2_image'"
+          powershell -command "Expand-Archive -Force './SDL2_ttf-devel-2.22.0-VC.zip' 'SDL2_ttf'"
+          set SDL2DIR=${{ github.workspace }}/SDL2/SDL2-2.30.3
+          set SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2
+          set SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0
+
+      - name: Configure and Build Project
+        uses: threeal/cmake-action@main
+        with:
+          source-dir: AsteroidsSDL/src
+          build-dir: out
+
+      - name: Run CPack
+        run: |
+          cd out/Build/x64-Debug
+          cpack
+          dir
+
+      - name: Zip Result
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}
+        run: |
+           copy /S .\AsteroidsSDL\res\* .\out
+           powershell -command "Compress-Archive '.\out\*' '.\Win64.zip'"
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./Win64.zip
+          asset_name: Win64.zip
+          asset_content_type: application/zip
+
   # TODO: Appimage and flatpak
   build_linux:
     runs-on: ubuntu-latest
