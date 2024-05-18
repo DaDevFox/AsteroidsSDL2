@@ -59,7 +59,7 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          dir /b/s *.zip  
+          dir /s *.zip  
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
@@ -173,7 +173,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
             cp -r AsteroidsSDL/res/* out
-            zip -y -r OSX.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework 
+            zip -y -r macOS.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework 
 
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -182,6 +182,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./OSX.zip
-          asset_name: OSX.zip
+          asset_path: ./macOS.zip
+          asset_name: macOS.zip
           asset_content_type: application/zip
