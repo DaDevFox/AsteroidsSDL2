@@ -60,8 +60,8 @@ jobs:
       - name: Unzip Dependencies
         run: |
           dir SLD*
-          cd ../
-          dir SDL*
+          cd SDL2
+          dir
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
