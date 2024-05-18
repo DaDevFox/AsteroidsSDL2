@@ -59,11 +59,11 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          dir SLD*
+          dir SDL*
           cd SDL2
           dir
           mkdir SDL2
-          mkdir SDL2_ttf
+          mkdir SDL2_ttft
           mkdir SDL2_image
           powershell -command "Expand-Archive -Force './SDL2-devel-2.30.3-VC.zip' 'SDL2'"
           powershell -command "Expand-Archive -Force './SDL2_image-devel-2.8.2-VC.zip' 'SDL2_image'"

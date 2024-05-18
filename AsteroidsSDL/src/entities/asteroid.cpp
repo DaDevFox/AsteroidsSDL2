@@ -482,10 +482,25 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	float m = (float)(by - ay) / (float)(bx - ax);
 	int b = (int)((float)ay - (float)ax * m);
 	int divider = 0;
-	auto comparator = [m, b](SDL_Point self, SDL_Point other)->bool
+
+	auto compute_region = [&](SDL_Point point)->bool
 		{
-			bool self_in = ((float)self.y > (m * (float)self.x + (float)b));
-			bool other_in = ((float)other.y > (m * (float)other.x + (float)b));
+			float epsilon = 3.0F;
+			float x = point.x;
+			float y = point.y;
+			float end_product = bx * by;
+
+			bool halfspace_1 = bx * y - by * x - (ax * y - x * ay) + (ax * by - by * ax) < 0;
+			bool halfspace_2 = -(bx * bx) * epsilon + end_product - (by * by * epsilon + end_product) - (bx * y - by * x) + (by * epsilon + bx) * y - (by - bx * epsilon) * x < 0;
+			bool halfspace_3 = -(ax * ax) * epsilon + ay * ax - (ay * ay) * epsilon - ax * ay - (ax * y - ay * x) + (ay * epsilon + ax) * y - (-ax * epsilon + ay) * x > 0;
+
+			return halfspace_3;
+		};
+
+	auto comparator = [compute_region, ax, ay, bx, by, m, b](SDL_Point self, SDL_Point other)->bool
+		{
+			bool self_in = compute_region(self);
+			bool other_in = compute_region(other);
 
 			return self_in > other_in;
 		};
@@ -517,6 +532,9 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 		queue.pop();
 		i++;
 	}
+
+	window.camera.teleport(created->x, created->y);
+	time_scaling = 0.0F;
 
 	return created;
 }
