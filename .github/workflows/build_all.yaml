@@ -77,9 +77,12 @@ jobs:
 
       - name: Run CPack
         run: |
-          cd out/Build/x64-Debug
-          cd ../../../
+          cd out
+          dir
+          cd build
+          dir
           cpack
+          cd ../../
 
       - name: Zip Result
         env:
