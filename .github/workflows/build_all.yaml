@@ -58,7 +58,7 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          dir 
+          dir *.zip
           cd ../
           dir
           mkdir SDL2
