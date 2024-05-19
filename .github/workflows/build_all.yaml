@@ -58,17 +58,12 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          shell: cmd
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
           powershell -command "Expand-Archive -Force './SDL2-devel-2.30.3-VC.zip' 'SDL2'"
           powershell -command "Expand-Archive -Force './SDL2_image-devel-2.8.2-VC.zip' 'SDL2_image'"
           powershell -command "Expand-Archive -Force './SDL2_ttf-devel-2.22.0-VC.zip' 'SDL2_ttf'"
-          set SDL2DIR=${{ github.workspace }}/SDL2/SDL2-2.30.3
-          set SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2
-          set SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0
-          set
 
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
