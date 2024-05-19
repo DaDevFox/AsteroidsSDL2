@@ -67,6 +67,7 @@ jobs:
           set SDL2DIR=${{ github.workspace }}/SDL2/SDL2-2.30.3
           set SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2
           set SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0
+          set
 
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
@@ -77,8 +78,8 @@ jobs:
       - name: Run CPack
         run: |
           cd out/Build/x64-Debug
+          cd ../../../
           cpack
-          dir
 
       - name: Zip Result
         env:
