@@ -58,7 +58,6 @@ jobs:
       - uses: actions/checkout@master
 
       - name: Unzip Dependencies
-        needs: SDL-download
         run: |
           dir 
           cd ../
