@@ -58,6 +58,7 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
+          shell: cmd
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
