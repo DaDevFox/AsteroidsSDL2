@@ -66,13 +66,14 @@ jobs:
           powershell -command "Expand-Archive -Force './SDL2_ttf-devel-2.22.0-VC.zip' 'SDL2_ttf'"
           chcp 65001 
           echo ("SDL2DIR=${{ github.workspace }}/SDL2/SDL2-2.30.3") >> $env:GITHUB_ENV
+          echo ("SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2) >> $env:GITHUB_ENV
+          echo ("SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0) >> $env:GITHUB_ENV
 
       - name: Configure and Build Project
         uses: threeal/cmake-action@main
         with:
           source-dir: AsteroidsSDL/src
           build-dir: out
-          args: -D CMAKE_PREFIX_PATH="${{ github.workspace }}/SDL2/SDL2-2.30.3;${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2;${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0"
 
       - name: Run CPack
         run: |
