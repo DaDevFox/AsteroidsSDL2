@@ -77,8 +77,8 @@ jobs:
 
       - name: Run CPack
         run: |
+          Get-ChildItem -Recurse
           cd out\x64\Debug
-          dir
           cpack
           cd ..\..\..\
 
