@@ -79,6 +79,7 @@ jobs:
         run: |
           Get-ChildItem -Recurse
           cd out
+          cmake install
           cpack
           cd ..\
 
