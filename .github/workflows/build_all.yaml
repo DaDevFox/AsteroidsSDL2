@@ -79,7 +79,7 @@ jobs:
         run: |
           cd out
           dir
-          cd Debug
+          cd x64
           dir
           cpack
           cd ../../
