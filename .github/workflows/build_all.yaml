@@ -35,7 +35,6 @@ jobs:
     needs: create_release
     steps:
       - uses: robinraju/release-downloader@v1.10
-        id: SDL-download
         with:
           repository: 'libsdl-org/SDL'
           tag: 'release-2.30.3'
@@ -59,7 +58,7 @@ jobs:
 
       - name: Unzip Dependencies
         run: |
-          dir 
+          dir /a:hda
           cd ../
           dir
           mkdir SDL2
