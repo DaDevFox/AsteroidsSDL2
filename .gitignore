@@ -14,6 +14,9 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CPackProperties.cmake
 
+CMakeFiles/*
+Packaging/*
+
 
 # User-specific files
 *.rsuser
