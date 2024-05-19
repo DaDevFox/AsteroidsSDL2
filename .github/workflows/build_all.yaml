@@ -36,6 +36,9 @@ jobs:
     steps:
       - uses: robinraju/release-downloader@v1.10
         id: SDL-download
+        run: |
+          echo "test"
+          dir
         with:
           repository: 'libsdl-org/SDL'
           tag: 'release-2.30.3'
