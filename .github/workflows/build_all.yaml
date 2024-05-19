@@ -34,6 +34,8 @@ jobs:
     runs-on: windows-latest
     needs: create_release
     steps:
+      - uses: actions/checkout@master
+
       - uses: robinraju/release-downloader@v1.10
         with:
           repository: 'libsdl-org/SDL'
@@ -54,13 +56,8 @@ jobs:
           file: 'SDL2_image-devel-2.8.2-VC.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@master
-
       - name: Unzip Dependencies
         run: |
-          dir *.zip
-          cd ../
-          dir
           mkdir SDL2
           mkdir SDL2_ttf
           mkdir SDL2_image
