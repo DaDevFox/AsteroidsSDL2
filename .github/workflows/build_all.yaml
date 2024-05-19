@@ -78,9 +78,9 @@ jobs:
       - name: Run CPack
         run: |
           Get-ChildItem -Recurse
-          cd out\x64\Debug
+          cd out
           cpack
-          cd ..\..\..\
+          cd ..\
 
       - name: Zip Result
         env:
