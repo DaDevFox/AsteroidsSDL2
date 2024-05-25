@@ -8,6 +8,7 @@ const char* RESOURCE_pip_texture_path = "./pip.png";
 const char* RESOURCE_laser_beam_texture_path = "./laser_beam.png";
 const char* RESOURCE_highlighter_beam_texture_path = "./highlighter_beam.png";
 
+float SETTING_scroll_sensitivity = 0.01F;
 int SETTING_camera_pan_speed = 10;
 float SETTING_camera_pan_smoothness = 0.995F;
 float SETTING_camera_zoom_smoothness = 0.995F;

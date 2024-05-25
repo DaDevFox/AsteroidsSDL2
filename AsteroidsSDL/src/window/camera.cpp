@@ -109,6 +109,11 @@ void Camera::input_update(SDL_Event* running_event)
 			set_zoom(desired_zoom + 0.1f);
 		}
 	}
+
+	if (running_event->type == SDL_MOUSEWHEEL)
+	{
+		set_zoom(desired_zoom + running_event->wheel.y * delta_time * SETTING_scroll_sensitivity);
+	}
 }
 
 void Camera::update(float delta_time)

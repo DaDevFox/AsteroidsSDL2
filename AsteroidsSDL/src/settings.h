@@ -12,6 +12,7 @@ extern const char* RESOURCE_pip_texture_path;
 extern const char* RESOURCE_laser_beam_texture_path;
 extern const char* RESOURCE_highlighter_beam_texture_path;
 
+extern float SETTING_scroll_sensitivity;
 extern int SETTING_camera_pan_speed;
 extern float SETTING_camera_pan_smoothness;
 extern float SETTING_camera_zoom_smoothness;
