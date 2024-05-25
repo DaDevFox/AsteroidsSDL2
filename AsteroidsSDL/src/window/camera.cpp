@@ -5,9 +5,14 @@
 
 const int edge_buffer = 512;
 
+float round_to_factor(float value, float factor)
+{
+	return roundf(value * 1.0F / factor) * factor;
+}
+
 void Camera::set_zoom(float new_zoom)
 {
-	desired_zoom = SDL_min(SDL_max(new_zoom, SETTING_camera_zoom_min), SETTING_camera_zoom_max);
+	desired_zoom = round_to_factor(SDL_min(SDL_max(new_zoom, SETTING_camera_zoom_min), SETTING_camera_zoom_max), SETTING_zoom_clamping);
 
 	//x = desired_x - screen_to_world_x(WINDOW_width) / 2.0F;
 	//y = desired_y - screen_to_world_y(WINDOW_height) / 2.0F;
@@ -102,17 +107,17 @@ void Camera::input_update(SDL_Event* running_event)
 
 		if (sym == KEY_zoom_in || sym == KEY_zoom_in_alt)
 		{
-			set_zoom(desired_zoom - 0.1f);
+			set_zoom(desired_zoom - SETTING_zoom_clamping);
 		}
 		if (sym == KEY_zoom_out || sym == KEY_zoom_out_alt)
 		{
-			set_zoom(desired_zoom + 0.1f);
+			set_zoom(desired_zoom + SETTING_zoom_clamping);
 		}
 	}
 
 	if (running_event->type == SDL_MOUSEWHEEL)
 	{
-		set_zoom(desired_zoom + running_event->wheel.y * delta_time * SETTING_scroll_sensitivity);
+		set_zoom(desired_zoom + running_event->wheel.y * unscaled_delta_time * SETTING_scroll_sensitivity);
 	}
 }
 
