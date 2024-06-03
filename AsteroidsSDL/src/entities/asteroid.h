@@ -22,10 +22,15 @@ private:
 	void rand_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 	void circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost_y, int* pixel_count);
 
-	Asteroid* split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end, bool specify_theta, float specified_theta);
+	bool check_valid_split_line(int start_idx, int end_idx);
+	void resolve_endpoint(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end, bool specify_theta, float specified_theta);
+	void separate_outlines(const SDL_Point& start, const SDL_Point& end, Asteroid* other, int* separated_point_count);
+	void undo_separate_outlines(Asteroid* other, int separated_point_count, int outline_bridge_count);
+	Asteroid* split_init();
 	void split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions);
 	void remove_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions);
-	bool fill_pixels_from_outline(Asteroid* asteroid);
+	int fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>& added);
+	void fill_pixels(Asteroid* asteroid, std::set<SDL_Point>& points);
 };
 
 extern int ASTEROID_max_asteroid_radius;

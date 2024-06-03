@@ -242,18 +242,19 @@ SDL_Point operator/(SDL_Point a, int b)
 
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point);
 
-bool Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
+int Asteroid::fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>& added)
 {
-	SDL_DestroyTexture(asteroid->texture);
-	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-	SDL_LockSurface(temp_surface); // locks the surface from outside read/writing; so we can write to it
+	added.clear();
 
-	Uint32* buffer = (Uint32*)temp_surface->pixels;
-
-	// ADD OUTLINE POINTS
-	std::set<SDL_Point> added;
+	// to find start point:
+	/** softwareengineering.stackexchange.com/questions/226578/selecting-a-point-inside-a-non-convex-polygon
+	Compute the bounding box
+	Cast a ray from one corner in the direction of the opposite corner, or from the center of a bounding box edge to the opposite edge center.
+	Then, a point exactly between the first and second intersection will be inside the polygon.
+	*/
 	if (asteroid->outline_point_count > 0)
 	{
+		// ADD OUTLINE POINTS
 		added.insert(asteroid->outline, asteroid->outline + asteroid->outline_point_count);
 
 		// get start pos for flood fill (CoM of asteroid)
@@ -280,7 +281,7 @@ bool Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 
 			if (added.find(SDL_Point{ current.x, current.y + 1 }) == added.end()
 				&& open_set.find(SDL_Point{ current.x, current.y + 1 }) == open_set.end()
-				&& current.y + 1 < ASTEROID_maximum_radius * 2) // neighbor is not in added set or open set
+				&& current.y + 1 < ASTEROID_maximum_radius * 2) // neighbor is not in points points or open points
 				open_set.insert(SDL_Point{ current.x, current.y + 1 });
 			if (added.find(SDL_Point{ current.x, current.y - 1 }) == added.end()
 				&& open_set.find(SDL_Point{ current.x, current.y - 1 }) == open_set.end()
@@ -302,30 +303,34 @@ bool Asteroid::fill_pixels_from_outline(Asteroid* asteroid)
 
 	const int max_size = asteroid->w * asteroid->h;
 	if (added.size() >= max_size - asteroid->point_count)  //approxomation for square 'overfill' scenario
-	{
-		SDL_UnlockSurface(temp_surface); // cleanup before returning
-		SDL_FreeSurface(temp_surface);
+		return -1;
 
-		return false;
-	}
+	return added.size();
+}
+
+void Asteroid::fill_pixels(Asteroid* asteroid, std::set<SDL_Point>& points)
+{
+	SDL_DestroyTexture(asteroid->texture);
+	SDL_Surface* temp_surface = SDL_CreateRGBSurface(0, w, h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	SDL_LockSurface(temp_surface); // locks the surface from outside read/writing; so we can write to it
+
+	Uint32* buffer = (Uint32*)temp_surface->pixels;
 
 	// WRITE ALL ADDED 
-	auto iterator = added.begin();
-	while (iterator != added.end())
+	auto iterator = points.begin();
+	while (iterator != points.end())
 	{
 		*(buffer + pixel_to_index(iterator->x, iterator->y, w)) = GAME_asteroid_color_raw;
 
 		iterator++;
 	}
 
-	asteroid->point_count = added.size();
+	asteroid->point_count = points.size();
 	SDL_UnlockSurface(temp_surface); // allow external read/writes when finished writing
 
 	asteroid->texture = window.create_texture_from_surface(temp_surface);
 
 	SDL_FreeSurface(temp_surface);
-
-	return true;
 }
 
 bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point point)
@@ -339,59 +344,118 @@ bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point poi
 
 Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity, bool specify_endpoint, float specified_theta)
 {
+	const int max_retries = 100;
+
 	SDL_Point start;
 	SDL_Point end;
 
-	Asteroid* created = split_separate_init(collision_x, collision_y, &start, &end, specify_endpoint, specified_theta);
-	std::vector<SDL_Point> outline_bridge;
-
 	int retries = 0;
+	int moved_points = 0;
+	Asteroid* created = split_init();
+
+	std::set<SDL_Point> floodfill_points_self;
+	std::set<SDL_Point> floodfill_points_created;
+	std::vector<SDL_Point> outline_bridge;
 	do
 	{
 		if (retries > 0)
-		{
-			if ((start.x < end.x ? start.x : end.x) <= 0 || (start.y < end.y ? start.y : end.y) <= 0 ||
-				(end.x > start.x ? end.x : start.x) >= w || (end.y > start.y ? end.y : start.y) >= w)
-				break;
+			undo_separate_outlines(created, moved_points, outline_bridge.size());
 
-			// outline_bridge has been initialized; undo its changes, increase size and retry
-			remove_bridge_outline(this, start, end, &outline_bridge);
-			remove_bridge_outline(created, start, end, &outline_bridge);
+		resolve_endpoint(collision_x, collision_y, &start, &end, specify_endpoint, specified_theta);
+		if (end.x == -1 || end.y == -1)
+			return created;
 
-			if (retries % 2 == 0)
-			{
-				(start.x < end.x ? start.x : end.x)--;
-				(start.y < end.y ? start.y : end.y)--;
-			}
-			else
-			{
-				(end.x > start.x ? end.x : start.x)++;
-				(end.y > start.y ? end.y : start.y)++;
-			}
-		}
+		separate_outlines(start, end, created, &moved_points);
+
 
 		split_bridge_outline(this, start, end, &outline_bridge);
 		split_bridge_outline(created, start, end, &outline_bridge);
-		retries++;
+
+		int self_points = fill_interior_from_outline(this, floodfill_points_self);
+		int created_points = fill_interior_from_outline(created, floodfill_points_created);
+
+		// always includes the -1 failure case in retry condition
+		if (self_points <= outline_point_count || created_points <= created->outline_point_count)
+		{
+			outline_bridge.clear();
+			retries++;
+			continue;
+		}
+
+		fill_pixels(this, floodfill_points_self);
+		fill_pixels(created, floodfill_points_created);
+		break;
 	}
-	while (!fill_pixels_from_outline(this) || !fill_pixels_from_outline(created));
+	while (retries < max_retries);
 
 
-	SDL_Log("created asteroid: %i; added %zu points, retrying %i times due to buffer infill overflows", created->outline_point_count, outline_bridge.size(), retries);
+	SDL_Log("created asteroid: %i; added %zu points, retrying %i times due to inadequate asteroid shapes and sizes or overflows", created->outline_point_count, outline_bridge.size(), retries);
 
-	created->x = x + 1;
-	created->y = y + 1;
 
-	created->velocity_x = velocity_x;
-	created->velocity_y = velocity_y;
-	created->desired_velocity_x = desired_velocity_x;
-	created->desired_velocity_y = desired_velocity_y;
-
+	window.camera.teleport(created->x, created->y);
+	time_scaling = 0.0F;
 	SDL_Log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
 	return created;
 }
 
-Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end, bool specify_theta, float specified_theta)
+void get_line(float ax, float ay, float bx, float by, float* m, int* b)
+{
+	*m = (float)(by - ay) / (float)(bx - ax);
+	*b = (int)((float)ay - (float)ax * (*m));
+}
+
+bool Asteroid::check_valid_split_line(int start_idx, int end_idx)
+{
+	float ax = outline[start_idx].x, ay = outline[start_idx].y;
+	float bx = outline[end_idx].x, by = outline[end_idx].y;
+	if ((start_idx == end_idx || outline[end_idx].x == outline[start_idx].x)
+		|| (bx - ax) * (bx - ax) + (by - ay) * (by - ay) < (int)((float)outline_point_count / (3.0F * PI)) * (int)((float)outline_point_count / (3.0F * PI)))
+		return false;
+
+	float m;
+	int b;
+	get_line(ax, ay, bx, by, &m, &b);
+
+	// raycast; check for interceding points (skip if there are; non(perfectly)convex shape selected)
+	int count = 0;
+	int last_x = -1, last_y = -1;
+	int x_prev = w, y_prev = h;
+	int x_initial = (int)(-b / m), y_initial = 0.0F;
+	int x = x_initial, y = y_initial;
+	float theta = atan2f(ay, ax - x_initial);
+	bool inside_outline = false; // keeps track of current transit state
+
+	for (float dist = 0.0F; dist < 1.41F * (float)w; dist += 0.5F)
+	{
+		x = (int)(cosf(theta) * dist) + x_initial;
+		y = (int)(sinf(theta) * dist) + y_initial;
+
+		if (x_prev == x && y_prev == y || x <= 0 || y <= 0 || x > w || y > h)
+			continue;
+
+		if (outline_contains(outline, outline_point_count, { x, y }))
+		{
+			if (!inside_outline)
+			{
+				count++;
+				inside_outline = true;
+			}
+			last_x = x;
+			last_y = y;
+		}
+		else if (inside_outline)
+			inside_outline = false;
+
+		x_prev = x;
+		y_prev = y;
+	}
+
+	printf("hit count: %d\n", count);
+
+	return count == 2;
+}
+
+void Asteroid::resolve_endpoint(float collision_x, float collision_y, SDL_Point* start, SDL_Point* end, bool specify_theta, float specified_theta)
 {
 	int collision_pixel_x = (int)collision_x - (screen_x - (w >> 1));
 	int collision_pixel_y = (int)collision_y - (screen_y - (h >> 1));
@@ -403,56 +467,38 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 			contact_idx = i;
 
 	if (contact_idx == -1)
-		return nullptr;
+	{
+		SDL_LogError(0, "Catastrophic: hit point (%d, %d) outside outline of receiving entity (ID=%d)", collision_pixel_x, collision_pixel_y, id);
+		*start = { -1, -1 };
+		*end = { -1, -1 };
+		return;
+	}
 
-	Asteroid* created = append_asteroid_to_pool();
 	int split_endpoint = 0;
+
 	if (!specify_theta)
 	{
-		while (true)
+		std::vector<int> points;
+		for (int i = 0; i < outline_point_count; i++)
+			points.push_back(i);
+
+		while (points.size() > 1)
 		{
-			while (split_endpoint < outline_point_count
-				&& ((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
-					|| (outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y) < (int)((double)outline_point_count / (2.0 * M_PI)) * (int)((double)outline_point_count / (2.0 * M_PI))))
-				split_endpoint++;
+			int selected = rand() % points.size();
+			split_endpoint = points.at(selected);
+			points.erase(points.begin() + selected);
 
-			// raycast; check for interceding points (skip if there are; non(perfectly)convex shape selected)
-			int count = 0;
-			int last_x = -1, last_y = -1;
-			int x = collision_pixel_x, y = collision_pixel_y;
-			int x_prev = w, y_prev = h;
-			float theta = atan2f(outline[split_endpoint].y - collision_pixel_y, outline[split_endpoint].x - collision_pixel_x);
-			for (float dist = 0.0F; dist < 1.41F * (float)w; dist += 0.5F)
-			{
-				x = (int)(cosf(theta) * dist) + collision_pixel_x;
-				y = (int)(sinf(theta) * dist) + collision_pixel_y;
-
-				if (x_prev == x && y_prev == y || x <= 0 || y <= 0 || x > w || y > h)
-					continue;
-
-				if (outline_contains(outline, outline_point_count, { x, y }))
-				{
-					count++;
-					last_x = x;
-					last_y = y;
-				}
-
-				x_prev = x;
-				y_prev = y;
-			}
-
-			if (last_x != outline[split_endpoint].x || last_y != outline[split_endpoint].y || count > 2)
-			{
-				split_endpoint++;
+			if (((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
+				||
+				(outline[split_endpoint].x - collision_pixel_x) * (outline[split_endpoint].x - collision_pixel_x) + (outline[split_endpoint].y - collision_pixel_y) * (outline[split_endpoint].y - collision_pixel_y)
+				< (int)((float)outline_point_count / (3.0F * PI)) * (int)((float)outline_point_count / (3.0F * PI))))
 				continue;
-			}
+
+			if (!check_valid_split_line(contact_idx, split_endpoint))
+				continue;
 
 			break;
 		}
-
-		if (split_endpoint == outline_point_count)
-			while (split_endpoint == outline_point_count || !(split_endpoint != contact_idx && outline[split_endpoint].x != outline[contact_idx].x))
-				split_endpoint = rand() % outline_point_count;
 	}
 	else
 	{
@@ -468,8 +514,6 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 				split_endpoint = rand() % outline_point_count;
 	}
 
-	SDL_Log("split command: (%i, %i) to (%i, %i)", collision_pixel_x, collision_pixel_y, outline[split_endpoint].x, outline[split_endpoint].y);
-
 	int ax = collision_pixel_x;
 	int ay = collision_pixel_y;
 	int bx = outline[split_endpoint].x;
@@ -477,27 +521,84 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 
 	*start = { ax, ay };
 	*end = { bx, by };
+}
 
-	// use y > mx + b to sort points to either resultant asteroid
-	float m = (float)(by - ay) / (float)(bx - ax);
-	int b = (int)((float)ay - (float)ax * m);
+void Asteroid::undo_separate_outlines(Asteroid* other, int separated_point_count, int outline_bridge_count)
+{
+	// exclude bridges (back to original outline if taken collectively)
+	separated_point_count -= outline_bridge_count;
+	outline_point_count -= outline_bridge_count;
+
+	// and unsort points from two shapes back into single original
+	for (int i = 0; i < SDL_max(outline_point_count, separated_point_count); i++)
+	{
+		if (i < outline_point_count)
+			outline[i + separated_point_count] = outline[i];
+		if (i < separated_point_count)
+			outline[i] = other->outline[i];
+	}
+
+	outline_point_count = outline_point_count + separated_point_count;
+	other->outline_point_count = 0;
+}
+
+/// <summary>
+/// Splits outlines based on the line between start and end; separated_point_count points are moved (selected noncontinuously from original outline) from original asteroid outline to other asteroid outline; outline_point_count of original is truncated to reflect removal of these
+/// </summary>
+/// <param name="start"></param>
+/// <param name="end"></param>
+/// <param name="other"></param>
+/// <param name="separated_point_count"></param>
+void Asteroid::separate_outlines(const SDL_Point& start, const SDL_Point& end, Asteroid* other, int* separated_point_count)
+{
+	int ax = start.x;
+	int ay = start.y;
+	int bx = end.x;
+	int by = end.y;
+
+
+	// use y > mx + b_main to sort points to either resultant asteroid
+	//float m_main = (float)(by - ay)/* / (float)(bx - ax);
+	//int b_main = (int)((float)ay - */(float)ax * m_main);
 	int divider = 0;
+
+	float epsilon = 0.1F;
+
+	float m_main, m_outer_low, m_outer_high;
+	int b_main, b_outer_low, b_outer_high;
+
+	float cx = (ax + bx) * 0.5F;
+	float cy = (ay + by) * 0.5F;
+
+	get_line(ax, ay, bx, by, &m_main, &b_main);
+
+	get_line(ax, ay, ax - epsilon * (ay - cy), ay + epsilon * (ax - cx), &m_outer_low, &b_outer_low);
+	get_line(bx, by, bx - epsilon * (by - cy), by + epsilon * (bx - cx), &m_outer_high, &b_outer_high);
 
 	auto compute_region = [&](SDL_Point point)->bool
 		{
-			float epsilon = 3.0F;
 			float x = point.x;
 			float y = point.y;
-			float end_product = bx * by;
 
-			bool halfspace_1 = bx * y - by * x - (ax * y - x * ay) + (ax * by - by * ax) < 0;
-			bool halfspace_2 = -(bx * bx) * epsilon + end_product - (by * by * epsilon + end_product) - (bx * y - by * x) + (by * epsilon + bx) * y - (by - bx * epsilon) * x < 0;
-			bool halfspace_3 = -(ax * ax) * epsilon + ay * ax - (ay * ay) * epsilon - ax * ay - (ax * y - ay * x) + (ay * epsilon + ax) * y - (-ax * epsilon + ay) * x > 0;
+			bool halfspace_1 = y > m_main * x + b_main;
+			bool halfspace_2, halfspace_3;
+			if (b_outer_low < b_outer_high)
+			{
+				halfspace_2 = y > m_outer_low * x + (float)b_outer_low;
+				if (!halfspace_2)
+					printf("test");
+				halfspace_3 = y < m_outer_low * x + (float)b_outer_high;
+			}
+			else
+			{
+				halfspace_2 = y < m_outer_low * x + (float)b_outer_low;
+				halfspace_3 = y > m_outer_low * x + (float)b_outer_high;
+			}
 
-			return halfspace_3;
+			return halfspace_1;
 		};
 
-	auto comparator = [compute_region, ax, ay, bx, by, m, b](SDL_Point self, SDL_Point other)->bool
+	auto comparator = [compute_region, ax, ay, bx, by, m_main, b_main](SDL_Point self, SDL_Point other)->bool
 		{
 			bool self_in = compute_region(self);
 			bool other_in = compute_region(other);
@@ -509,7 +610,7 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 
 	for (int i = 0; i < outline_point_count; i++)
 	{
-		bool in = (outline[i].y > (int)(m * (float)outline[i].x + (float)b));
+		bool in = (outline[i].y > (int)(m_main * (float)outline[i].x + (float)b_main));
 		//SDL_Log("p (%i, %i): %i", outline[i].x, outline[i].y, in ? 1 : 0);
 		if (!in)
 			divider++;
@@ -517,10 +618,11 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 	}
 
 
-	created->outline_point_count = divider;
+	other->outline_point_count = divider;
+	*separated_point_count = divider;
 	for (int i = 0; i < divider; i++)
 	{
-		created->outline[i] = (SDL_Point)queue.top();
+		other->outline[i] = (SDL_Point)queue.top();
 		queue.pop();
 	}
 
@@ -532,9 +634,19 @@ Asteroid* Asteroid::split_separate_init(float collision_x, float collision_y, SD
 		queue.pop();
 		i++;
 	}
+}
 
-	window.camera.teleport(created->x, created->y);
-	time_scaling = 0.0F;
+Asteroid* Asteroid::split_init()
+{
+	Asteroid* created = append_asteroid_to_pool();
+
+	created->x = x + 1;
+	created->y = y + 1;
+
+	created->velocity_x = velocity_x;
+	created->velocity_y = velocity_y;
+	created->desired_velocity_x = desired_velocity_x;
+	created->desired_velocity_y = desired_velocity_y;
 
 	return created;
 }
@@ -903,7 +1015,7 @@ void Asteroid::create_outline(Uint32* buffer)
 				continue;
 			}
 
-		}
+}
 	}
 
 	this->center_x = sum_x / count;
@@ -985,9 +1097,9 @@ void player_input_update(SDL_Event* running_event)
 	//	//printf("(%i, %i) -> (%f, %f) c: %i\n", mouse_x, mouse_y, mouse_world_x, mouse_world_y, chunk);
 	//	if (collision_check_grid[chunk])
 	//	{
-	//		std::set<int> set = *(collision_check_grid[chunk]);
-	//		//printf("%zu\n", set.size());
-	//		for (int i : set)
+	//		std::points<int> points = *(collision_check_grid[chunk]);
+	//		//printf("%zu\n", points.size());
+	//		for (int i : points)
 	//			if (Entity::active[i]->in_bounds(mouse_world_x, mouse_world_y))
 	//				((Asteroid*)Entity::active[i])->split(mouse_world_x, mouse_world_y, 10.0F);
 	//	}
@@ -1006,7 +1118,7 @@ void player_input_update(SDL_Event* running_event)
 		controlled_asteroid = -1;
 	}*/
 
-	// CLICK to set heading
+	// CLICK to points heading
 	if (running_event->type == SDL_MOUSEBUTTONDOWN && running_event->button.button == SETTING_primary_mouse_button)
 		clicking = true;
 	else if (running_event->type == SDL_MOUSEBUTTONUP && running_event->button.button == SETTING_primary_mouse_button)
