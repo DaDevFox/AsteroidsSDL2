@@ -246,6 +246,8 @@ int Asteroid::fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>
 {
 	added.clear();
 
+	int original_size = 0;
+
 	// to find start point:
 	/** softwareengineering.stackexchange.com/questions/226578/selecting-a-point-inside-a-non-convex-polygon
 	Compute the bounding box
@@ -256,6 +258,7 @@ int Asteroid::fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>
 	{
 		// ADD OUTLINE POINTS
 		added.insert(asteroid->outline, asteroid->outline + asteroid->outline_point_count);
+		original_size = added.size(); // size of outline EXCLUDING duplicates
 
 		// get start pos for flood fill (CoM of asteroid)
 		// DANGER: designed for circular asteroids only, IE asteroids with no/few protrusions
@@ -299,13 +302,15 @@ int Asteroid::fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>
 			added.insert(current);
 			open_set.erase(current);
 		}
+
+		SDL_Log("%zu\n", added.size());
 	}
 
 	const int max_size = asteroid->w * asteroid->h;
 	if (added.size() >= max_size - asteroid->point_count)  //approxomation for square 'overfill' scenario
 		return -1;
 
-	return added.size();
+	return added.size() - original_size; // return number of interior points (excluding outline)
 }
 
 void Asteroid::fill_pixels(Asteroid* asteroid, std::set<SDL_Point>& points)
@@ -345,6 +350,7 @@ bool outline_contains(SDL_Point* outline, int outline_point_count, SDL_Point poi
 Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_rel_velocity, bool specify_endpoint, float specified_theta)
 {
 	const int max_retries = 100;
+	const int min_interior_points = 5;
 
 	SDL_Point start;
 	SDL_Point end;
@@ -356,29 +362,45 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	std::set<SDL_Point> floodfill_points_self;
 	std::set<SDL_Point> floodfill_points_created;
 	std::vector<SDL_Point> outline_bridge;
+	int debug_offset = 0;
+
 	do
 	{
-		if (retries > 0)
-			undo_separate_outlines(created, moved_points, outline_bridge.size());
+		SDL_Log("Outline point count: %d\n", outline_point_count);
+		for (int i = 0; i < outline_point_count; i++)
+			window.render_pixel_deferred(10.0F, x - (w >> 1) + outline[i].x + w * debug_offset, y - (h >> 1) + outline[i].y, { 255, 255, 255, 0 });
 
 		resolve_endpoint(collision_x, collision_y, &start, &end, specify_endpoint, specified_theta);
 		if (end.x == -1 || end.y == -1)
 			return created;
 
+		SDL_Log("Start: (%d, %d); End: (%d, %d)", start.x, start.y, end.x, end.y);
 		separate_outlines(start, end, created, &moved_points);
+		for (int i = 0; i < outline_point_count; i++)
+			window.render_pixel_deferred(10.0F, x - (w >> 1) + outline[i].x + w * debug_offset, y + outline[i].y, { 255, 255, 0, 0 });
+		for (int i = 0; i < created->outline_point_count; i++)
+			window.render_pixel_deferred(10.0F, x - (w >> 1) + created->outline[i].x + w * debug_offset, y + created->outline[i].y, { 0, 255, 255, 0 });
 
 
 		split_bridge_outline(this, start, end, &outline_bridge);
 		split_bridge_outline(created, start, end, &outline_bridge);
+		for (int i = 0; i < outline_point_count; i++)
+			window.render_pixel_deferred(10.0F, x - (w >> 1) + outline[i].x + w * debug_offset, y + (h >> 1) + outline[i].y, { 255, 255, 0, 0 });
+		for (int i = 0; i < created->outline_point_count; i++)
+			window.render_pixel_deferred(10.0F, x - (w >> 1) + created->outline[i].x + w * debug_offset, y + (h >> 1) + created->outline[i].y, { 0, 255, 255, 0 });
 
+		// points are stored in sets; sizes considerably lower b/c duplicates
 		int self_points = fill_interior_from_outline(this, floodfill_points_self);
 		int created_points = fill_interior_from_outline(created, floodfill_points_created);
 
+		SDL_Log("Filled interior points: %d/%d for original; %d/%d for created", self_points, outline_point_count, created_points, created->outline_point_count);
 		// always includes the -1 failure case in retry condition
-		if (self_points <= outline_point_count || created_points <= created->outline_point_count)
+		if (self_points < min_interior_points || created_points < min_interior_points)
 		{
-			outline_bridge.clear();
 			retries++;
+			undo_separate_outlines(created, moved_points + outline_bridge.size() /* need outline point count of entire shell of other asteroid */, outline_bridge.size());
+			outline_bridge.clear();
+			debug_offset++;
 			continue;
 		}
 
@@ -468,6 +490,9 @@ void Asteroid::resolve_endpoint(float collision_x, float collision_y, SDL_Point*
 
 	if (contact_idx == -1)
 	{
+		DEBUG_mode = true;
+		DEBUG_wireframe_mode = true;
+		time_scaling = 0.0F;
 		SDL_LogError(0, "Catastrophic: hit point (%d, %d) outside outline of receiving entity (ID=%d)", collision_pixel_x, collision_pixel_y, id);
 		*start = { -1, -1 };
 		*end = { -1, -1 };
@@ -478,15 +503,17 @@ void Asteroid::resolve_endpoint(float collision_x, float collision_y, SDL_Point*
 
 	if (!specify_theta)
 	{
+		std::default_random_engine e(2);
+
 		std::vector<int> points;
 		for (int i = 0; i < outline_point_count; i++)
 			points.push_back(i);
+		std::shuffle(points.begin(), points.end(), e);
 
 		while (points.size() > 1)
 		{
-			int selected = rand() % points.size();
-			split_endpoint = points.at(selected);
-			points.erase(points.begin() + selected);
+			split_endpoint = points.back();
+			points.pop_back();
 
 			if (((split_endpoint == contact_idx || outline[split_endpoint].x == outline[contact_idx].x)
 				||
@@ -532,11 +559,17 @@ void Asteroid::undo_separate_outlines(Asteroid* other, int separated_point_count
 	// and unsort points from two shapes back into single original
 	for (int i = 0; i < SDL_max(outline_point_count, separated_point_count); i++)
 	{
-		if (i < outline_point_count)
-			outline[i + separated_point_count] = outline[i];
-		if (i < separated_point_count)
-			outline[i] = other->outline[i];
+		if (outline_point_count < separated_point_count)
+		{
+			if (i < outline_point_count)
+				outline[i + separated_point_count] = outline[i];
+			if (i < separated_point_count)
+				outline[i] = other->outline[i];
+		}
+		else if (i < separated_point_count)
+			outline[i + outline_point_count] = other->outline[i];
 	}
+
 
 	outline_point_count = outline_point_count + separated_point_count;
 	other->outline_point_count = 0;
@@ -585,8 +618,6 @@ void Asteroid::separate_outlines(const SDL_Point& start, const SDL_Point& end, A
 			if (b_outer_low < b_outer_high)
 			{
 				halfspace_2 = y > m_outer_low * x + (float)b_outer_low;
-				if (!halfspace_2)
-					printf("test");
 				halfspace_3 = y < m_outer_low * x + (float)b_outer_high;
 			}
 			else
@@ -640,6 +671,8 @@ Asteroid* Asteroid::split_init()
 {
 	Asteroid* created = append_asteroid_to_pool();
 
+	created->outline_point_count = 0;
+
 	created->x = x + 1;
 	created->y = y + 1;
 
@@ -653,8 +686,6 @@ Asteroid* Asteroid::split_init()
 
 void Asteroid::split_bridge_outline(Asteroid* asteroid, const SDL_Point& start, const SDL_Point& end, std::vector<SDL_Point>* outline_additions)
 {
-	//std::vector<SDL_Point> outline_additions;
-
 	if (outline_additions->size() == 0)
 	{
 		int cragginess_resolution = 10;
@@ -739,7 +770,7 @@ Asteroid* append_asteroid_to_pool()
 	if (GAME_asteroid_count == GAME_asteroid_pool_size)
 		return nullptr;
 
-	return (Asteroid*)entities + GAME_ship_count + GAME_asteroid_count++;
+	return new ((Asteroid*)entities + GAME_ship_count + GAME_asteroid_count++) Asteroid();
 }
 
 
@@ -1015,7 +1046,7 @@ void Asteroid::create_outline(Uint32* buffer)
 				continue;
 			}
 
-}
+		}
 	}
 
 	this->center_x = sum_x / count;
@@ -1251,8 +1282,6 @@ void asteroids_update(float delta_time)
 
 		x_diff *= PLAYER_controlspeed_maximum;
 		y_diff *= PLAYER_controlspeed_maximum;
-
-
 
 		player->desired_velocity_x += (x_diff - player->desired_velocity_x) * delta_time * player->movement_windup_speed;
 		player->desired_velocity_y += (y_diff - player->desired_velocity_y) * delta_time * player->movement_windup_speed;
