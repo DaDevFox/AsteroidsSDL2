@@ -135,6 +135,7 @@ void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost
 	int variance = 1;
 
 	float theta;
+	std::set<SDL_Point> visited;
 	// lines per circle
 	float resolution = 360.0F;
 	float step = 2.0F * PI / resolution;
@@ -166,8 +167,12 @@ void Asteroid::circle_expand_fill(Uint32* buffer, int* leftmost_x, int* leftmost
 			if (prev_x == offset_x && prev_y == offset_y)
 				continue;
 
-			*(buffer + pixel_to_index(center_x + offset_x, center_y + offset_y, w)) = GAME_asteroid_color_raw;
-			(*pixel_count)++;
+			if (!visited.contains({ offset_x, offset_y }))
+			{
+				*(buffer + pixel_to_index(center_x + offset_x, center_y + offset_y, w)) = GAME_asteroid_color_raw;
+				(*pixel_count)++;
+				visited.insert({ offset_x, offset_y });
+			}
 
 			prev_x = offset_x;
 			prev_y = offset_y;
@@ -196,7 +201,7 @@ void Asteroid::generate()
 	if (id == PLAYER_entity_id)
 	{
 		PLAYER_initial_outline_point_count = point_count;
-		debug_log("player initial point count: %d\n", point_count);
+		debug_log("player (id=%d) initial point count: %d\n", id, point_count);
 	}
 	create_outline(buffer);
 
