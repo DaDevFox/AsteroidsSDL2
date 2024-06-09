@@ -5,6 +5,8 @@
 #define INITIAL_WIDTH 680
 #define INITIAL_HEIGHT 400
 
+void debug_log(const char* format, ...);
+
 extern int PLAYER_initial_outline_point_count;
 extern const int GAME_min_outline_point_count;
 extern const int PLAYER_asteroid_id;

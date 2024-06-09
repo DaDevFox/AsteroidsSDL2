@@ -51,7 +51,7 @@ int WINDOW_width;
 int GAME_height = 1024;
 int GAME_width = 1024;
 
-SDL_Rect GAME_window_rect = {0, 0, GAME_width, GAME_height };
+SDL_Rect GAME_window_rect = { 0, 0, GAME_width, GAME_height };
 
 void* entities;
 
@@ -69,13 +69,30 @@ Uint32 current_tick;
 
 SDL_Event running_event;
 
-SDL_Color game_frame_color{120, 120, 120, 255 };
+SDL_Color game_frame_color{ 120, 120, 120, 255 };
 
 // resources
 TTF_Font* encode_sans_medium;
 TTF_Font* encode_sans_bold;
 
 void resize(void);
+
+void debug_log(const char* format, ...)
+{
+	if (!DEBUG_master) return;
+
+	// credit to chatGPT
+	va_list args;
+	va_start(args, format);
+
+	// Log using SDL_LogMessageV
+	va_list args_copy;
+	va_copy(args_copy, args);
+	SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, args_copy);
+	va_end(args_copy);
+
+	va_end(args);
+}
 
 /// <summary>
 /// Inits SDL2 and required systems. returns false if failure occurs
@@ -198,7 +215,6 @@ void update()
 
 	last_tick = current_tick;
 }
-
 
 void game_loop()
 {
