@@ -125,20 +125,20 @@ void RenderWindow::cleanup()
 
 SDL_Color RenderWindow::get_pixel_color(float world_x, float world_y)
 {
-	SDL_Rect rect = {0,0,1,1 };
+	SDL_Rect rect = { 0,0,1,1 };
 	camera.world_to_screen(world_x, world_y, &rect.x, &rect.y);
 	Uint32* buffer = nullptr;
 	SDL_RenderReadPixels(renderer, &rect, SDL_PixelFormatEnum::SDL_PIXELFORMAT_RGBA8888, buffer, sizeof(int));
 
 	if (buffer == nullptr)
-		return {0, 0, 0, 0 };
+		return { 0, 0, 0, 0 };
 
 	Uint8 r = *((Uint8*)buffer);
 	Uint8 g = *((Uint8*)buffer + 1);
 	Uint8 b = *((Uint8*)buffer + 2);
 	Uint8 a = *((Uint8*)buffer + 3);
 
-	return {r, g, b, a };
+	return { r, g, b, a };
 
 }
 
@@ -181,7 +181,7 @@ void RenderWindow::render_rect_outline(float world_x, float world_y, float world
 
 void RenderWindow::render_rect(int screen_x, int screen_y, int screen_w, int screen_h, SDL_Color color)
 {
-	SDL_Rect rect{screen_x, screen_y, screen_w, screen_h };
+	SDL_Rect rect{ screen_x, screen_y, screen_w, screen_h };
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderFillRect(renderer, &rect);
 }
@@ -275,7 +275,7 @@ void RenderWindow::render_line(int x1, int y1, int x2, int y2, const SDL_Color& 
 	int screen_y2;
 	world_to_screen(x1, y1, &screen_x1, &screen_y1);
 	world_to_screen(x2, y2, &screen_x2, &screen_y2);
-	SDL_Rect rect = {0, 0, WINDOW_width, WINDOW_height };
+	SDL_Rect rect = { 0, 0, WINDOW_width, WINDOW_height };
 
 	if (SDL_IntersectRectAndLine(&rect, &screen_x1, &screen_y1, &screen_x2, &screen_y2))
 	{
@@ -720,8 +720,9 @@ void RenderWindow::render_all_deferred()
 	while (it != deferred_render_calls.end())
 	{
 		std::tuple<float, float, float, SDL_Color> tuple = *it;
-		std::get<0>(tuple) -= delta_time;
-		if (std::get<1>(tuple) < 0.0F)
+		*it = std::tuple<float, float, float, SDL_Color>(std::get<0>(tuple) - delta_time * 0.001F, std::get<1>(tuple), std::get<2>(tuple), std::get<3>(tuple));
+
+		if (std::get<0>(tuple) < 0.0F)
 		{
 			it = deferred_render_calls.erase(it);
 			continue;
