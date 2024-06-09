@@ -23,8 +23,8 @@ void generate_ship_outline(Entity* ship);
 void search_for_targets();
 Entity* check_overlap(float x, float y, int ignore_id);
 
-void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, float signed_end = 0.0F, const SDL_Color& color = {255, 255, 255, 255 });
-void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius = -1.0F, const SDL_Color& color = {255, 255, 255, 255 });
+void render_dotted_line(RenderWindow* window, Entity* ship, Entity* asteroid, float signed_end = 0.0F, const SDL_Color& color = { 255, 255, 255, 255 });
+void render_dotted_circle(RenderWindow* window, Entity* asteroid, float radius = -1.0F, const SDL_Color& color = { 255, 255, 255, 255 });
 
 void ship_check_states(int i);
 
@@ -116,22 +116,22 @@ void generate_ship_outline(Entity* ship)
 	// edge rows
 	for (int x = 1; x < ship->w - 1; x++)
 	{
-		outline.push_back({x, 0 });
-		outline.push_back({x, ship->h });
+		outline.push_back({ x, 0 });
+		outline.push_back({ x, ship->h });
 	}
 
 	// edge columns
 	for (int y = 1; y < ship->h - 1; y++)
 	{
-		outline.push_back({0, y });
-		outline.push_back({ship->w, y });
+		outline.push_back({ 0, y });
+		outline.push_back({ ship->w, y });
 	}
 
 	// corners
-	outline.push_back({0, 0 });
-	outline.push_back({0, ship->h });
-	outline.push_back({ship->w, 0 });
-	outline.push_back({ship->w, ship->h });
+	outline.push_back({ 0, 0 });
+	outline.push_back({ 0, ship->h });
+	outline.push_back({ ship->w, 0 });
+	outline.push_back({ ship->w, ship->h });
 
 	if (outline.size() < 4 * SETTING_MAX_POINT_COUNT)
 	{
@@ -146,7 +146,7 @@ void generate_ship_outline(Entity* ship)
 SDL_Point default_position(int i)
 {
 	int radius = GAME_width >> 2;
-	return {(int)((float)(GAME_width >> 1) + cosf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius), (int)((float)(GAME_height >> 1) + sinf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius) };
+	return { (int)((float)(GAME_width >> 1) + cosf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius), (int)((float)(GAME_height >> 1) + sinf((float)i / (float)GAME_ship_count * 2.0F * PI) * (float)radius) };
 }
 
 Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int ignore_id, SDL_Point* hit);
@@ -269,7 +269,7 @@ void update_target_position(int i)
 
 	x_accumulate /= (float)shadowing_targets[i]->size();
 	y_accumulate /= (float)shadowing_targets[i]->size();
-	target_positions[i] = {(int)x_accumulate, (int)y_accumulate };
+	target_positions[i] = { (int)x_accumulate, (int)y_accumulate };
 }
 
 void ships_tick_warning(int i);
@@ -403,7 +403,7 @@ void ship_check_states(int i)
 	float x = ship->x;
 	float y = ship->y;
 
-	int awareness_radius = 2;
+	int awareness_radius = 4;
 
 	int floor_y = (int)y / chunk_size - awareness_radius;
 	int ceil_y = (int)y / chunk_size + awareness_radius;
@@ -436,7 +436,7 @@ void ship_check_states(int i)
 		const float crit_accel_notice = 0.03F;
 
 		if (notice_timers[i]->find(id) == notice_timers[i]->end())
-			notice_timers[i]->insert({id, 0.0F });
+			notice_timers[i]->insert({ id, 0.0F });
 
 		if (desired_vel_x * desired_vel_x + desired_vel_y * desired_vel_y >= crit_accel_notice * crit_accel_notice)
 			notice_timers[i]->at(id) = SDL_min(notice_timers[i]->at(id) + (delta_time / 1000.0F) * accel_to_notice_scaling, notice_for_auto_attack);
@@ -491,6 +491,8 @@ void ship_tick_attack(int i)
 
 	float diff_x = target->x - (target->w >> 1) + target->center_x - ship->x;
 	float diff_y = target->y - (target->h >> 1) + target->center_y - ship->y;
+	// OPTIONAL: slowdown during ship firing sequence
+	float time_scaling_low = 1.0F;
 
 	// cooling down
 	if (ship_attack_timers[i] < SHIP_attack_cooldown_time)
@@ -499,6 +501,8 @@ void ship_tick_attack(int i)
 		ship->velocity_y = 0.0F;
 		ship->desired_velocity_x = ship->velocity_x;
 		ship->desired_velocity_y = ship->velocity_y;
+		if (time_scaling != 0.0F)
+			time_scaling = (1.0F - ship_attack_timers[i] / SHIP_attack_cooldown_time) * (1.0F - time_scaling_low) + time_scaling_low;
 	}
 	// currently attacking (animate projectile)
 	else if (ship_attack_timers[i] < SHIP_attack_cooldown_time + SHIP_attack_time)
@@ -509,6 +513,8 @@ void ship_tick_attack(int i)
 
 		ship->desired_velocity_x = -diff_x * recoil_percentage;
 		ship->desired_velocity_y = -diff_y * recoil_percentage;
+		if (time_scaling != 0.0F)
+			time_scaling = time_scaling_low;
 	}
 	// charging to target
 	else
@@ -522,6 +528,9 @@ void ship_tick_attack(int i)
 			signed_dist_normalized = 1.0F / (1.0F + signed_dist_normalized);
 		else
 			signed_dist_normalized = 1.0F;
+
+		if (time_scaling != 0.0F)
+			time_scaling = signed_dist_normalized * (1.0F - time_scaling_low) + time_scaling_low;
 
 		ship->desired_rotation = attack_theta * signed_dist_normalized + vel_theta * (1.0F - signed_dist_normalized);
 	}
@@ -629,7 +638,7 @@ void render_fovs(RenderWindow* window)
 		float sin_theta = sinf(theta);
 		for (float i = 0.0F; i < radius; i++)
 		{
-			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, {100, 100, 100, 255 });
+			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, { 100, 100, 100, 255 });
 		}
 
 		theta = ship->rotation + fov / 2.0;
@@ -637,13 +646,13 @@ void render_fovs(RenderWindow* window)
 		sin_theta = sinf(theta);
 		for (float i = 0.0F; i < radius; i++)
 		{
-			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, {100, 100, 100, 255 });
+			window->render_rect(ship->x + i * cos_theta, ship->y + i * sin_theta, 1.0F, 1.0F, { 100, 100, 100, 255 });
 		}
 
 		double theta_max = ship->rotation + fov / 2.0;
 		for (double theta = ship->rotation - fov / 2.0; theta < theta_max; theta += granularity)
 		{
-			window->render_rect(ship->x + cosf(theta) * radius, ship->y + sinf(theta) * radius, 1.0F, 1.0F, {100, 100, 100, 255 });
+			window->render_rect(ship->x + cosf(theta) * radius, ship->y + sinf(theta) * radius, 1.0F, 1.0F, { 100, 100, 100, 255 });
 		}
 	}
 }
@@ -702,11 +711,11 @@ void render_notice_bars(RenderWindow* window)
 			}
 		}
 
-		SDL_Color color_bg = {100, 100, 100, 60 };
+		SDL_Color color_bg = { 100, 100, 100, 60 };
 
-		SDL_Color color_good = {255, 255, 255, 255 };
-		SDL_Color color_warned = {255, 255, 0, 255 };
-		SDL_Color color_attacking = {255, 0, 0, 255 };
+		SDL_Color color_good = { 255, 255, 255, 255 };
+		SDL_Color color_warned = { 255, 255, 0, 255 };
+		SDL_Color color_attacking = { 255, 0, 0, 255 };
 
 		for (std::pair<int, float> pair : accumulated)
 		{
@@ -737,7 +746,7 @@ void render_notice_bars(RenderWindow* window)
 			if (warned)
 			{
 				progress = SDL_min(pair.second / notice_for_auto_attack, 1.0F);
-				color = SDL_Color{(unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
+				color = SDL_Color{ (unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
 				(unsigned char)((float)color_warned.g * (1.0F - progress) + (float)color_attacking.g * progress),
 				(unsigned char)((float)color_warned.b * (1.0F - progress) + (float)color_attacking.b * progress),
 				255 };
@@ -746,15 +755,15 @@ void render_notice_bars(RenderWindow* window)
 				for (int i = 0; i < GAME_ship_count; i++)
 				{
 					if (ship_attack_timers[i] >= SHIP_attack_cooldown_time && ship_healths[i] > 0)
-						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, {255, 0, 0, 255 });
+						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + ship_targets[i], 0.0F, { 255, 0, 0, 255 });
 					else if (warning_ship[i])
-						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), {255, 255, 0, 255 });
+						render_dotted_line(window, (Entity*)entities + i, (Entity*)entities + pair.first, 10.0F + (float)((Entity*)entities + pair.first)->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
 				}
 			}
 			else
 			{
 				progress = SDL_min(pair.second / notice_for_auto_warn, 1.0F);
-				color = SDL_Color{(unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
+				color = SDL_Color{ (unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
 				(unsigned char)((float)color_good.g * (1.0F - progress) + (float)color_warned.g * progress),
 				(unsigned char)((float)color_good.b * (1.0F - progress) + (float)color_warned.b * progress),
 				255 };
@@ -777,11 +786,11 @@ void render_notice_bars(RenderWindow* window)
 	}
 	else
 	{
-		SDL_Color color_bg = {100, 100, 100, 60 };
+		SDL_Color color_bg = { 100, 100, 100, 60 };
 
-		SDL_Color color_good = {255, 255, 255, 255 };
-		SDL_Color color_warned = {255, 255, 0, 255 };
-		SDL_Color color_attacking = {255, 0, 0, 255 };
+		SDL_Color color_good = { 255, 255, 255, 255 };
+		SDL_Color color_warned = { 255, 255, 0, 255 };
+		SDL_Color color_attacking = { 255, 0, 0, 255 };
 
 		int ship_id = 0;
 		for (std::map<int, float>* ptr : notice_timers)
@@ -810,22 +819,22 @@ void render_notice_bars(RenderWindow* window)
 				if (warned)
 				{
 					progress = SDL_min(pair.second / notice_for_auto_attack, 1.0F);
-					color = SDL_Color{(unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
+					color = SDL_Color{ (unsigned char)((float)color_warned.r * (1.0F - progress) + (float)color_attacking.r * progress),
 					(unsigned char)((float)color_warned.g * (1.0F - progress) + (float)color_attacking.g * progress),
 					(unsigned char)((float)color_warned.b * (1.0F - progress) + (float)color_attacking.b * progress),
 					255 };
 
 
 					if (ship_attack_timers[ship_id] >= SHIP_attack_cooldown_time && ship_healths[ship_id] > 0)
-						render_dotted_line(window, ship, player, 0.0F, {255, 0, 0, 255 });
+						render_dotted_line(window, ship, player, 0.0F, { 255, 0, 0, 255 });
 					else
-						render_dotted_line(window, ship, player, 10.0F + (float)(player->outline_point_count / (2.0F * PI)), {255, 255, 0, 255 });
+						render_dotted_line(window, ship, player, 10.0F + (float)(player->outline_point_count / (2.0F * PI)), { 255, 255, 0, 255 });
 
 				}
 				else
 				{
 					progress = SDL_min(pair.second / notice_for_auto_warn, 1.0F);
-					color = SDL_Color{(unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
+					color = SDL_Color{ (unsigned char)((float)color_good.r * (1.0F - progress) + (float)color_warned.r * progress),
 					(unsigned char)((float)color_good.g * (1.0F - progress) + (float)color_warned.g * progress),
 					(unsigned char)((float)color_good.b * (1.0F - progress) + (float)color_warned.b * progress),
 					255 };
@@ -1021,12 +1030,12 @@ void ships_render_update(RenderWindow* window)
 					ship->screen_x, ship->screen_y - (beam_width >> 1), height, beam_width,
 					0, beam_width >> 1, ship->rotation,
 					laser_beam_texture);
-				render_thrust(window, target, {255, 0, 0, 255 }, 3, 4, 26.0F, true);
+				render_thrust(window, target, { 255, 0, 0, 255 }, 3, 4, 26.0F, true);
 			}
 			// charging up
 			else
 			{
-				render_thrust(window, target, {255, 0, 0, 255 }, 3, 4, 26.0F, true);
+				render_thrust(window, target, { 255, 0, 0, 255 }, 3, 4, 26.0F, true);
 			}
 
 			// decerements time in ships_update() func already (above is mirror functionality for render stage)
@@ -1038,10 +1047,10 @@ void ships_render_update(RenderWindow* window)
 			for (int id : *shadowing_targets[i])
 			{
 				Entity* other = (Entity*)entities + id;
-				if (other->id != PLAYER_entity_id)
-					render_thrust(window, other, {255, 255, 0, 255 }, 3, 4, 26.0F, true);
+				if (id != PLAYER_entity_id && id < GAME_ship_count + GAME_asteroid_pool_size && id > 0)
+					render_thrust(window, other, { 255, 255, 0, 255 }, 3, 4, 26.0F, true);
 				else
-					render_dotted_circle(window, other, 10.0F + (float)other->outline_point_count / (2.0F * PI), {255, 255, 0, 255 });
+					render_dotted_circle(window, other, 10.0F + (float)other->outline_point_count / (2.0F * PI), { 255, 255, 0, 255 });
 			}
 		}
 
@@ -1049,13 +1058,13 @@ void ships_render_update(RenderWindow* window)
 		{
 			float text_height = 30.0F;
 			float size = 20.0F;
-			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, {255, 255, 0, 255 });
+			window->render_rect((float)target_positions[i].x - size * 0.5F, (float)target_positions[i].y - size * 0.5F, size, size, { 255, 255, 0, 255 });
 
 			if (ship_health_damaged_timers[i] > 0.0F)
 			{
 				char health_text[8] = "";
 				snprintf(health_text, 8, "%.3f", ship_health_damaged_timers[i]);
-				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, health_text, encode_sans_medium, {0, 255, 0, 255 });
+				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, health_text, encode_sans_medium, { 0, 255, 0, 255 });
 				text_height += 30.0F;
 			}
 
@@ -1063,7 +1072,7 @@ void ships_render_update(RenderWindow* window)
 			{
 				char warn_text[8] = "";
 				snprintf(warn_text, 8, "%.3f, %.3f", ship_warn_timers[i], ship_attack_timers[i]);
-				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, warn_text, encode_sans_medium, {255, 0, 255, 255 });
+				window->render_centered_world((float)target_positions[i].x, (float)target_positions[i].y - size * 0.5F - text_height, warn_text, encode_sans_medium, { 255, 0, 255, 255 });
 			}
 		}
 
@@ -1089,7 +1098,7 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 		y = (int)(sinf(theta) * j) + origin_y;
 
 		if (DEBUG_mode && DEBUG_display_entity_outlines)
-			window.render_rect((float)x, (float)y, 1.0F, 1.0F, SDL_Color{255, 0, 0, 255 });
+			window.render_rect((float)x, (float)y, 1.0F, 1.0F, SDL_Color{ 255, 0, 0, 255 });
 
 		if (x_prev == x && y_prev == y)
 			continue;
@@ -1097,7 +1106,7 @@ Entity* raycast(float origin_x, float origin_y, float theta, float max_dist, int
 		Entity* other;
 		if ((other = check_overlap(x, y, ignore_id)))
 		{
-			*hit = {x, y };
+			*hit = { x, y };
 			return other;
 		}
 

@@ -313,7 +313,7 @@ int Asteroid::fill_interior_from_outline(Asteroid* asteroid, std::set<SDL_Point>
 		debug_log("%zu\n", added.size());
 	}
 
-	const int max_size = asteroid->w * asteroid->h;
+	const int max_size = (asteroid->w - 1) * (asteroid->h - 1);
 	if (added.size() >= max_size - asteroid->point_count)  //approxomation for square 'overfill' scenario
 		return -1;
 
@@ -428,8 +428,6 @@ Asteroid* Asteroid::split(float collision_x, float collision_y, float collision_
 	debug_log("created asteroid: %i; added %zu points, retrying %i times due to inadequate asteroid shapes and sizes or overflows", created->outline_point_count, outline_bridge.size(), retries);
 
 
-	window.camera.teleport(created->x, created->y);
-	time_scaling = 0.0F;
 	debug_log("split asteroid idx: %i; has %i points; origin index %i", created->id, created->outline_point_count, id);
 	return created;
 }
@@ -504,9 +502,12 @@ void Asteroid::resolve_endpoint(float collision_x, float collision_y, SDL_Point*
 
 	if (contact_idx == -1)
 	{
-		DEBUG_mode = true;
-		DEBUG_wireframe_mode = true;
-		time_scaling = 0.0F;
+		if (DEBUG_master)
+		{
+			DEBUG_mode = true;
+			DEBUG_wireframe_mode = true;
+			time_scaling = 0.0F;
+		}
 		SDL_LogError(0, "Catastrophic: hit point (%d, %d) outside outline of receiving entity (ID=%d)", collision_pixel_x, collision_pixel_y, id);
 		*start = { -1, -1 };
 		*end = { -1, -1 };
