@@ -1,5 +1,0 @@
-D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/AsteroidsSDL.dir
-D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/PACKAGE.dir
-D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/INSTALL.dir
-D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/ALL_BUILD.dir
-D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/ZERO_CHECK.dir
