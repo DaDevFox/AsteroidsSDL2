@@ -13,7 +13,7 @@ jobs:
         id: versionnum
         run: |
           echo "version=$(cat AsteroidsSDL/src/config.txt | head -2 | tail -1)" >> $GITHUB_OUTPUT
-      
+
       - name: Concatenate 'v'
         id: versionvnum
         run: |
@@ -38,22 +38,22 @@ jobs:
 
       - uses: robinraju/release-downloader@v1.10
         with:
-          repository: 'libsdl-org/SDL'
-          tag: 'release-2.30.3'
-          fileName: 'SDL2-devel-2.30.3-VC.zip'
+          repository: "libsdl-org/SDL"
+          tag: "release-2.30.3"
+          fileName: "SDL2-devel-2.30.3-VC.zip"
 
       - uses: dsaltares/fetch-gh-release-asset@master
         with:
-          repo: 'libsdl-org/SDL_ttf'
-          version: 'tags/release-2.22.0'
-          file: 'SDL2_ttf-devel-2.22.0-VC.zip'
+          repo: "libsdl-org/SDL_ttf"
+          version: "tags/release-2.22.0"
+          file: "SDL2_ttf-devel-2.22.0-VC.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: dsaltares/fetch-gh-release-asset@master
         with:
-          repo: 'libsdl-org/SDL_image'
-          version: 'tags/release-2.8.2'
-          file: 'SDL2_image-devel-2.8.2-VC.zip'
+          repo: "libsdl-org/SDL_image"
+          version: "tags/release-2.8.2"
+          file: "SDL2_image-devel-2.8.2-VC.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Unzip Dependencies
@@ -70,33 +70,30 @@ jobs:
           echo ("SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0") >> $env:GITHUB_ENV
 
       - name: Configure and Build Project
-        uses: threeal/cmake-action@main
-        with:
-          source-dir: AsteroidsSDL/src
-          build-dir: out
+        run: |
+          cmake . -G "Ninja" -DCMAKE_CONFIGURATION_TYPES="Debug"
+          cmake --build . --config Debug
 
       - name: Run CPack
         run: |
           Get-ChildItem -Recurse
-          cd out
-          cmake .
           cpack
-          cd ..\
 
       - name: Zip Result
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           copy /S .\AsteroidsSDL\res\* .\out
-           powershell -command "Compress-Archive '.\out\*' '.\Win64.zip'"
+          mkdir out
+          copy /S .\AsteroidsSDL\src\packages\* .\out
+          powershell -command "Compress-Archive '.\out\*' '.\Win64.zip'"
 
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./Win64.zip
           asset_name: Win64.zip
           asset_content_type: application/zip
@@ -128,16 +125,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-           cp -r AsteroidsSDL/res/* out
-           zip -r Linux.zip out
+          cp -r AsteroidsSDL/res/* out
+          zip -r Linux.zip out
 
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./Linux.zip
           asset_name: Linux.zip
           asset_content_type: application/zip
@@ -151,7 +148,7 @@ jobs:
         run: |
           brew install sdl2
           brew install sdl2_image
-          brew install sdl2_ttf      
+          brew install sdl2_ttf
 
       - uses: actions/checkout@master
 
@@ -173,16 +170,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         run: |
-            cp -r AsteroidsSDL/res/* out
-            zip -y -r macOS.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework 
+          cp -r AsteroidsSDL/res/* out
+          zip -y -r macOS.zip out -x out/_CPack_Packages/Darwin/DragNDrop/Asteroids-0.2.0-Darwin/Applications/Xcode_15.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk/System/Library/Frameworks/Ruby.framework
 
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./macOS.zip
           asset_name: macOS.zip
           asset_content_type: application/zip

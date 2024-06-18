@@ -19,6 +19,9 @@ set(${CMAKE_BUILD_TYPE} "Debug")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 set(CMAKE_CXX_STANDARD 23)
 
+message("Generating with config types: ${CMAKE_CONFIGURATION_TYPES}")
+
+
 file(GLOB asteroids_SRC
      "*.h"
      "*.cpp"
@@ -59,9 +62,38 @@ if ( (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     endif(DEVELOPMENT_DEPLOY)
 
 endif()
-
 set(LIB_INSTALL_DIR lib)
 set(INCLUDE_INSTALL_DIR include)
+
+
+# CPack generic config
+set(CPACK_VERBATIM_VARIABLES YES)
+set(CPACK_SOURCE_IGNORE_FILES .git/ .github/ .vs/ .vscode/ .mypy_cache/ _CPack_Packages/ ${CMAKE_BINARY_DIR}/ ${PROJECT_BINARY_DIR}/)
+
+set(CPACK_PACKAGE_NAME ${ProjName})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Stealth-simulation game about avoiding enemy ships")
+
+set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME})
+
+set(CPACK_PACKAGE_EXECUTABLES ${PROJECT_NAME} ${ProjName})
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${ProjName}-${CMAKE_PROJECT_VERSION}")
+
+set(CPACK_MONOLITHIC_INSTALL TRUE)
+
+#set(CPACK_RESOURCE_FILE_WELCOME
+#  ${CMAKE_CURRENT_LIST_DIR}/Welcome.txt)
+#set(CPACK_RESOURCE_FILE_README
+#  ${CMAKE_CURRENT_LIST_DIR}/Readme.txt)
+#set(CPACK_RESOURCE_FILE_LICENSE
+#  ${CMAKE_CURRENT_LIST_DIR}/License.txt)
+#set(CPACK_PACKAGE_DESCRIPTION_FILE
+#  ${CMAKE_CURRENT_LIST_DIR}/Description.txt)
+
+
 
 if(APPLE)
 #    find_library(SDL2 SDL2)
@@ -104,12 +136,6 @@ if(APPLE)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
     # CPack config
-    set(CPACK_PACKAGE_NAME ${ProjName})
-    set(CPACK_PACKAGE_VENDOR "Fox Games")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
-    set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
     # Cpack invocation
     include(CPack)
@@ -132,11 +158,17 @@ if(APPLE)
 #    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
 #    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 else(APPLE)
+    # https://github.com/search?q=path%3A%2F%28%5E%7C%5C%2F%29CMakeLists%5C.txt%24%2F+NSIS&type=code :pray:
     add_executable(${PROJECT_NAME} ${asteroids_SRC})
+    target_sources(${PROJECT_NAME} PUBLIC
+      ${SHARED_STATIC_ASSETS}
+      installation/win/icon.ico
+      installation/win/app.rc 
+      installation/win/App.manifest)
     
     set(CPACK_GENERATOR "NSIS")
-    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
-    SET(CPACK_OUTPUT_FILE_PREFIX packages)
+    set(CPACK_OUTPUT_FILE_PREFIX packages)
+
 
     # TEMP; FOR LOCAL DEV ONLY
     set(CMAKE_PREFIX_PATH CMAKE_PREFIX_PATH "D:/SDL")
@@ -146,8 +178,8 @@ else(APPLE)
     find_package(SDL2TTF REQUIRED)
 
     # link/set includes for executable
-    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+    include_directories(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
+    target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
     # cp files into installler (installer will copy back out on install)
     install(FILES ${SDL2_DLL} DESTINATION bin)
@@ -158,30 +190,53 @@ else(APPLE)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
     
 
-    # CPack config
-
-    set_property(INSTALL subdir/$<TARGET_FILE_NAME:${ProjName}> PROPERTY CPACK_DESKTOP_SHORTCUTS ${ProjName})
-
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY ${ProjName})
+    # Windows config properties
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${PROJECT_NAME}")
     
-    set(CPACK_PACKAGE_NAME ${ProjName})
-    set(CPACK_PACKAGE_VENDOR "Fox Games")
-    set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-    set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-    set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+    # NSIS config properties
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL YES)
 
-    set(CPACK_NSIS_MODIFY_PATH "ON")
-    set(CPACK_PACKAGE_EXECUTABLES ${PROJECT_NAME} "${ProjName}")
-    set(CPACK_CREATE_DESKTOP_LINKS "\\\"${PROJECT_NAME}\\\"")
-    set(CPACK_NSIS_BRANDING_TEXT "${PROJECT_NAME}")
-    
-    set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/installation/nsis/icon.ico")
+    # NSIS assets
 
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${PROJECT_NAME}}")
+    # Icons
+    set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}\\\\installation\\\\win\\\\nsis_icon.ico")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_SOURCE_DIR}\\\\installation\\\\win\\\\icon.ico")
+
+    # Header, Installer/Uninstaller Welcome
+    # set(CPACK_NSIS_MUI_HEADERIMAGE ${CMAKE_CURRENT_LIST_DIR}/nsis\\\\nsis_header.bmp)
+ #    set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP
+ #      ${CMAKE_CURRENT_LIST_DIR}/nsis\\\\nsis_install_welcome.bmp)
+ #    set(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP
+ #     ${CMAKE_CURRENT_LIST_DIR}/nsis\\\\nsis_uninstall_welcome.bmp)
 
     
+    set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
+
+    set(CPACK_NSIS_EXECUTABLES_DIRECTORY "bin")
+    
+    #set(CPACK_CREATE_DESKTOP_LINKS ON) 
+    # REPLACED BY BELOW (above misses SetOutPath)
+    set(CPACK_NSIS_CREATE_ICONS_EXTRA "SetOutPath \\\"$INSTDIR\\\\bin\\\" \n CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' \n CreateShortCut '$DESKTOP\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' ") 
+    set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$START_MENU\\\\${PROJECT_NAME}.lnk'" "Delete '$DESKTOP\\\\${PROJECT_NAME}.lnk'")
+
+    
+    # result of https://gitlab.kitware.com/cmake/cmake/-/issues/15982 -- very frustrating bug :(
+    set(CPACK_NSIS_MODIFY_PATH "ON") 
+
+    set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
+    set(CPACK_NSIS_WELCOME_TITLE_3LINES "ON")
+    
+    set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${PROJECT_NAME}")
+
+    #set(CPACK_NSIS_CREATE_ICONS_EXTRA 
+        #"CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe'"
+    #)
+    #set(CPACK_NSIS_DELETE_ICONS_EXTRA
+        #"Delete '$SMPROGRAMS\\\\$START_MENU\\\\${PROJECT_NAME}.lnk'"
+    #)
+
+
 
     # Cpack invocation
     include(CPack)
 endif()
-
