@@ -80,8 +80,9 @@ jobs:
 
       - name: Run CPack
         run: |
+          cd AsteroidsSDL\src
           Get-ChildItem -Recurse
-          cpack -G "NSIS" --config CPackConfig.cmake
+          cpack -G "NSIS"
 
       - name: Zip Result
         env:
