@@ -107,10 +107,10 @@ C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtens
 C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/Platform/Windows.cmake
 C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/Platform/WindowsPaths.cmake
 C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Templates/CPackConfig.cmake.in
-D:/Dev/CPPTestProject/AsteroidsSDL/CMakeFiles/3.28.3-msvc11/CMakeCCompiler.cmake
-D:/Dev/CPPTestProject/AsteroidsSDL/CMakeFiles/3.28.3-msvc11/CMakeCXXCompiler.cmake
-D:/Dev/CPPTestProject/AsteroidsSDL/CMakeFiles/3.28.3-msvc11/CMakeRCCompiler.cmake
-D:/Dev/CPPTestProject/AsteroidsSDL/CMakeFiles/3.28.3-msvc11/CMakeSystem.cmake
+D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/3.28.3-msvc11/CMakeCCompiler.cmake
+D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/3.28.3-msvc11/CMakeCXXCompiler.cmake
+D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/3.28.3-msvc11/CMakeRCCompiler.cmake
+D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/3.28.3-msvc11/CMakeSystem.cmake
 D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeLists.txt
 D:/Dev/CPPTestProject/AsteroidsSDL/src/cmake/FindSDL2.cmake
 D:/Dev/CPPTestProject/AsteroidsSDL/src/cmake/FindSDL2IMAGE.cmake
