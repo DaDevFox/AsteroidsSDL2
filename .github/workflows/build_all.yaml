@@ -71,6 +71,7 @@ jobs:
 
       - name: Configure and Build Project
         run: |
+          cd src
           cmake . -G "Ninja" -DCMAKE_CONFIGURATION_TYPES="Debug"
           cmake --build . --config Debug
 
