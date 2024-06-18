@@ -36,27 +36,34 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - uses: robinraju/release-downloader@v1.10
+      - name: Dependency | Fetch SDL
+        uses: robinraju/release-downloader@v1.10
         with:
           repository: "libsdl-org/SDL"
           tag: "release-2.30.3"
           fileName: "SDL2-devel-2.30.3-VC.zip"
 
-      - uses: dsaltares/fetch-gh-release-asset@master
+      - name: Dependency | Fetch SDL_ttf
+        uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: "libsdl-org/SDL_ttf"
           version: "tags/release-2.22.0"
           file: "SDL2_ttf-devel-2.22.0-VC.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: dsaltares/fetch-gh-release-asset@master
+      - name: Dependency | Fetch SDL_image
+        uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: "libsdl-org/SDL_image"
           version: "tags/release-2.8.2"
           file: "SDL2_image-devel-2.8.2-VC.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Unzip Dependencies
+      - name: Dependency | Install NSIS
+        run: |
+          winget install NSIS
+
+      - name: Dependency | Unzip SDL Libs
         run: |
           mkdir SDL2
           mkdir SDL2_ttf
