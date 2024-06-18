@@ -81,7 +81,7 @@ jobs:
       - name: Run CPack
         run: |
           Get-ChildItem -Recurse
-          cpack -G "NSIS"
+          cpack -G "NSIS" --config CPackConfig.cmake
 
       - name: Zip Result
         env:

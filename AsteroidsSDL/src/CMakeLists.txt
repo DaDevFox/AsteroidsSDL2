@@ -216,7 +216,7 @@ else(APPLE)
     
     #set(CPACK_CREATE_DESKTOP_LINKS ON) 
     # REPLACED BY BELOW (above misses SetOutPath)
-    set(CPACK_NSIS_CREATE_ICONS_EXTRA "SetOutPath \\\"$INSTDIR\\\\bin\\\" \n CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' \n CreateShortCut '$DESKTOP\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' ") 
+    set(CPACK_NSIS_CREATE_ICONS_EXTRA "SetOutPath \"$INSTDIR\\\\bin\" \n CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' \n CreateShortCut '$DESKTOP\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe' ") 
     set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$START_MENU\\\\${PROJECT_NAME}.lnk'" "Delete '$DESKTOP\\\\${PROJECT_NAME}.lnk'")
 
     
