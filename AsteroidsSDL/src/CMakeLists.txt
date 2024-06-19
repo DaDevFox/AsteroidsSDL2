@@ -67,6 +67,18 @@ set(INCLUDE_INSTALL_DIR include)
 
 
 # CPack generic config
+if(WIN32)
+    if("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64")
+        set(ProjSystem "win64")
+    else()
+        set(ProjSystem "win32")
+    endif()
+elseif(${CMAKE_SYSTEM_NAME} matches "Darwin")
+    set(ProjSystem "macOS")
+elseif(${CMAKE_SYSTEM_NAME} matches "Linux")
+    set(ProjSystem "linux")
+endif(WIN32)
+
 set(CPACK_VERBATIM_VARIABLES YES)
 set(CPACK_SOURCE_IGNORE_FILES .git/ .github/ .vs/ .vscode/ .mypy_cache/ _CPack_Packages/ ${CMAKE_BINARY_DIR}/ ${PROJECT_BINARY_DIR}/)
 
@@ -80,8 +92,8 @@ set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME})
 
 set(CPACK_PACKAGE_EXECUTABLES ${PROJECT_NAME} ${ProjName})
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${ProjName}-${CMAKE_PROJECT_VERSION}")
-set(CPACK_PACKAGE_FILE_NAME "${ProjName}-${CMAKE_PROJECT_VERSION}-${CPACK_SYSTEM_NAME}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${ProjName}-${ProjVersion}")
+set(CPACK_PACKAGE_FILE_NAME "${ProjName}-${ProjVersion}-${ProjSystem}")
 
 set(CPACK_MONOLITHIC_INSTALL TRUE)
 
