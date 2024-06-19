@@ -76,7 +76,7 @@ SET(SDL2IMAGE_SEARCH_PATHS
 	/opt/local # DarwinPorts
 	/opt/csw # Blastwave
 	/opt
-	$ENV{SDL2IMAGEDIR}
+	${SDL2IMAGEDIR}
 )
 
 FIND_PATH(SDL2IMAGE_INCLUDE_DIR SDL_image.h
