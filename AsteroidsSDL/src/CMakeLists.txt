@@ -112,70 +112,7 @@ set(CPACK_MONOLITHIC_INSTALL TRUE)
 #  ${CMAKE_CURRENT_LIST_DIR}/Description.txt)
 
 
-
-if(APPLE)
-#    find_library(SDL2 SDL2)
-#    find_library(SDL2IMAGE SDL2_image)
-#    find_library(SDL2TTF sdl2_ttf)
-    
-    set(CPACK_GENERATOR "DragNDrop;productbuild")
-
-#    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-#    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-#    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
-#    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-    LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
-#    list(APPEND CMAKE_INSTALL_RPATH
-#      "@executable_path/../../Frameworks")
-
-#    set(CMAKE_INSTALL_PREFIX "Library/Frameworks/SDL2.framework")
-
-    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
-
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2IMAGE REQUIRED)
-    find_package(SDL2TTF REQUIRED)
-
-    add_executable(${ProjName} ${asteroids_SRC})
-    
-    include_directories(${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR})
-    target_link_libraries(${ProjName} ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} ${SDL2IMAGE_LIBRARY})
-    
-    list(POP_FRONT ${SDL2_LIBRARIES} SDL2_DYLIB_T)
-    list(POP_FRONT ${SDL2IMAGE_LIBRARY} SDL2_IMAGE_DYLIB_T)
-    list(POP_FRONT ${SDL2TTF_LIBRARY} SDL2_TTF_DYLIB_T)
-
-    # unsure if libraries themselves are also needed
-    install(FILES ${SDL2_DYLIB_T} DESTINATION bin)
-    install(FILES ${SDL2_IMAGE_DYLIB_T} DESTINATION bin)
-    install(FILES ${SDL2_TTF_DYLIB_T} DESTINATION bin)
-    install(FILES ${asteroids_RES} DESTINATION bin)
-    
-    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-
-    # CPack config
-
-    # Cpack invocation
-    include(CPack)
-
-#    install(DIRECTORY ${SDL2_INCLUDE_DIR} 
-#        DESTINATION include)
-#    install(DIRECTORY ${SDL2TTF_INCLUDE_DIR} 
-#        DESTINATION include)
-#    install(DIRECTORY ${SDL2Image_INCLUDE_DIR}
-#        DESTINATION include)
-
-#    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
-
-#    install(FILES SDL.h DESTINATION include)
-#    install(FILES SDL_image.h DESTINATION include)
-#    install(FILES SDL_ttf.h DESTINATION include)
-
-#    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
-#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
-#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
-#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
-else(APPLE)
+if(WIN32)
     # https://github.com/search?q=path%3A%2F%28%5E%7C%5C%2F%29CMakeLists%5C.txt%24%2F+NSIS&type=code :pray:
     add_executable(${PROJECT_NAME} ${asteroids_SRC})
     target_sources(${PROJECT_NAME} PUBLIC
@@ -260,8 +197,68 @@ else(APPLE)
         #"Delete '$SMPROGRAMS\\\\$START_MENU\\\\${PROJECT_NAME}.lnk'"
     #)
 
+    # Cpack invocation
+    include(CPack)
+else()
+#    find_library(SDL2 SDL2)
+#    find_library(SDL2IMAGE SDL2_image)
+#    find_library(SDL2TTF sdl2_ttf)
+    
+    set(CPACK_GENERATOR "DragNDrop;productbuild")
 
+#    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
+#    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+#    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/libs")
+#    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/libs" isSystemDir)
+#    list(APPEND CMAKE_INSTALL_RPATH
+#      "@executable_path/../../Frameworks")
+
+#    set(CMAKE_INSTALL_PREFIX "Library/Frameworks/SDL2.framework")
+
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Packaging")
+
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2IMAGE REQUIRED)
+    find_package(SDL2TTF REQUIRED)
+
+    add_executable(${ProjName} ${asteroids_SRC})
+    
+    include_directories(${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR})
+    target_link_libraries(${ProjName} ${SDL2_LIBRARIES} ${SDL2TTF_LIBRARY} ${SDL2IMAGE_LIBRARY})
+    
+    list(POP_FRONT ${SDL2_LIBRARIES} SDL2_DYLIB_T)
+    list(POP_FRONT ${SDL2IMAGE_LIBRARY} SDL2_IMAGE_DYLIB_T)
+    list(POP_FRONT ${SDL2TTF_LIBRARY} SDL2_TTF_DYLIB_T)
+
+    # unsure if libraries themselves are also needed
+    install(FILES ${SDL2_DYLIB_T} DESTINATION bin)
+    install(FILES ${SDL2_IMAGE_DYLIB_T} DESTINATION bin)
+    install(FILES ${SDL2_TTF_DYLIB_T} DESTINATION bin)
+    install(FILES ${asteroids_RES} DESTINATION bin)
+    
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+    # CPack config
 
     # Cpack invocation
     include(CPack)
+
+#    install(DIRECTORY ${SDL2_INCLUDE_DIR} 
+#        DESTINATION include)
+#    install(DIRECTORY ${SDL2TTF_INCLUDE_DIR} 
+#        DESTINATION include)
+#    install(DIRECTORY ${SDL2Image_INCLUDE_DIR}
+#        DESTINATION include)
+
+#    install(DIRECTORY ${SDL2_LIBRARY} DESTINATION lib)
+
+#    install(FILES SDL.h DESTINATION include)
+#    install(FILES SDL_image.h DESTINATION include)
+#    install(FILES SDL_ttf.h DESTINATION include)
+
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2")
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_image")
+#    target_link_libraries(${PROJECT_NAME} "-framework SDL2_ttf")
+#    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 endif()

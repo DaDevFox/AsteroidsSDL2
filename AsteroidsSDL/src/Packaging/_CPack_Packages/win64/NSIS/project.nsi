@@ -548,7 +548,7 @@ FunctionEnd
 
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "SHCTX"
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Humanity\AsteroidsSDL"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Fox Games\AsteroidsSDL"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
@@ -662,7 +662,7 @@ Section "-Core installation"
   File /r "${INST_DIR}\*.*"
 
   ;Store installation folder
-  WriteRegStr SHCTX "Software\Humanity\AsteroidsSDL" "" $INSTDIR
+  WriteRegStr SHCTX "Software\Fox Games\AsteroidsSDL" "" $INSTDIR
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -673,7 +673,7 @@ Section "-Core installation"
   Push "0.4.3"
   Call ConditionalAddToRegistry
   Push "Publisher"
-  Push "Humanity"
+  Push "Fox Games"
   Call ConditionalAddToRegistry
   Push "UninstallString"
   Push "$\"$INSTDIR\Uninstall.exe$\""
@@ -883,7 +883,7 @@ Section "Uninstall"
   RMDir "$INSTDIR"
 
   ; Remove the registry entries.
-  DeleteRegKey SHCTX "Software\Humanity\AsteroidsSDL"
+  DeleteRegKey SHCTX "Software\Fox Games\AsteroidsSDL"
 
   ; Removes all optional components
   !insertmacro SectionList "RemoveSection_CPack"
@@ -927,7 +927,7 @@ Delete '$SMPROGRAMS\\$START_MENU\\AsteroidsSDL.lnk';Delete '$DESKTOP\\AsteroidsS
     StrCmp "$MUI_TEMP" "$SMPROGRAMS" secondStartMenuDeleteLoopDone secondStartMenuDeleteLoop
   secondStartMenuDeleteLoopDone:
 
-  DeleteRegKey /ifempty SHCTX "Software\Humanity\AsteroidsSDL"
+  DeleteRegKey /ifempty SHCTX "Software\Fox Games\AsteroidsSDL"
 
   Push $INSTDIR\bin
   StrCmp $DO_NOT_ADD_TO_PATH_ "1" doNotRemoveFromPath 0
