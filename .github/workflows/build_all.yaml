@@ -1,5 +1,9 @@
 name: "Asteroids Cross-Platform Build"
-on: workflow_dispatch
+on: 
+  push:
+    branches:
+      - master
+  workflow_dispatch
 
 jobs:
   create_release:
