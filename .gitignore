@@ -14,9 +14,16 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CPackProperties.cmake
 
-CMakeFiles/*
-Packaging/*
-
+CMakeFiles/
+Packaging/
+AsteroidsSDL/src/CMakeFiles/
+AsteroidsSDL/src/Packaging/
+AsteroidsSDL/src/CMakeCache.txt
+AsteroidsSDL/src/cmake_install.cmake
+AsteroidsSDL/src/CPackConfig.cmake
+AsteroidsSDL/src/CPackSourceConfig.cmake
+AsteroidsSDL/src/*.vcxproj
+AsteroidsSDL/src/*.vcxproj.filters
 
 # User-specific files
 *.rsuser
