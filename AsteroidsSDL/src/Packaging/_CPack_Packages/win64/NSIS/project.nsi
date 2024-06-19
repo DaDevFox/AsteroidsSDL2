@@ -713,7 +713,7 @@ Section "-Core installation"
   CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
   CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\AsteroidsSDL.lnk" "$INSTDIR\bin\AsteroidsSDL.exe"
 
-SetOutPath \"$INSTDIR\\bin\" 
+SetOutPath "$INSTDIR\\bin" 
  CreateShortCut '$SMPROGRAMS\\$STARTMENU_FOLDER\\AsteroidsSDL.lnk' '$INSTDIR\\bin\\AsteroidsSDL.exe' 
  CreateShortCut '$DESKTOP\\AsteroidsSDL.lnk' '$INSTDIR\\bin\\AsteroidsSDL.exe' 
   CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
