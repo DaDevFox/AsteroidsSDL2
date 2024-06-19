@@ -186,6 +186,16 @@ jobs:
           cd AsteroidsSDL/src
           cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
           cmake --build . --config Release
+      - name: Upload DragNDrop Installer
+        id: macos_dmg_upload
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.release_url }} 
+          asset_path: ./AsteroidsSDL/src/Packaging/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-macOS.dmg
+          asset_name: AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-macOS.dmg
+          asset_content_type: application/vnd.apple.installer+xml
 
       - name: linux | Run CPack
         run: |
@@ -194,23 +204,16 @@ jobs:
           cd ../../
           tree .
 
-      - name: Zip Result
-        env:
-          GITHUB_TOKEN: ${{ secrets.token }}
-        run: |
-          cp -r AsteroidsSDL/res/* out
-          zip -r Linux.zip out
-
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Upload DragNDrop Installer
+        id: linux_deb_upload
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./Linux.zip
-          asset_name: Linux.zip
-          asset_content_type: application/zip
+          upload_url: ${{ needs.create_release.outputs.release_url }} 
+          asset_path: ./AsteroidsSDL/src/Packaging/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-linux.dpkg
+          asset_name: AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-linux.dpkg
+          asset_content_type: application/vnd.apple.installer+xml
 
   build_macos:
     runs-on: macos-latest
@@ -239,7 +242,7 @@ jobs:
           cd ../../
           tree .
 
-      - name: Upload macOS Installer
+      - name: Upload DragNDrop Installer
         id: macos_dmg_upload
         uses: actions/upload-release-asset@v1
         env:
@@ -250,7 +253,7 @@ jobs:
           asset_name: AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-macOS.dmg
           asset_content_type: application/vnd.apple.installer+xml
 
-      - name: Upload macOS Installer
+      - name: Upload productbuild Installer
         id: macos_pkg_upload
         uses: actions/upload-release-asset@v1
         env:
