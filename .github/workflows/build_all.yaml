@@ -75,7 +75,7 @@ jobs:
       - name: Configure and Build Project
         run: |
           cd AsteroidsSDL\src
-          cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Debug"
+          cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Debug" -DSDL2_LIBRARIES=${{env.SDL2DIR}} -DSDL2IMAGE_LIBRARY=${{env.SDL2IMAGEDIR}} -DSDL2TTF_LIBRARY=${{env.SDL2TTFDIR}} 
           cmake --build . --config Debug
 
       - name: Run CPack
