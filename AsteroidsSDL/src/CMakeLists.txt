@@ -17,7 +17,7 @@ option(DEVELOPMENT_DEPLOY "Deploy to ./redist instead of to the system" ON)
 
 set(${CMAKE_BUILD_TYPE} "Debug")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 
 message("Generating with config types: ${CMAKE_CONFIGURATION_TYPES}")
 
