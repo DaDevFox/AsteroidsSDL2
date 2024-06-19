@@ -186,16 +186,6 @@ jobs:
           cd AsteroidsSDL/src
           cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
           cmake --build . --config Release
-      - name: Upload DragNDrop Installer
-        id: macos_dmg_upload
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} 
-          asset_path: ./AsteroidsSDL/src/Packaging/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-macOS.dmg
-          asset_name: AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-macOS.dmg
-          asset_content_type: application/vnd.apple.installer+xml
 
       - name: linux | Run CPack
         run: |
