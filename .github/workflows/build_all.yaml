@@ -216,7 +216,7 @@ jobs:
 
       - name: macOS | Configure and Build Project
         run: |
-          cd AsteroidsSDL\src
+          cd AsteroidsSDL/src
           cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
           cmake --build . --config Release
 
