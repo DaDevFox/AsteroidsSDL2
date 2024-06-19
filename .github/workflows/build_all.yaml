@@ -181,11 +181,18 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: Configure and Build Project
-        uses: threeal/cmake-action@main
-        with:
-          source-dir: AsteroidsSDL/src
-          build-dir: out
+      - name: linux | Configure and Build Project
+        run: |
+          cd AsteroidsSDL/src
+          cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
+          cmake --build . --config Release
+
+      - name: linux | Run CPack
+        run: |
+          cd AsteroidsSDL/src
+          cpack 
+          cd ../../
+          tree .
 
       - name: Zip Result
         env:
@@ -225,7 +232,7 @@ jobs:
           cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
           cmake --build . --config Release
 
-      - name: CMake Install
+      - name: macOS | Run CPack
         run: |
           cd AsteroidsSDL/src
           cpack 
