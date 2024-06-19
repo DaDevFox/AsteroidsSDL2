@@ -94,7 +94,7 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.release_url }} 
           asset_path: ./AsteroidsSDL/src/packages/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win64.exe
-          asset_name: Win64.zip
+          asset_name: AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win64.exe
           asset_content_type: application/vnd.microsoft.portable-executable
 
   build_windows_32:
@@ -157,10 +157,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./packages/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win32.exe
-          asset_name: Win32.zip
-          asset_content_type: application/vnd.microsoft.portable-executable
+          upload_url: ${{ needs.create_release.outputs.release_url }} 
+          asset_path: ./AsteroidsSDL/src/packages/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win32.exe
 
   # TODO: Appimage and flatpak
   build_linux:
@@ -216,17 +214,16 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: CMake Configure and Build
-        uses: threeal/cmake-action@main
-        with:
-          source-dir: AsteroidsSDL/src
-          build-dir: out
+      - name: macOS | Configure and Build Project
+        run: |
+          cd AsteroidsSDL\src
+          cmake . -DCMAKE_CONFIGURATION_TYPES="Release" 
+          cmake --build . --config Release
 
       - name: CMake Install
         run: |
           cd out
-          cpack --config CPackSourceConfig.cmake 
-          cpack --config CPackConfig.cmake 
+          cpack 
           cd ../
 
       #TODO: work on certificate signing: https://localazy.com/blog/how-to-automatically-sign-macos-apps-using-github-actions
