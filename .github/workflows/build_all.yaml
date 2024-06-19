@@ -233,7 +233,7 @@ jobs:
           tree .
 
       - name: Upload macOS Installer
-        id: upload-release-asset
+        id: macos_dmg_upload
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -244,7 +244,7 @@ jobs:
           asset_content_type: application/vnd.apple.installer+xml
 
       - name: Upload macOS Installer
-        id: upload-release-asset
+        id: macos_pkg_upload
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
