@@ -77,14 +77,14 @@ jobs:
       - name: x64 | Configure and Build Project
         run: |
           cd AsteroidsSDL\src
-          cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Release" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
+          cmake . -G "Visual Studio 17 2022" -A x64 -DCMAKE_CONFIGURATION_TYPES="Release" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
           cmake --build . --config Release
 
       - name: x64 | Run CPack
         run: |
           cd AsteroidsSDL\src
-          Get-ChildItem -Recurse
           cpack -G "NSIS"
+          Get-ChildItem -Recurse
 
       - name: Upload Win64 Installer
         id: upload-release-asset
@@ -148,8 +148,8 @@ jobs:
       - name: x86 | Run CPack
         run: |
           cd AsteroidsSDL\src
-          Get-ChildItem -Recurse
           cpack -G "NSIS"
+          Get-ChildItem -Recurse
 
       - name: Upload Win32 Installer
         id: upload-release-asset
