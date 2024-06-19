@@ -7,6 +7,8 @@ jobs:
     outputs:
       tag: ${{ steps.previoustag.outputs.tag }}
       release_url: ${{steps.create_release.outputs.upload_url}}
+      version_number: ${{steps.versionnum.outputs.version}}
+      semantic_version: ${{steps.versionvnum.outputs.v_version}}
     steps:
       - uses: actions/checkout@master
       - name: Get Version Number
@@ -30,7 +32,7 @@ jobs:
           draft: false
           prerelease: false
 
-  build_windows:
+  build_windows_64:
     runs-on: windows-latest
     needs: create_release
     steps:
@@ -72,27 +74,91 @@ jobs:
           echo ("SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2") >> $env:GITHUB_ENV
           echo ("SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0") >> $env:GITHUB_ENV
 
-      - name: Configure and Build Project
+      - name: x64 | Configure and Build Project
         run: |
           cd AsteroidsSDL\src
           cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Debug" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
           cmake --build . 
 
-      - name: Run CPack
+      - name: x64 | Run CPack
         run: |
           cd AsteroidsSDL\src
           Get-ChildItem -Recurse
           cpack -G "NSIS"
 
-      - name: Upload Release Asset
+      - name: Upload Win64 Installer
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./AsteroidsSDL-${{ needs.create_release.steps.versionnum.outputs.version }}-win64.exe
+          asset_path: ./AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win64.exe
           asset_name: Win64.zip
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+  build_windows_32:
+    runs-on: windows-latest
+    needs: create_release
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Dependency | Fetch SDL
+        uses: robinraju/release-downloader@v1.10
+        with:
+          repository: "libsdl-org/SDL"
+          tag: "release-2.30.3"
+          fileName: "SDL2-devel-2.30.3-VC.zip"
+
+      - name: Dependency | Fetch SDL_ttf
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "libsdl-org/SDL_ttf"
+          version: "tags/release-2.22.0"
+          file: "SDL2_ttf-devel-2.22.0-VC.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency | Fetch SDL_image
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: "libsdl-org/SDL_image"
+          version: "tags/release-2.8.2"
+          file: "SDL2_image-devel-2.8.2-VC.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency | Unzip SDL Libs
+        run: |
+          mkdir SDL2
+          mkdir SDL2_ttf
+          mkdir SDL2_image
+          powershell -command "Expand-Archive -Force './SDL2-devel-2.30.3-VC.zip' 'SDL2'"
+          powershell -command "Expand-Archive -Force './SDL2_image-devel-2.8.2-VC.zip' 'SDL2_image'"
+          powershell -command "Expand-Archive -Force './SDL2_ttf-devel-2.22.0-VC.zip' 'SDL2_ttf'"
+          chcp 65001 
+          echo ("SDL2DIR=${{ github.workspace }}/SDL2/SDL2-2.30.3") >> $env:GITHUB_ENV
+          echo ("SDL2IMAGEDIR=${{ github.workspace }}/SDL2_image/SDL2_image-2.8.2") >> $env:GITHUB_ENV
+          echo ("SDL2TTFDIR=${{ github.workspace }}/SDL2_ttf/SDL2_ttf-2.22.0") >> $env:GITHUB_ENV
+
+      - name: x86 | Configure and Build Project
+        run: |
+          cmake . -G "Visual Studio 17 2022" -A x86 -DCMAKE_CONFIGURATION_TYPES="Debug" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
+          cmake --build . 
+
+      - name: x86 | Run CPack
+        run: |
+          cd AsteroidsSDL\src
+          Get-ChildItem -Recurse
+          cpack -G "NSIS"
+
+      - name: Upload Win32 Installer
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win32.exe
+          asset_name: Win32.zip
           asset_content_type: application/vnd.microsoft.portable-executable
 
   # TODO: Appimage and flatpak
