@@ -78,7 +78,7 @@ jobs:
         run: |
           cd AsteroidsSDL\src
           cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Release" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
-          cmake --build . 
+          cmake --build . --config Release
 
       - name: x64 | Run CPack
         run: |
@@ -143,7 +143,7 @@ jobs:
         run: |
           cd AsteroidsSDL\src
           cmake . -G "Visual Studio 17 2022" -A x86 -DCMAKE_CONFIGURATION_TYPES="Release" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
-          cmake --build . 
+          cmake --build . --config Release
 
       - name: x86 | Run CPack
         run: |

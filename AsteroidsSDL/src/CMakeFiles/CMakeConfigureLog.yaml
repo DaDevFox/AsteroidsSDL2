@@ -24,7 +24,7 @@ events:
       The output was:
       0
       MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-      Build started 6/19/2024 12:04:13 PM.
+      Build started 6/19/2024 1:13:04 PM.
       
       Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\3.28.3-msvc11\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -53,7 +53,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.29
+      Time Elapsed 00:00:01.08
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -79,7 +79,7 @@ events:
       The output was:
       0
       MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-      Build started 6/19/2024 12:04:15 PM.
+      Build started 6/19/2024 1:13:05 PM.
       
       Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\3.28.3-msvc11\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -108,7 +108,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.81
+      Time Elapsed 00:00:00.85
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -127,8 +127,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-sxw8ox"
-      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-sxw8ox"
+      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-gzm407"
+      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-gzm407"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
@@ -136,40 +136,40 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-sxw8ox'
+        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-gzm407'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_2a8bc.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_5456f.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-        Build started 6/19/2024 12:04:16 PM.
+        Build started 6/19/2024 1:13:06 PM.
         
-        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-sxw8ox\\cmTC_2a8bc.vcxproj" on node 1 (default targets).
+        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-gzm407\\cmTC_5456f.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_2a8bc.dir\\Debug\\".
+          Creating directory "cmTC_5456f.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-sxw8ox\\Debug\\".
-          Creating directory "cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.tlog\\".
+          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-gzm407\\Debug\\".
+          Creating directory "cmTC_5456f.dir\\Debug\\cmTC_5456f.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.tlog\\unsuccessfulbuild".
+          Creating "cmTC_5456f.dir\\Debug\\cmTC_5456f.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_5456f.dir\\Debug\\cmTC_5456f.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a8bc.dir\\Debug\\\\" /Fd"cmTC_2a8bc.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_5456f.dir\\Debug\\\\" /Fd"cmTC_5456f.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a8bc.dir\\Debug\\\\" /Fd"cmTC_2a8bc.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCCompilerABI.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_5456f.dir\\Debug\\\\" /Fd"cmTC_5456f.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-sxw8ox\\Debug\\cmTC_2a8bc.exe" /INCREMENTAL /ILK:"cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-sxw8ox/Debug/cmTC_2a8bc.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-sxw8ox/Debug/cmTC_2a8bc.lib" /MACHINE:X64  /machine:x64 cmTC_2a8bc.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_2a8bc.vcxproj -> D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-sxw8ox\\Debug\\cmTC_2a8bc.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-gzm407\\Debug\\cmTC_5456f.exe" /INCREMENTAL /ILK:"cmTC_5456f.dir\\Debug\\cmTC_5456f.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-gzm407/Debug/cmTC_5456f.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-gzm407/Debug/cmTC_5456f.lib" /MACHINE:X64  /machine:x64 cmTC_5456f.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_5456f.vcxproj -> D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-gzm407\\Debug\\cmTC_5456f.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.tlog\\unsuccessfulbuild".
-          Touching "cmTC_2a8bc.dir\\Debug\\cmTC_2a8bc.tlog\\cmTC_2a8bc.lastbuildstate".
-        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-sxw8ox\\cmTC_2a8bc.vcxproj" (default targets).
+          Deleting file "cmTC_5456f.dir\\Debug\\cmTC_5456f.tlog\\unsuccessfulbuild".
+          Touching "cmTC_5456f.dir\\Debug\\cmTC_5456f.tlog\\cmTC_5456f.lastbuildstate".
+        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-gzm407\\cmTC_5456f.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.83
+        Time Elapsed 00:00:00.74
         
       exitCode: 0
   -
@@ -181,8 +181,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-54gdcj"
-      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-54gdcj"
+      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-van2y9"
+      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-van2y9"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /W3 /GR /EHsc"
       CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
@@ -190,40 +190,40 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-54gdcj'
+        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-van2y9'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_ec59d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_920ca.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-        Build started 6/19/2024 12:04:17 PM.
+        Build started 6/19/2024 1:13:07 PM.
         
-        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-54gdcj\\cmTC_ec59d.vcxproj" on node 1 (default targets).
+        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-van2y9\\cmTC_920ca.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_ec59d.dir\\Debug\\".
+          Creating directory "cmTC_920ca.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-54gdcj\\Debug\\".
-          Creating directory "cmTC_ec59d.dir\\Debug\\cmTC_ec59d.tlog\\".
+          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-van2y9\\Debug\\".
+          Creating directory "cmTC_920ca.dir\\Debug\\cmTC_920ca.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_ec59d.dir\\Debug\\cmTC_ec59d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_ec59d.dir\\Debug\\cmTC_ec59d.tlog\\unsuccessfulbuild".
+          Creating "cmTC_920ca.dir\\Debug\\cmTC_920ca.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_920ca.dir\\Debug\\cmTC_920ca.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_ec59d.dir\\Debug\\\\" /Fd"cmTC_ec59d.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_920ca.dir\\Debug\\\\" /Fd"cmTC_920ca.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_ec59d.dir\\Debug\\\\" /Fd"cmTC_ec59d.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_920ca.dir\\Debug\\\\" /Fd"cmTC_920ca.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.28\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-54gdcj\\Debug\\cmTC_ec59d.exe" /INCREMENTAL /ILK:"cmTC_ec59d.dir\\Debug\\cmTC_ec59d.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-54gdcj/Debug/cmTC_ec59d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-54gdcj/Debug/cmTC_ec59d.lib" /MACHINE:X64  /machine:x64 cmTC_ec59d.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_ec59d.vcxproj -> D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-54gdcj\\Debug\\cmTC_ec59d.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-van2y9\\Debug\\cmTC_920ca.exe" /INCREMENTAL /ILK:"cmTC_920ca.dir\\Debug\\cmTC_920ca.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-van2y9/Debug/cmTC_920ca.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-van2y9/Debug/cmTC_920ca.lib" /MACHINE:X64  /machine:x64 cmTC_920ca.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_920ca.vcxproj -> D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-van2y9\\Debug\\cmTC_920ca.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_ec59d.dir\\Debug\\cmTC_ec59d.tlog\\unsuccessfulbuild".
-          Touching "cmTC_ec59d.dir\\Debug\\cmTC_ec59d.tlog\\cmTC_ec59d.lastbuildstate".
-        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-54gdcj\\cmTC_ec59d.vcxproj" (default targets).
+          Deleting file "cmTC_920ca.dir\\Debug\\cmTC_920ca.tlog\\unsuccessfulbuild".
+          Touching "cmTC_920ca.dir\\Debug\\cmTC_920ca.tlog\\cmTC_920ca.lastbuildstate".
+        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-van2y9\\cmTC_920ca.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.78
+        Time Elapsed 00:00:00.83
         
       exitCode: 0
   -
@@ -234,12 +234,12 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:97 (CHECK_C_SOURCE_COMPILES)"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:163 (_threads_check_libc)"
       - "cmake/FindSDL2.cmake:159 (find_package)"
-      - "CMakeLists.txt:176 (find_package)"
+      - "CMakeLists.txt:189 (find_package)"
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-451nh3"
-      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-451nh3"
+      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-uu6byr"
+      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-uu6byr"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
@@ -248,40 +248,40 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-451nh3'
+        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-uu6byr'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_35d8a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_2a665.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-        Build started 6/19/2024 12:04:18 PM.
+        Build started 6/19/2024 1:13:08 PM.
         
-        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\cmTC_35d8a.vcxproj" on node 1 (default targets).
+        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\cmTC_2a665.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_35d8a.dir\\Debug\\".
+          Creating directory "cmTC_2a665.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\Debug\\".
-          Creating directory "cmTC_35d8a.dir\\Debug\\cmTC_35d8a.tlog\\".
+          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\Debug\\".
+          Creating directory "cmTC_2a665.dir\\Debug\\cmTC_2a665.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_35d8a.dir\\Debug\\cmTC_35d8a.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_35d8a.dir\\Debug\\cmTC_35d8a.tlog\\unsuccessfulbuild".
+          Creating "cmTC_2a665.dir\\Debug\\cmTC_2a665.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_2a665.dir\\Debug\\cmTC_2a665.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_35d8a.dir\\Debug\\\\" /Fd"cmTC_35d8a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\src.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a665.dir\\Debug\\\\" /Fd"cmTC_2a665.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\src.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_35d8a.dir\\Debug\\\\" /Fd"cmTC_35d8a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\src.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2a665.dir\\Debug\\\\" /Fd"cmTC_2a665.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\src.c"
           src.c
-        D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\cmTC_35d8a.vcxproj]
-        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\cmTC_35d8a.vcxproj" (default targets) -- FAILED.
+        D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\cmTC_2a665.vcxproj]
+        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\cmTC_2a665.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\cmTC_35d8a.vcxproj" (default target) (1) ->
+        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\cmTC_2a665.vcxproj" (default target) (1) ->
         (ClCompile target) -> 
-          D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-451nh3\\cmTC_35d8a.vcxproj]
+          D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-uu6byr\\cmTC_2a665.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.47
+        Time Elapsed 00:00:00.55
         
       exitCode: 1
   -
@@ -291,12 +291,12 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:112 (CHECK_LIBRARY_EXISTS)"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:175 (_threads_check_lib)"
       - "cmake/FindSDL2.cmake:159 (find_package)"
-      - "CMakeLists.txt:176 (find_package)"
+      - "CMakeLists.txt:189 (find_package)"
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-dfmgne"
-      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-dfmgne"
+      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-9k8u1r"
+      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-9k8u1r"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
@@ -305,37 +305,37 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-dfmgne'
+        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-9k8u1r'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_a1114.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_12b9a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-        Build started 6/19/2024 12:04:19 PM.
+        Build started 6/19/2024 1:13:09 PM.
         
-        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\cmTC_a1114.vcxproj" on node 1 (default targets).
+        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\cmTC_12b9a.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_a1114.dir\\Debug\\".
+          Creating directory "cmTC_12b9a.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\Debug\\".
-          Creating directory "cmTC_a1114.dir\\Debug\\cmTC_a1114.tlog\\".
+          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\Debug\\".
+          Creating directory "cmTC_12b9a.dir\\Debug\\cmTC_12b9a.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_a1114.dir\\Debug\\cmTC_a1114.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_a1114.dir\\Debug\\cmTC_a1114.tlog\\unsuccessfulbuild".
+          Creating "cmTC_12b9a.dir\\Debug\\cmTC_12b9a.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_12b9a.dir\\Debug\\cmTC_12b9a.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_a1114.dir\\Debug\\\\" /Fd"cmTC_a1114.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_12b9a.dir\\Debug\\\\" /Fd"cmTC_12b9a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_a1114.dir\\Debug\\\\" /Fd"cmTC_a1114.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\CheckFunctionExists.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_12b9a.dir\\Debug\\\\" /Fd"cmTC_12b9a.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\Debug\\cmTC_a1114.exe" /INCREMENTAL /ILK:"cmTC_a1114.dir\\Debug\\cmTC_a1114.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-dfmgne/Debug/cmTC_a1114.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-dfmgne/Debug/cmTC_a1114.lib" /MACHINE:X64  /machine:x64 cmTC_a1114.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\cmTC_a1114.vcxproj]
-        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\cmTC_a1114.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\Debug\\cmTC_12b9a.exe" /INCREMENTAL /ILK:"cmTC_12b9a.dir\\Debug\\cmTC_12b9a.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-9k8u1r/Debug/cmTC_12b9a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-9k8u1r/Debug/cmTC_12b9a.lib" /MACHINE:X64  /machine:x64 cmTC_12b9a.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\cmTC_12b9a.vcxproj]
+        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\cmTC_12b9a.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\cmTC_a1114.vcxproj" (default target) (1) ->
+        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\cmTC_12b9a.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-dfmgne\\cmTC_a1114.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-9k8u1r\\cmTC_12b9a.vcxproj]
         
             0 Warning(s)
             1 Error(s)
@@ -350,12 +350,12 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:112 (CHECK_LIBRARY_EXISTS)"
       - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/FindThreads.cmake:176 (_threads_check_lib)"
       - "cmake/FindSDL2.cmake:159 (find_package)"
-      - "CMakeLists.txt:176 (find_package)"
+      - "CMakeLists.txt:189 (find_package)"
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-3pu6ok"
-      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-3pu6ok"
+      source: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-7pw74t"
+      binary: "D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-7pw74t"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
@@ -364,42 +364,42 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-3pu6ok'
+        Change Dir: 'D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-7pw74t'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_38c7b.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_9fe09.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.10.4+10fbfbf2e for .NET Framework
-        Build started 6/19/2024 12:04:20 PM.
+        Build started 6/19/2024 1:13:10 PM.
         
-        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\cmTC_38c7b.vcxproj" on node 1 (default targets).
+        Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\cmTC_9fe09.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_38c7b.dir\\Debug\\".
+          Creating directory "cmTC_9fe09.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\Debug\\".
-          Creating directory "cmTC_38c7b.dir\\Debug\\cmTC_38c7b.tlog\\".
+          Creating directory "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\Debug\\".
+          Creating directory "cmTC_9fe09.dir\\Debug\\cmTC_9fe09.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_38c7b.dir\\Debug\\cmTC_38c7b.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_38c7b.dir\\Debug\\cmTC_38c7b.tlog\\unsuccessfulbuild".
+          Creating "cmTC_9fe09.dir\\Debug\\cmTC_9fe09.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_9fe09.dir\\Debug\\cmTC_9fe09.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_38c7b.dir\\Debug\\\\" /Fd"cmTC_38c7b.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_9fe09.dir\\Debug\\\\" /Fd"cmTC_9fe09.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.40.33811 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_38c7b.dir\\Debug\\\\" /Fd"cmTC_38c7b.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\CheckFunctionExists.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_9fe09.dir\\Debug\\\\" /Fd"cmTC_9fe09.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\Debug\\cmTC_38c7b.exe" /INCREMENTAL /ILK:"cmTC_38c7b.dir\\Debug\\cmTC_38c7b.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-3pu6ok/Debug/cmTC_38c7b.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-3pu6ok/Debug/cmTC_38c7b.lib" /MACHINE:X64  /machine:x64 cmTC_38c7b.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\cmTC_38c7b.vcxproj]
-        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\cmTC_38c7b.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.40.33807\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\Debug\\cmTC_9fe09.exe" /INCREMENTAL /ILK:"cmTC_9fe09.dir\\Debug\\cmTC_9fe09.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-7pw74t/Debug/cmTC_9fe09.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Dev/CPPTestProject/AsteroidsSDL/src/CMakeFiles/CMakeScratch/TryCompile-7pw74t/Debug/cmTC_9fe09.lib" /MACHINE:X64  /machine:x64 cmTC_9fe09.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\cmTC_9fe09.vcxproj]
+        Done Building Project "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\cmTC_9fe09.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\cmTC_38c7b.vcxproj" (default target) (1) ->
+        "D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\cmTC_9fe09.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-3pu6ok\\cmTC_38c7b.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [D:\\Dev\\CPPTestProject\\AsteroidsSDL\\src\\CMakeFiles\\CMakeScratch\\TryCompile-7pw74t\\cmTC_9fe09.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.67
+        Time Elapsed 00:00:00.66
         
       exitCode: 1
 ...
