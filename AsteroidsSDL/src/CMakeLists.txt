@@ -176,6 +176,13 @@ else(APPLE)
     find_package(SDL2 REQUIRED)
     find_package(SDL2IMAGE REQUIRED)
     find_package(SDL2TTF REQUIRED)
+    
+    message("SDL2: ${SDL2_LIBRARIES}")
+    message("SDL2 dll: ${SDL2_DLL}")
+    message("SDL2_image: ${SDL2IMAGE_LIBRARY}")
+    message("SDL2_image dll: ${SDL2_IMAGE_DLL}")
+    message("SDL2_ttf: ${SDL2TTF_LIBRARY}")
+    message("SDL2_ttf dll: ${SDL2_TTF_DLL}")
 
     # link/set includes for executable
     include_directories(${SDL2_INCLUDE_DIR} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
