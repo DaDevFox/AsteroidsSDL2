@@ -229,6 +229,7 @@ jobs:
         run: |
           cd AsteroidsSDL/src
           cpack 
+          cd ../../
           tree .
 
       - name: Upload macOS Installer
