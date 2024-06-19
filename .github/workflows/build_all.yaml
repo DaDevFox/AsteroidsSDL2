@@ -76,7 +76,7 @@ jobs:
         run: |
           cd AsteroidsSDL\src
           cmake . -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES="Debug" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}} 
-          cmake --build . --config Debug
+          cmake --build . --config Debug -DCMAKE_CONFIGURATION_TYPES="Debug" -DSDL2_DIR=${{env.SDL2DIR}} -DSDL2IMAGEDIR=${{env.SDL2IMAGEDIR}} -DSDL2TTFLIBRARY=${{env.SDL2TTFDIR}}
 
       - name: Run CPack
         run: |
