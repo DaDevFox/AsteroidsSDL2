@@ -85,7 +85,6 @@ jobs:
           cd AsteroidsSDL\src
           cpack -G "NSIS"
           Get-ChildItem -Recurse
-          Copy-Item -Path .\packages\AsteroidsSDL-${{needs.create_release.outputs.version_number}}-win64.exe -Destination .\AsteroidsSDL-${{needs.create_release.outputs.version_number}}-win64.exe 
 
       - name: Upload Win64 Installer
         id: upload-release-asset
@@ -93,8 +92,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.release_url }} # This pulls from the CREATE RELEASE job above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win64.exe
+          upload_url: ${{ needs.create_release.outputs.release_url }} 
+          asset_path: ./AsteroidsSDL/src/packages/AsteroidsSDL-${{ needs.create_release.outputs.version_number }}-win64.exe
           asset_name: Win64.zip
           asset_content_type: application/vnd.microsoft.portable-executable
 
